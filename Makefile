@@ -18,6 +18,7 @@ depend: .depend
 .depend: $(SOURCES)
 	@rm -f ./.depend
 	@$(CC) $(CFLAGS) -MM $^ > ./.depend
+	@sed -i ':x; /\\$$/ { N; s/\\\n//; tx }' ./.depend
 	@sed -i 's/^/$(BUILDDIR)\//' ./.depend
 
 -include .depend
