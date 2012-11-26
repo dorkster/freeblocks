@@ -1,0 +1,28 @@
+# FreeBlocks
+-----------------------------------------------------------------------
+
+FreeBlocks is a puzzle game with similar gameplay to Tetris Attack.
+
+## Copyright & License
+
+FreeBlocks is Copyright (c) 2012 Justin Jacobs
+
+FreeBlocks' source code is released under the GNU GPL v3. Later versions are permitted.
+
+The graphics are by Kenney.nl, licensed under CC-BY 3.0.
+The included LCD Solid font is public domain.
+
+## Dependencies & Building
+
+* SDL
+* SDL_ttf
+* SDL_image
+
+To compile FreeBlocks, simply run `make` in the base directory.
+
+## Controls
+
+* Arrow keys = Move cursor
+* Z = Switch blocks
+* X = Manually bump up the stack
+* ESC = Quit
