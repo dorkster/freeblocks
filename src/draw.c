@@ -26,7 +26,7 @@
 void drawEverything() {
     // Fill the screen with black
     SDL_FillRect(screen,NULL, 0x1b1b1b);
-    
+
     drawBlocks();
     drawCursor();
     drawInfo();
@@ -34,13 +34,16 @@ void drawEverything() {
 
 void drawCursor() {
     SDL_Rect dest;
+    int bump = (float)(BUMP_TIME - bump_timer)/((float)BUMP_TIME / BLOCK_SIZE);
     dest.x = cursor_x*BLOCK_SIZE;
-    dest.y = cursor_y*BLOCK_SIZE;
+    dest.y = (cursor_y*BLOCK_SIZE) - bump;
     SDL_BlitSurface(surface_cursor,NULL,screen,&dest);
 }
 
 void drawBlocks() {
     int i,j;
+
+    int bump = (float)(BUMP_TIME - bump_timer)/((float)BUMP_TIME / BLOCK_SIZE);
 
     for(i=0;i<ROWS;i++) {
         for(j=0;j<COLS;j++) {
@@ -52,7 +55,7 @@ void drawBlocks() {
                 src.w = src.h = BLOCK_SIZE;
 
                 dest.x = blocks[i][j].x;
-                dest.y = blocks[i][j].y;
+                dest.y = blocks[i][j].y - bump;
 
                 SDL_BlitSurface(surface_blocks,&src,screen,&dest);
             }

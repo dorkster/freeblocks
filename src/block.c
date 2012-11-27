@@ -85,7 +85,7 @@ void blockLogic() {
     blockGravity();
     blockMatch();
 
-    if (bump_timer > 0) bump_timer--;
+    if (bump_timer > 0 && clear_delay == 0) bump_timer--;
     if (bump_timer == 0) blockAddLayer();
 }
 
@@ -148,9 +148,6 @@ void blockMatch() {
                 if (blocks[i][j].matched) {
                     blockClear(i,j);
                     score += POINTS_PER_BLOCK;
-                    // if the stack is close to being bumped,
-                    // delay it for a second to make things less jarring
-                    if (clear_delay < 60) clear_delay = 60;
                 }
             }
         }
@@ -167,13 +164,12 @@ void blockAddLayer() {
     // check if one of the columns is full
     // if so, set game over state
     for (j=0;j<COLS;j++) {
-        if (blocks[0][j].alive) {
+        if (blocks[1][j].alive) {
             game_over = true;
-            return;
         }
     }
 
-    if (cursor_y > 0) cursor_y--;
+    if (cursor_y > 1) cursor_y--;
 
     for (j=0;j<COLS;j++) {
         for (i=1;i<ROWS;i++) {

@@ -45,11 +45,12 @@ void gameLogic() {
 }
 
 void gameMove() {
+    if (cursor_y < 1) cursor_y = 1;
     if (action_cooldown > 0) return;
 
     if (action_moveleft && cursor_x > 0) cursor_x--;
     else if (action_moveright && cursor_x < 6) cursor_x++;
-    else if (action_moveup && cursor_y > 0) cursor_y--;
+    else if (action_moveup && cursor_y > 1) cursor_y--;
     else if (action_movedown && cursor_y < 14) cursor_y++;
     else return;
 
