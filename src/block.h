@@ -36,7 +36,7 @@ typedef struct Block{
     bool matched;
 }Block;
 
-extern Block blocks[15][8];
+Block blocks[15][8];
 int clear_delay;
 int bump_timer;
 

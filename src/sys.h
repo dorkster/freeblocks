@@ -29,23 +29,23 @@ typedef enum { false = 0, true = 1 } bool;
 #define SCREEN_BPP 32
 #define FPS 60
 
-extern SDL_Surface* screen;
-extern TTF_Font* font;
-extern SDL_Surface* text_info;
+SDL_Surface* screen;
+TTF_Font* font;
+SDL_Surface* text_info;
 
-extern int score;
-extern bool game_over;
-extern bool quit;
-extern int cursor_x;
-extern int cursor_y;
+int score;
+bool game_over;
+bool quit;
+int cursor_x;
+int cursor_y;
 
-extern int action_cooldown;
-extern bool action_moveleft;
-extern bool action_moveright;
-extern bool action_moveup;
-extern bool action_movedown;
-extern bool action_switch;
-extern bool action_bump;
+int action_cooldown;
+bool action_moveleft;
+bool action_moveright;
+bool action_moveup;
+bool action_movedown;
+bool action_switch;
+bool action_bump;
 
 SDL_Event event;
 
@@ -61,7 +61,7 @@ void sysCleanup();
 void sysInput();
 
 // Images
-extern SDL_Surface* surface_blocks;
-extern SDL_Surface* surface_cursor;
+SDL_Surface* surface_blocks;
+SDL_Surface* surface_cursor;
 
 #endif
