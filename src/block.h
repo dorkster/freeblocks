@@ -25,7 +25,10 @@
 #define ROWS 15
 #define COLS 8
 #define CLEAR_TIME 30
-#define BUMP_TIME 600
+#define BUMP_TIME 30
+#define SPEED_TIME 3600
+#define SPEED_PER_LEVEL 2
+#define MAX_SPEED 12
 
 const int POINTS_PER_BLOCK;
 
@@ -39,6 +42,9 @@ typedef struct Block{
 Block blocks[15][8];
 int clear_delay;
 int bump_timer;
+int bump_pixels;
+int speed;
+int speed_timer;
 
 void blockSet(int i, int j, bool alive, int color);
 void blockClear(int i, int j);

@@ -34,16 +34,13 @@ void drawEverything() {
 
 void drawCursor() {
     SDL_Rect dest;
-    int bump = (float)(BUMP_TIME - bump_timer)/((float)BUMP_TIME / BLOCK_SIZE);
     dest.x = cursor_x*BLOCK_SIZE;
-    dest.y = (cursor_y*BLOCK_SIZE) - bump;
+    dest.y = (cursor_y*BLOCK_SIZE) - bump_pixels;
     SDL_BlitSurface(surface_cursor,NULL,screen,&dest);
 }
 
 void drawBlocks() {
     int i,j;
-
-    int bump = (float)(BUMP_TIME - bump_timer)/((float)BUMP_TIME / BLOCK_SIZE);
 
     for(i=0;i<ROWS;i++) {
         for(j=0;j<COLS;j++) {
@@ -55,7 +52,7 @@ void drawBlocks() {
                 src.w = src.h = BLOCK_SIZE;
 
                 dest.x = blocks[i][j].x;
-                dest.y = blocks[i][j].y - bump;
+                dest.y = blocks[i][j].y - bump_pixels;
 
                 SDL_BlitSurface(surface_blocks,&src,screen,&dest);
             }
@@ -71,7 +68,7 @@ void drawInfo() {
     dest.y = 488;
 
     if (game_over) sprintf(info,"Score: %-5d  Game Over!",score);
-    else sprintf(info,"Score: %-5d",score);
+    else sprintf(info,"Score: %-5d  Speed: %d",score,speed);
 
     text_info = TTF_RenderText_Solid(font,info,color);
     if(!text_info) return;

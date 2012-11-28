@@ -22,6 +22,9 @@
 Block blocks[ROWS][COLS];
 int clear_delay = 0;
 int bump_timer = 0;
+int bump_pixels = 0;
+int speed = 1;
+int speed_timer = SPEED_TIME;
 const int POINTS_PER_BLOCK = 20;
 
 void blockSet(int i, int j, bool alive, int color) {
@@ -63,6 +66,12 @@ void blockInitAll() {
     int new_color = -1;
     int last_color = -1;
 
+    clear_delay = 0;
+    bump_timer = 0;
+    bump_pixels = 0;
+    speed = 1;
+    speed_timer = SPEED_TIME;
+
     for(i=0;i<ROWS;i++) {
         for(j=0;j<COLS;j++) {
             blockSet(i,j,false,-1);
@@ -86,7 +95,20 @@ void blockLogic() {
     blockMatch();
 
     if (bump_timer > 0 && clear_delay == 0) bump_timer--;
-    if (bump_timer == 0) blockAddLayer();
+    if (bump_timer == 0) {
+        bump_pixels++;
+        bump_timer = BUMP_TIME - speed*SPEED_PER_LEVEL;
+        if (bump_timer < 0) bump_timer = 0;
+    }
+    if (bump_pixels > 0 && bump_pixels % BLOCK_SIZE == 0) {
+        blockAddLayer();
+        bump_pixels = bump_pixels-BLOCK_SIZE+1;
+    }
+    if (speed_timer > 0) speed_timer--;
+    if (speed < MAX_SPEED && speed_timer == 0) {
+        speed++;
+        speed_timer = SPEED_TIME;
+    }
 }
 
 void blockGravity() {
@@ -185,6 +207,4 @@ void blockAddLayer() {
         last_color = new_color;
         blockSet(ROWS-1,j,true,new_color);
     }
-
-    bump_timer = BUMP_TIME;
 }
