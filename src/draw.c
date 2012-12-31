@@ -17,7 +17,6 @@
 */
 
 #include "SDL/SDL_ttf.h"
-#include "SDL/SDL_gfxPrimitives.h"
 
 #include "block.h"
 #include "draw.h"
