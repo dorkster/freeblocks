@@ -23,11 +23,12 @@
 
 #define BLOCK_SIZE 32
 #define ROWS 15
-#define COLS 8
+#define COLS 20
+#define START_ROWS 5
 #define CLEAR_TIME 30
 #define BUMP_TIME 30
 #define SPEED_TIME 3600
-#define SPEED_PER_LEVEL 2
+#define SPEED_PER_LEVEL 1
 #define MAX_SPEED 12
 
 const int POINTS_PER_BLOCK;
@@ -39,7 +40,7 @@ typedef struct Block{
     bool matched;
 }Block;
 
-Block blocks[15][8];
+Block blocks[ROWS][COLS];
 int clear_delay;
 int bump_timer;
 int bump_pixels;

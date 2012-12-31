@@ -78,7 +78,7 @@ void blockInitAll() {
         }
     }
 
-    for(i=8;i<ROWS;i++) {
+    for(i=ROWS-START_ROWS;i<ROWS;i++) {
         for(j=0;j<COLS;j++) {
             new_color = rand() % 6;
             while (new_color == last_color || new_color == blocks[i-1][j].color) {
@@ -102,7 +102,7 @@ void blockLogic() {
     }
     if (bump_pixels > 0 && bump_pixels % BLOCK_SIZE == 0) {
         blockAddLayer();
-        bump_pixels = bump_pixels-BLOCK_SIZE+1;
+        bump_pixels -= BLOCK_SIZE+1;
     }
     if (speed_timer > 0) speed_timer--;
     if (speed < MAX_SPEED && speed_timer == 0) {
@@ -127,7 +127,8 @@ void blockMatch() {
     int match_count = 0;
 
     // next, mark all the blocks that will be cleared
-    for (i=0;i<ROWS;i++) {
+    // skip the bottom row because blocks there aren't fully "in" the block field
+    for (i=0;i<ROWS-1;i++) {
         for(j=0;j<COLS;j++) {
             if (blocks[i][j].alive) {
                 // horizontal matches
@@ -146,7 +147,7 @@ void blockMatch() {
                 }
                 // vertical matches
                 match_count = 0;
-                for(k=i+1;k<ROWS;k++) {
+                for(k=i+1;k<ROWS-1;k++) {
                     if (blockCompare(i,j,k,j))
                         match_count++;
                     else
@@ -165,7 +166,7 @@ void blockMatch() {
     if (clear_delay > 0) clear_delay--;
     if (clear_delay == 0) {
         // now, clear all the matches
-        for (i=0;i<ROWS;i++) {
+        for (i=0;i<ROWS-1;i++) {
             for(j=0;j<COLS;j++) {
                 if (blocks[i][j].matched) {
                     blockClear(i,j);
@@ -207,4 +208,7 @@ void blockAddLayer() {
         last_color = new_color;
         blockSet(ROWS-1,j,true,new_color);
     }
+
+    // reset bump pixels to the previous block level
+    bump_pixels -= bump_pixels % BLOCK_SIZE;
 }

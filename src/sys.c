@@ -62,9 +62,19 @@ bool sysLoadFiles() {
 
     surface_blocks = IMG_Load("./res/blocks.png");
     if (!surface_blocks) return false;
+    else {
+        SDL_Surface *cleanup = surface_blocks;
+        surface_blocks = SDL_DisplayFormatAlpha(surface_blocks);
+        SDL_FreeSurface(cleanup);
+    }
 
     surface_cursor = IMG_Load("./res/cursor.png");
     if (!surface_cursor) return false;
+    else {
+        SDL_Surface *cleanup = surface_blocks;
+        surface_blocks = SDL_DisplayFormatAlpha(surface_blocks);
+        SDL_FreeSurface(cleanup);
+    }
 
     return true;
 }

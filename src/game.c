@@ -23,8 +23,8 @@
 #include "sys.h"
 
 void gameInit() {
-    cursor_x = 3;
-    cursor_y = 7;
+    cursor_x = (COLS/2)-1;
+    cursor_y = ROWS-START_ROWS-1;
     game_over = false;
     score = 0;
 
@@ -49,9 +49,9 @@ void gameMove() {
     if (action_cooldown > 0) return;
 
     if (action_moveleft && cursor_x > 0) cursor_x--;
-    else if (action_moveright && cursor_x < 6) cursor_x++;
+    else if (action_moveright && cursor_x < COLS-2) cursor_x++;
     else if (action_moveup && cursor_y > 1) cursor_y--;
-    else if (action_movedown && cursor_y < 14) cursor_y++;
+    else if (action_movedown && cursor_y < ROWS-2) cursor_y++;
     else return;
 
     action_cooldown = 10;

@@ -24,7 +24,7 @@
 
 void drawEverything() {
     // Fill the screen with black
-    SDL_FillRect(screen,NULL, 0x1b1b1b);
+    SDL_FillRect(screen,NULL, 0x000000);
 
     drawBlocks();
     drawCursor();
@@ -48,6 +48,10 @@ void drawBlocks() {
 
                 if (blocks[i][j].matched) src.x = 6 * BLOCK_SIZE;
                 else src.x = blocks[i][j].color * BLOCK_SIZE;
+
+                if (i == ROWS-1) src.y = BLOCK_SIZE;
+                else src.y = 0;
+
                 src.w = src.h = BLOCK_SIZE;
 
                 dest.x = blocks[i][j].x;
@@ -64,7 +68,7 @@ void drawInfo() {
     SDL_Color color = {217,217,217};
     SDL_Rect dest;
     dest.x = 8;
-    dest.y = 488;
+    dest.y = SCREEN_HEIGHT-24;
 
     if (game_over) sprintf(info,"Score: %-5d  Game Over!",score);
     else sprintf(info,"Score: %-5d  Speed: %d",score,speed);
