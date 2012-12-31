@@ -27,6 +27,7 @@ TTF_Font* font = NULL;
 SDL_Surface* text_info = NULL;
 SDL_Surface* surface_blocks = NULL;
 SDL_Surface* surface_cursor = NULL;
+SDL_Surface* surface_statusbar = NULL;
 
 int score = 0;
 bool game_over = false;
@@ -57,8 +58,9 @@ bool sysInit() {
 }
 
 bool sysLoadFiles() {
-    font = TTF_OpenFont("./res/LCD_Solid.ttf",16);
+    font = TTF_OpenFont("./res/Alegreya-Regular.ttf",20);
     if(!font) return false;
+    else TTF_SetFontHinting(font, TTF_HINTING_LIGHT);
 
     surface_blocks = IMG_Load("./res/blocks.png");
     if (!surface_blocks) return false;
@@ -73,6 +75,14 @@ bool sysLoadFiles() {
     else {
         SDL_Surface *cleanup = surface_blocks;
         surface_blocks = SDL_DisplayFormatAlpha(surface_blocks);
+        SDL_FreeSurface(cleanup);
+    }
+
+    surface_statusbar = IMG_Load("./res/statusbar.png");
+    if (!surface_statusbar) return false;
+    else {
+        SDL_Surface *cleanup = surface_statusbar;
+        surface_statusbar = SDL_DisplayFormatAlpha(surface_statusbar);
         SDL_FreeSurface(cleanup);
     }
 

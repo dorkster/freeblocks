@@ -67,13 +67,20 @@ void drawInfo() {
     char info[256];
     SDL_Color color = {217,217,217};
     SDL_Rect dest;
+
+    // statusbar background
+    dest.x = 0;
+    dest.y = SCREEN_HEIGHT - surface_statusbar->h;
+    SDL_BlitSurface(surface_statusbar,NULL,screen,&dest);
+
+    // statusbar text
     dest.x = 8;
-    dest.y = SCREEN_HEIGHT-24;
+    dest.y = SCREEN_HEIGHT-32;
 
     if (game_over) sprintf(info,"Score: %-5d  Game Over!",score);
     else sprintf(info,"Score: %-5d  Speed: %d",score,speed);
 
-    text_info = TTF_RenderText_Solid(font,info,color);
+    text_info = TTF_RenderText_Blended(font,info,color);
     if(!text_info) return;
 
     SDL_BlitSurface(text_info,NULL,screen,&dest);
