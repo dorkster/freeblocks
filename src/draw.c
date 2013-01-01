@@ -26,6 +26,8 @@ void drawEverything() {
     // Fill the screen with black
     SDL_FillRect(screen,NULL, 0x000000);
 
+    SDL_BlitSurface(surface_background,NULL,screen,NULL);
+
     drawBlocks();
     drawCursor();
     drawInfo();

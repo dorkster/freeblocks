@@ -28,6 +28,7 @@ SDL_Surface* text_info = NULL;
 SDL_Surface* surface_blocks = NULL;
 SDL_Surface* surface_cursor = NULL;
 SDL_Surface* surface_statusbar = NULL;
+SDL_Surface* surface_background = NULL;
 
 int score = 0;
 bool game_over = false;
@@ -86,6 +87,14 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
+    surface_background = IMG_Load("./res/background.png");
+    if (!surface_background) return false;
+    else {
+        SDL_Surface *cleanup = surface_background;
+        surface_background = SDL_DisplayFormatAlpha(surface_background);
+        SDL_FreeSurface(cleanup);
+    }
+
     return true;
 }
 
@@ -93,6 +102,8 @@ void sysCleanup() {
     TTF_CloseFont(font);
     SDL_FreeSurface(surface_blocks);
     SDL_FreeSurface(surface_cursor);
+    SDL_FreeSurface(surface_statusbar);
+    SDL_FreeSurface(surface_background);
     SDL_Quit();
 }
 

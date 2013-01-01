@@ -11,8 +11,9 @@ FreeBlocks is Copyright (c) 2012 Justin Jacobs
 
 FreeBlocks' source code is released under the GNU GPL v3. Later versions are permitted.
 
-The graphics are by Kenney.nl, licensed under CC-BY 3.0.
-The included LCD Solid font is public domain.
+The block graphics are modified versions of those by Kenney.nl, licensed under CC-BY 3.0.
+The included Alegreya font is licensed under the SIL Open Font License, Version 1.1.
+All other artwork is by me, Justin Jacobs, and is licensed under CC-BY-SA 3.0.
 
 
 

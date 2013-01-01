@@ -78,7 +78,7 @@ void gameBump() {
 void gameOver() {
     if (action_cooldown > 0) return;
 
-    if (action_switch || action_bump) {
+    if (action_switch) {
         gameInit();
     }
 }
