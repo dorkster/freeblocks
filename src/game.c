@@ -32,15 +32,18 @@ void gameInit() {
 }
 
 void gameLogic() {
-    if (action_cooldown > 0) action_cooldown--;
+    if (action_cooldown > 0 && !paused) action_cooldown--;
 
     if (game_over) {
         gameOver();
     } else {
-        blockLogic();
-        gameMove();
-        gameSwitch();
-        gameBump();
+        gamePause(); // check if the pause key is pressed
+        if (!paused) {
+            blockLogic();
+            gameMove();
+            gameSwitch();
+            gameBump();
+        }
     }
 }
 
@@ -80,5 +83,16 @@ void gameOver() {
 
     if (action_switch) {
         gameInit();
+    }
+}
+
+void gamePause() {
+    if (action_cooldown > 0) return;
+
+    if (action_pause) {
+        if (!paused) paused = true;
+        else paused = false;
+
+        action_pause = false;
     }
 }

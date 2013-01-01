@@ -32,6 +32,7 @@ SDL_Surface* surface_background = NULL;
 
 int score = 0;
 bool game_over = false;
+bool paused = false;
 bool quit = false;
 int cursor_x = 3;
 int cursor_y = 7;
@@ -43,6 +44,7 @@ bool action_moveup = false;
 bool action_movedown = false;
 bool action_switch = false;
 bool action_bump = false;
+bool action_pause = false;
 
 bool sysInit() {
     if(SDL_Init(SDL_INIT_EVERYTHING) == -1) return false;
@@ -122,6 +124,8 @@ void sysInput() {
                 action_switch = true;
             if(event.key.keysym.sym == 'x')
                 action_bump = true;
+            if(event.key.keysym.sym == 'p')
+                action_pause = true;
 
             if(event.key.keysym.sym == SDLK_ESCAPE)
                 quit = true;
@@ -140,6 +144,8 @@ void sysInput() {
                 action_switch = false;
             if(event.key.keysym.sym == 'x')
                 action_bump = false;
+            if(event.key.keysym.sym == 'p')
+                action_pause = false;
         }
             
         if(event.type == SDL_QUIT) {

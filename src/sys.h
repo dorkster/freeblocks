@@ -35,6 +35,7 @@ SDL_Surface* text_info;
 
 int score;
 bool game_over;
+bool paused;
 bool quit;
 int cursor_x;
 int cursor_y;
@@ -46,6 +47,7 @@ bool action_moveup;
 bool action_movedown;
 bool action_switch;
 bool action_bump;
+bool action_pause;
 
 SDL_Event event;
 

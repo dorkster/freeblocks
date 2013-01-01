@@ -25,5 +25,6 @@ void gameMove();
 void gameSwitch();
 void gameBump();
 void gameOver();
+void gamePause();
 
 #endif

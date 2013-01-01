@@ -34,6 +34,9 @@ void drawEverything() {
 }
 
 void drawCursor() {
+    // don't show the cursor when paused
+    if (paused) return;
+
     SDL_Rect dest;
     dest.x = cursor_x*BLOCK_SIZE;
     dest.y = (cursor_y*BLOCK_SIZE) - bump_pixels;
@@ -41,6 +44,9 @@ void drawCursor() {
 }
 
 void drawBlocks() {
+    // don't show the blocks when paused
+    if (paused) return;
+
     int i,j;
 
     for(i=0;i<ROWS;i++) {
@@ -79,8 +85,11 @@ void drawInfo() {
     dest.x = 8;
     dest.y = SCREEN_HEIGHT-32;
 
-    if (game_over) sprintf(info,"Score: %-5d  Game Over!",score);
-    else sprintf(info,"Score: %-5d  Speed: %d",score,speed);
+    if (game_over) sprintf(info,"Score: %-10d  Game Over!",score);
+    else {
+        if (paused) sprintf(info,"Score: %-10d  *Paused*",score);
+        else sprintf(info,"Score: %-10d  Speed: %d",score,speed);
+    }
 
     text_info = TTF_RenderText_Blended(font,info,color);
     if(!text_info) return;
