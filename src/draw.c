@@ -109,6 +109,11 @@ void drawTitle() {
     SDL_Color color = {217,217,217};
     SDL_Rect dest;
 
+    // title logo
+    dest.x = 0;
+    dest.y = SCREEN_HEIGHT/2 - surface_title->h/2;
+    SDL_BlitSurface(surface_title,NULL,screen,&dest);
+
     // statusbar background
     dest.x = 0;
     dest.y = SCREEN_HEIGHT - surface_statusbar->h;

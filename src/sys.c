@@ -28,6 +28,7 @@ SDL_Surface* surface_blocks = NULL;
 SDL_Surface* surface_cursor = NULL;
 SDL_Surface* surface_statusbar = NULL;
 SDL_Surface* surface_background = NULL;
+SDL_Surface* surface_title = NULL;
 
 int score = 0;
 bool game_over = false;
@@ -98,6 +99,14 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
+    surface_title = IMG_Load("./res/title.png");
+    if (!surface_title) return false;
+    else {
+        SDL_Surface *cleanup = surface_title;
+        surface_title = SDL_DisplayFormatAlpha(surface_title);
+        SDL_FreeSurface(cleanup);
+    }
+
     return true;
 }
 
@@ -107,6 +116,7 @@ void sysCleanup() {
     SDL_FreeSurface(surface_cursor);
     SDL_FreeSurface(surface_statusbar);
     SDL_FreeSurface(surface_background);
+    SDL_FreeSurface(surface_title);
     SDL_Quit();
 }
 

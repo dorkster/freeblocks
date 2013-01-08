@@ -72,5 +72,6 @@ SDL_Surface* surface_blocks;
 SDL_Surface* surface_cursor;
 SDL_Surface* surface_statusbar;
 SDL_Surface* surface_background;
+SDL_Surface* surface_title;
 
 #endif
