@@ -24,7 +24,6 @@
 
 SDL_Surface* screen = NULL;
 TTF_Font* font = NULL;
-SDL_Surface* text_info = NULL;
 SDL_Surface* surface_blocks = NULL;
 SDL_Surface* surface_cursor = NULL;
 SDL_Surface* surface_statusbar = NULL;
@@ -36,12 +35,14 @@ bool paused = false;
 bool quit = false;
 int cursor_x = 3;
 int cursor_y = 7;
+bool title_screen = true;
+short title_option = TITLE_PLAY;
 
 int action_cooldown = 0;
-bool action_moveleft = false;
-bool action_moveright = false;
-bool action_moveup = false;
-bool action_movedown = false;
+bool action_left = false;
+bool action_right = false;
+bool action_up = false;
+bool action_down = false;
 bool action_switch = false;
 bool action_bump = false;
 bool action_pause = false;
@@ -113,13 +114,13 @@ void sysInput() {
     while(SDL_PollEvent(&event)) {
         if(event.type == SDL_KEYDOWN) {
             if(event.key.keysym.sym == SDLK_LEFT)
-                action_moveleft = true;
+                action_left = true;
             if(event.key.keysym.sym == SDLK_RIGHT)
-                action_moveright = true;
+                action_right = true;
             if(event.key.keysym.sym == SDLK_UP)
-                action_moveup = true;
+                action_up = true;
             if(event.key.keysym.sym == SDLK_DOWN)
-                action_movedown = true;
+                action_down = true;
             if(event.key.keysym.sym == 'z')
                 action_switch = true;
             if(event.key.keysym.sym == 'x')
@@ -133,13 +134,13 @@ void sysInput() {
 
         if(event.type == SDL_KEYUP) {
             if(event.key.keysym.sym == SDLK_LEFT)
-                action_moveleft = false;
+                action_left = false;
             if(event.key.keysym.sym == SDLK_RIGHT)
-                action_moveright = false;
+                action_right = false;
             if(event.key.keysym.sym == SDLK_UP)
-                action_moveup = false;
+                action_up = false;
             if(event.key.keysym.sym == SDLK_DOWN)
-                action_movedown = false;
+                action_down = false;
             if(event.key.keysym.sym == 'z')
                 action_switch = false;
             if(event.key.keysym.sym == 'x')

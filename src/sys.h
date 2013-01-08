@@ -29,9 +29,12 @@ typedef enum { false = 0, true = 1 } bool;
 #define SCREEN_BPP 32
 #define FPS 60
 
+#define TITLE_PLAY 0
+#define TITLE_HIGHSCORES 1
+#define TITLE_QUIT 2
+
 SDL_Surface* screen;
 TTF_Font* font;
-SDL_Surface* text_info;
 
 int score;
 bool game_over;
@@ -39,12 +42,14 @@ bool paused;
 bool quit;
 int cursor_x;
 int cursor_y;
+bool title_screen;
+short title_option;
 
 int action_cooldown;
-bool action_moveleft;
-bool action_moveright;
-bool action_moveup;
-bool action_movedown;
+bool action_left;
+bool action_right;
+bool action_up;
+bool action_down;
 bool action_switch;
 bool action_bump;
 bool action_pause;

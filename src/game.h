@@ -19,6 +19,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+void gameTitle();
 void gameInit();
 void gameLogic();
 void gameMove();

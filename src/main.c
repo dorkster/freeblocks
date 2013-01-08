@@ -30,7 +30,7 @@ int main(void) {
     if(!sysInit()) return 1;
     if(!sysLoadFiles()) return 1;
 
-    gameInit();
+    gameTitle();
 
     while(!quit) {
         startTimer = SDL_GetTicks();

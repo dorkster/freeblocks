@@ -23,5 +23,6 @@ void drawEverything();
 void drawCursor();
 void drawBlocks();
 void drawInfo();
+void drawTitle();
 
 #endif
