@@ -24,5 +24,6 @@ void drawCursor();
 void drawBlocks();
 void drawInfo();
 void drawTitle();
+void drawHighScores();
 
 #endif

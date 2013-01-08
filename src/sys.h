@@ -37,6 +37,8 @@ SDL_Surface* screen;
 TTF_Font* font;
 
 int score;
+int high_scores[10];
+bool high_scores_screen;
 bool game_over;
 bool paused;
 bool quit;
@@ -66,6 +68,7 @@ bool sysInit();
 bool sysLoadFiles();
 void sysCleanup();
 void sysInput();
+void sysClearHighScores();
 
 // Images
 SDL_Surface* surface_blocks;
@@ -73,5 +76,6 @@ SDL_Surface* surface_cursor;
 SDL_Surface* surface_statusbar;
 SDL_Surface* surface_background;
 SDL_Surface* surface_title;
+SDL_Surface* surface_highscores;
 
 #endif

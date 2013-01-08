@@ -29,8 +29,10 @@ SDL_Surface* surface_cursor = NULL;
 SDL_Surface* surface_statusbar = NULL;
 SDL_Surface* surface_background = NULL;
 SDL_Surface* surface_title = NULL;
+SDL_Surface* surface_highscores = NULL;
 
 int score = 0;
+bool high_scores_screen = false;
 bool game_over = false;
 bool paused = false;
 bool quit = false;
@@ -107,6 +109,14 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
+    surface_highscores = IMG_Load("./res/highscores.png");
+    if (!surface_highscores) return false;
+    else {
+        SDL_Surface *cleanup = surface_highscores;
+        surface_highscores = SDL_DisplayFormatAlpha(surface_highscores);
+        SDL_FreeSurface(cleanup);
+    }
+
     return true;
 }
 
@@ -117,6 +127,7 @@ void sysCleanup() {
     SDL_FreeSurface(surface_statusbar);
     SDL_FreeSurface(surface_background);
     SDL_FreeSurface(surface_title);
+    SDL_FreeSurface(surface_highscores);
     SDL_Quit();
 }
 
@@ -165,3 +176,8 @@ void sysInput() {
     }
 }
 
+void sysClearHighScores() {
+    for (int i=0; i<10; i++) {
+        high_scores[i] = 0;
+    }
+}

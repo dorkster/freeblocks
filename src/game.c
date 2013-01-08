@@ -24,9 +24,15 @@
 
 void gameTitle() {
     title_screen = true;
+    high_scores_screen = false;
     game_over = false;
     score = 0;
     title_option = TITLE_PLAY;
+}
+
+void gameHighScores() {
+    title_screen = false;
+    high_scores_screen = true;
 }
 
 void gameInit() {
@@ -45,8 +51,7 @@ void gameLogic() {
         if (action_switch) {
             action_switch = false;
             if (title_option == TITLE_PLAY) gameInit();
-            // TODO add high scores list here
-            // else if (title_option == TITLE_HIGHSCORES)
+            else if (title_option == TITLE_HIGHSCORES) gameHighScores();
             else if (title_option == TITLE_QUIT) quit = true;
         } else if (action_left && action_cooldown == 0 && title_option > 0) {
             title_option--;
@@ -58,6 +63,16 @@ void gameLogic() {
         return;
     }
 
+    // handle high scores screen input
+    if (high_scores_screen) {
+        if (action_switch) {
+            action_switch = false;
+            gameTitle();
+        }
+        return;
+    }
+
+    // handle gameplay input
     if (game_over) {
         gameOver();
     } else {
@@ -103,6 +118,7 @@ void gameOver() {
 
     if (action_switch) {
         action_switch = false;
+        gameAddHighScore(score);
         gameTitle();
     }
 }
@@ -115,5 +131,17 @@ void gamePause() {
         else paused = false;
 
         action_pause = false;
+    }
+}
+
+void gameAddHighScore(int _score) {
+    for (int i=0; i<10; i++) {
+        if (_score > high_scores[i]) {
+            for (int j=9; j>i; j--) {
+                high_scores[j] = high_scores[j-1];
+            }
+            high_scores[i] = _score;
+            return;
+        }
     }
 }
