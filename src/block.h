@@ -32,6 +32,8 @@
 #define MAX_SPEED 15
 
 const int POINTS_PER_BLOCK;
+const int POINTS_PER_BUMP;
+const int POINTS_PER_COMBO_BLOCK;
 
 typedef struct Block{
     int x,y;

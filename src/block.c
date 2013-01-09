@@ -25,7 +25,9 @@ int bump_timer = 0;
 int bump_pixels = 0;
 int speed = 1;
 int speed_timer = SPEED_TIME;
-const int POINTS_PER_BLOCK = 20;
+const int POINTS_PER_BLOCK = 10;
+const int POINTS_PER_BUMP = 5;
+const int POINTS_PER_COMBO_BLOCK = 15;
 
 void blockSet(int i, int j, bool alive, int color) {
     blocks[i][j].x = j*BLOCK_SIZE;
@@ -166,14 +168,17 @@ void blockMatch() {
     if (clear_delay > 0) clear_delay--;
     if (clear_delay == 0) {
         // now, clear all the matches
+        int blocks_cleared = 0;
         for (i=0;i<ROWS-1;i++) {
             for(j=0;j<COLS;j++) {
                 if (blocks[i][j].matched) {
                     blockClear(i,j);
-                    score += POINTS_PER_BLOCK;
+                    blocks_cleared++;
                 }
             }
         }
+        score += blocks_cleared * POINTS_PER_BLOCK;
+        if (blocks_cleared-3 > 0) score += (blocks_cleared-3) * POINTS_PER_COMBO_BLOCK;
     }
 }
 

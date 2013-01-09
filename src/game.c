@@ -109,6 +109,7 @@ void gameSwitch() {
 void gameBump() {
     if (action_bump) {
         blockAddLayer();
+        score += POINTS_PER_BUMP;
         action_bump = false;
     }
 }
