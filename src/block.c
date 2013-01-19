@@ -145,9 +145,14 @@ void blockGravity() {
     int i,j;
 
     for (j=0;j<COLS;j++) {
-        for (i=0;i<ROWS-1;i++) {
-            if (blocks[i][j].alive && !blocks[i+1][j].alive)
+        for (i=ROWS-2;i>0;i--) {
+            if (blocks[i][j].alive && !blocks[i+1][j].alive) {
                 blockSwitch(i,j,i+1,j);
+
+                // return to the bottom of the column
+                // this process will be repeated until no more blocks need to fall in this column
+                i=ROWS-2;
+            }
         }
     }
 }
