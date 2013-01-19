@@ -64,6 +64,8 @@ void blockSwitch(int i, int j, int k, int l) {
 bool blockCompare(int i, int j, int k, int l) {
     if (blocks[i][j].color != blocks[k][l].color) return false;
     if (blocks[i][j].alive != blocks[k][l].alive) return false;
+    if (blocks[i][j].clear_timer > 0 || blocks[i][j].frame > 0) return false;
+    if (blocks[k][l].clear_timer > 0 || blocks[k][l].frame > 0) return false;
     return true;
 }
 
