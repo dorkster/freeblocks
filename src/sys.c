@@ -25,6 +25,7 @@
 SDL_Surface* screen = NULL;
 TTF_Font* font = NULL;
 SDL_Surface* surface_blocks = NULL;
+SDL_Surface* surface_clear = NULL;
 SDL_Surface* surface_cursor = NULL;
 SDL_Surface* surface_statusbar = NULL;
 SDL_Surface* surface_background = NULL;
@@ -77,6 +78,14 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
+    surface_clear = IMG_Load("./res/clear.png");
+    if (!surface_clear) return false;
+    else {
+        SDL_Surface *cleanup = surface_clear;
+        surface_clear = SDL_DisplayFormatAlpha(surface_clear);
+        SDL_FreeSurface(cleanup);
+    }
+
     surface_cursor = IMG_Load("./res/cursor.png");
     if (!surface_cursor) return false;
     else {
@@ -123,6 +132,7 @@ bool sysLoadFiles() {
 void sysCleanup() {
     TTF_CloseFont(font);
     SDL_FreeSurface(surface_blocks);
+    SDL_FreeSurface(surface_clear);
     SDL_FreeSurface(surface_cursor);
     SDL_FreeSurface(surface_statusbar);
     SDL_FreeSurface(surface_background);

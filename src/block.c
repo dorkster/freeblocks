@@ -20,7 +20,7 @@
 #include "sys.h"
 
 Block blocks[ROWS][COLS];
-int clear_delay = 0;
+bool animating = false;
 int bump_timer = 0;
 int bump_pixels = 0;
 int speed = 1;
@@ -35,12 +35,16 @@ void blockSet(int i, int j, bool alive, int color) {
     blocks[i][j].alive = alive;
     blocks[i][j].color = color;
     blocks[i][j].matched = false;
+    blocks[i][j].clear_timer = 0;
+    blocks[i][j].frame = -1;
 }
 
 void blockClear(int i, int j) {
     blocks[i][j].alive = false;
     blocks[i][j].color = 1;
     blocks[i][j].matched = false;
+    blocks[i][j].clear_timer = 0;
+    blocks[i][j].frame = -1;
 }
 
 void blockSwitch(int i, int j, int k, int l) {
@@ -63,12 +67,32 @@ bool blockCompare(int i, int j, int k, int l) {
     return true;
 }
 
+bool blockAnimate() {
+    int i,j;
+    bool anim = false;
+
+    for (i=0;i<ROWS;i++) {
+        for (j=0;j<COLS;j++) {
+            if (blocks[i][j].matched && blocks[i][j].frame < 8) {
+                if (blocks[i][j].clear_timer > 0) blocks[i][j].clear_timer--;
+                if (blocks[i][j].clear_timer == 0) {
+                    blocks[i][j].clear_timer = CLEAR_TIME;
+                    blocks[i][j].frame++;
+                }
+                anim = true;
+            }
+        }
+    }
+
+    return anim;
+}
+
 void blockInitAll() {
     int i,j;
     int new_color = -1;
     int last_color = -1;
 
-    clear_delay = 0;
+    animating = false;
     bump_timer = 0;
     bump_pixels = 0;
     speed = 1;
@@ -93,10 +117,12 @@ void blockInitAll() {
 }
 
 void blockLogic() {
+    animating = blockAnimate();
+
     blockGravity();
     blockMatch();
 
-    if (bump_timer > 0 && clear_delay == 0) bump_timer--;
+    if (bump_timer > 0 && !animating) bump_timer--;
     if (bump_timer == 0) {
         bump_pixels++;
         bump_timer = BUMP_TIME - speed*SPEED_PER_LEVEL;
@@ -127,6 +153,21 @@ void blockGravity() {
 void blockMatch() {
     int i,j,k;
     int match_count = 0;
+    int blocks_cleared = 0;
+
+    if (!animating) {
+        // now, clear all the matches
+        for (i=0;i<ROWS-1;i++) {
+            for(j=0;j<COLS;j++) {
+                if (blocks[i][j].matched) {
+                    blockClear(i,j);
+                    blocks_cleared++;
+                }
+            }
+        }
+        score += blocks_cleared * POINTS_PER_BLOCK;
+        if (blocks_cleared-3 > 0) score += (blocks_cleared-3) * POINTS_PER_COMBO_BLOCK;
+    }
 
     // next, mark all the blocks that will be cleared
     // skip the bottom row because blocks there aren't fully "in" the block field
@@ -143,7 +184,6 @@ void blockMatch() {
                 }
                 if (match_count > 1) {
                     for(k=j;k<j+match_count+1;k++) {
-                        if (!blocks[i][j].matched) clear_delay = CLEAR_TIME;
                         blocks[i][k].matched = true;
                     }
                 }
@@ -157,37 +197,20 @@ void blockMatch() {
                 }
                 if (match_count > 1) {
                     for(k=i;k<i+match_count+1;k++) {
-                        if (!blocks[i][j].matched) clear_delay = CLEAR_TIME;
                         blocks[k][j].matched = true;
                     }
                 }
             }
         }
     }
-
-    if (clear_delay > 0) clear_delay--;
-    if (clear_delay == 0) {
-        // now, clear all the matches
-        int blocks_cleared = 0;
-        for (i=0;i<ROWS-1;i++) {
-            for(j=0;j<COLS;j++) {
-                if (blocks[i][j].matched) {
-                    blockClear(i,j);
-                    blocks_cleared++;
-                }
-            }
-        }
-        score += blocks_cleared * POINTS_PER_BLOCK;
-        if (blocks_cleared-3 > 0) score += (blocks_cleared-3) * POINTS_PER_COMBO_BLOCK;
-    }
 }
 
 void blockAddLayer() {
+    if (animating) return;
+
     int i,j;
     int new_color = -1;
     int last_color = -1;
-
-    if (clear_delay > 0) return;
 
     // check if one of the columns is full
     // if so, set game over state

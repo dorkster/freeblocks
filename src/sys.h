@@ -72,6 +72,7 @@ void sysClearHighScores();
 
 // Images
 SDL_Surface* surface_blocks;
+SDL_Surface* surface_clear;
 SDL_Surface* surface_cursor;
 SDL_Surface* surface_statusbar;
 SDL_Surface* surface_background;

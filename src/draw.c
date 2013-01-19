@@ -60,18 +60,26 @@ void drawBlocks() {
             if(blocks[i][j].alive) {
                 SDL_Rect src,dest;
 
-                if (blocks[i][j].matched) src.x = 6 * BLOCK_SIZE;
-                else src.x = blocks[i][j].color * BLOCK_SIZE;
-
-                if (i == ROWS-1) src.y = BLOCK_SIZE;
-                else src.y = 0;
-
-                src.w = src.h = BLOCK_SIZE;
-
                 dest.x = blocks[i][j].x;
                 dest.y = blocks[i][j].y - bump_pixels;
 
-                SDL_BlitSurface(surface_blocks,&src,screen,&dest);
+                if (blocks[i][j].matched) {
+                    src.x = blocks[i][j].frame * BLOCK_SIZE;
+                    src.y = 0;
+
+                    src.w = src.h = BLOCK_SIZE;
+
+                    SDL_BlitSurface(surface_clear,&src,screen,&dest);
+                } else {
+                    src.x = blocks[i][j].color * BLOCK_SIZE;
+
+                    if (i == ROWS-1) src.y = BLOCK_SIZE;
+                    else src.y = 0;
+
+                    src.w = src.h = BLOCK_SIZE;
+
+                    SDL_BlitSurface(surface_blocks,&src,screen,&dest);
+                }
             }
         }
     }

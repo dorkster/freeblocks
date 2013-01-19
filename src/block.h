@@ -25,7 +25,7 @@
 #define ROWS 15
 #define COLS 20
 #define START_ROWS 4
-#define CLEAR_TIME 30
+#define CLEAR_TIME 4
 #define BUMP_TIME 30
 #define SPEED_TIME 3600
 #define SPEED_PER_LEVEL 1
@@ -40,10 +40,12 @@ typedef struct Block{
     bool alive;
     int color;
     bool matched;
+    int clear_timer;
+    int frame;
 }Block;
 
 Block blocks[ROWS][COLS];
-int clear_delay;
+bool animating;
 int bump_timer;
 int bump_pixels;
 int speed;
