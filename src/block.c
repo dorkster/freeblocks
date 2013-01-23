@@ -25,6 +25,7 @@ int bump_timer = 0;
 int bump_pixels = 0;
 int speed = 1;
 int speed_timer = SPEED_TIME;
+bool trigger_game_over = false;
 const int POINTS_PER_BLOCK = 10;
 const int POINTS_PER_BUMP = 5;
 const int POINTS_PER_COMBO_BLOCK = 15;
@@ -230,7 +231,7 @@ bool blockAddLayer() {
     // if so, set game over state
     for (j=0;j<COLS;j++) {
         if (blocks[1][j].alive) {
-            game_over = true;
+            trigger_game_over = true;
         }
     }
 

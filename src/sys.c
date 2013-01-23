@@ -28,7 +28,8 @@ TTF_Font* font = NULL;
 SDL_Surface* surface_blocks = NULL;
 SDL_Surface* surface_clear = NULL;
 SDL_Surface* surface_cursor = NULL;
-SDL_Surface* surface_statusbar = NULL;
+SDL_Surface* surface_bar = NULL;
+SDL_Surface* surface_bar_inactive = NULL;
 SDL_Surface* surface_background = NULL;
 SDL_Surface* surface_title = NULL;
 SDL_Surface* surface_highscores = NULL;
@@ -45,7 +46,6 @@ bool quit = false;
 int cursor_x = 3;
 int cursor_y = 7;
 bool title_screen = true;
-short title_option = TITLE_PLAY;
 
 int action_cooldown = 0;
 bool action_left = false;
@@ -103,11 +103,19 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_statusbar = IMG_Load("./res/graphics/statusbar.png");
-    if (!surface_statusbar) return false;
+    surface_bar = IMG_Load("./res/graphics/bar.png");
+    if (!surface_bar) return false;
     else {
-        SDL_Surface *cleanup = surface_statusbar;
-        surface_statusbar = SDL_DisplayFormatAlpha(surface_statusbar);
+        SDL_Surface *cleanup = surface_bar;
+        surface_bar = SDL_DisplayFormatAlpha(surface_bar);
+        SDL_FreeSurface(cleanup);
+    }
+
+    surface_bar_inactive = IMG_Load("./res/graphics/bar_inactive.png");
+    if (!surface_bar_inactive) return false;
+    else {
+        SDL_Surface *cleanup = surface_bar_inactive;
+        surface_bar_inactive = SDL_DisplayFormatAlpha(surface_bar_inactive);
         SDL_FreeSurface(cleanup);
     }
 
@@ -153,11 +161,12 @@ bool sysLoadFiles() {
 }
 
 void sysCleanup() {
+    Mix_HaltMusic();
     TTF_CloseFont(font);
     SDL_FreeSurface(surface_blocks);
     SDL_FreeSurface(surface_clear);
     SDL_FreeSurface(surface_cursor);
-    SDL_FreeSurface(surface_statusbar);
+    SDL_FreeSurface(surface_bar);
     SDL_FreeSurface(surface_background);
     SDL_FreeSurface(surface_title);
     SDL_FreeSurface(surface_highscores);
@@ -183,11 +192,8 @@ void sysInput() {
                 action_switch = true;
             if(event.key.keysym.sym == 'x')
                 action_bump = true;
-            if(event.key.keysym.sym == 'p')
-                action_pause = true;
-
             if(event.key.keysym.sym == SDLK_ESCAPE)
-                quit = true;
+                action_pause = true;
         }
 
         if(event.type == SDL_KEYUP) {
@@ -203,7 +209,7 @@ void sysInput() {
                 action_switch = false;
             if(event.key.keysym.sym == 'x')
                 action_bump = false;
-            if(event.key.keysym.sym == 'p')
+            if(event.key.keysym.sym == SDLK_ESCAPE)
                 action_pause = false;
         }
             

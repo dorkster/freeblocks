@@ -16,15 +16,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DRAW_H
-#define DRAW_H
+#ifndef MENU_H
+#define MENU_H
 
-void drawEverything();
-void drawMenu(int offset);
-void drawCursor();
-void drawBlocks();
-void drawInfo();
-void drawTitle();
-void drawHighScores();
+#define MAX_MENU_ITEMS 4
+
+int menu_option;
+int menu_size;
+char *menu_items[MAX_MENU_ITEMS];
+
+void menuAdd(char *item);
+void menuClear();
+int menuLogic();
 
 #endif

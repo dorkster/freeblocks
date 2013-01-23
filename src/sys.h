@@ -30,10 +30,6 @@ typedef enum { false = 0, true = 1 } bool;
 #define SCREEN_BPP 32
 #define FPS 60
 
-#define TITLE_PLAY 0
-#define TITLE_HIGHSCORES 1
-#define TITLE_QUIT 2
-
 SDL_Surface* screen;
 TTF_Font* font;
 
@@ -46,7 +42,6 @@ bool quit;
 int cursor_x;
 int cursor_y;
 bool title_screen;
-short title_option;
 
 int action_cooldown;
 bool action_left;
@@ -75,7 +70,8 @@ void sysClearHighScores();
 SDL_Surface* surface_blocks;
 SDL_Surface* surface_clear;
 SDL_Surface* surface_cursor;
-SDL_Surface* surface_statusbar;
+SDL_Surface* surface_bar;
+SDL_Surface* surface_bar_inactive;
 SDL_Surface* surface_background;
 SDL_Surface* surface_title;
 SDL_Surface* surface_highscores;

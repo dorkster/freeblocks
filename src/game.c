@@ -20,6 +20,7 @@
 
 #include "block.h"
 #include "game.h"
+#include "menu.h"
 #include "sys.h"
 
 void gameTitle() {
@@ -27,62 +28,97 @@ void gameTitle() {
     high_scores_screen = false;
     game_over = false;
     score = 0;
-    title_option = TITLE_PLAY;
     Mix_FadeOutMusic(2000);
+
+    menuAdd("Play Game");
+    menuAdd("High Scores");
+    menuAdd("Quit");
 }
 
 void gameHighScores() {
     title_screen = false;
     high_scores_screen = true;
+
+    menuAdd("Return to title screen");
 }
 
 void gameInit() {
     title_screen = false;
+    score = 0;
     cursor_x = (COLS/2)-1;
     cursor_y = ROWS-START_ROWS-1;
 
     blockInitAll();
 
-    Mix_PlayMusic(music,-1);
+    Mix_VolumeMusic(MIX_MAX_VOLUME);
+    if (!game_over) Mix_PlayMusic(music,-1);
+
+    game_over = false;
 }
 
 void gameLogic() {
-    if (action_cooldown > 0 && !paused) action_cooldown--;
+    int menu_choice;
 
-    // handle the title screen input
+    if (action_cooldown > 0) action_cooldown--;
+
+    // handle the title screen menu
     if (title_screen) {
-        if (action_switch) {
-            action_switch = false;
-            Mix_PlayChannel(-1,sound_menu,0);
-            if (title_option == TITLE_PLAY) gameInit();
-            else if (title_option == TITLE_HIGHSCORES) gameHighScores();
-            else if (title_option == TITLE_QUIT) quit = true;
-        } else if (action_left && action_cooldown == 0 && title_option > 0) {
-            title_option--;
-            action_cooldown = 20;
-        } else if (action_right && action_cooldown == 0 && title_option < TITLE_QUIT) {
-            title_option++;
-            action_cooldown = 20;
+        menu_choice = menuLogic();
+        if (menu_choice > -1) {
+            menuClear();
+            if (menu_choice == 0) gameInit();
+            else if (menu_choice == 1) gameHighScores();
+            else if (menu_choice == 2) quit = true;
         }
         return;
     }
 
-    // handle high scores screen input
+    // handle high scores screen menu
     if (high_scores_screen) {
-        if (action_switch) {
-            action_switch = false;
-            Mix_PlayChannel(-1,sound_menu,0);
-            gameTitle();
+        menu_choice = menuLogic();
+        if (menu_choice > -1) {
+            menuClear();
+            if (menu_choice == 0) gameTitle();
+        }
+        return;
+    }
+
+    // handle game over menu
+    if (game_over) {
+        menu_choice = menuLogic();
+        if (menu_choice > -1) {
+            menuClear();
+            if (menu_choice == 0) {
+                gameAddHighScore(score);
+                gameInit();
+            } else if (menu_choice == 1) {
+                gameAddHighScore(score);
+                gameTitle();
+            }
         }
         return;
     }
 
     // handle gameplay input
-    if (game_over) {
+    if (trigger_game_over) {
         gameOver();
     } else {
         gamePause(); // check if the pause key is pressed
-        if (!paused) {
+        // handle pause screen menu
+        if (paused) {
+            menu_choice = menuLogic();
+            if (menu_choice > -1) {
+                menuClear();
+                if (menu_choice == 0) {
+                    paused = false;
+                    Mix_VolumeMusic(MIX_MAX_VOLUME);
+                } else if (menu_choice == 1) {
+                    paused = false;
+                    gameAddHighScore(score);
+                    gameTitle();
+                }
+            }
+        } else {
             blockLogic();
             gameMove();
             gameSwitch();
@@ -134,14 +170,31 @@ void gameOver() {
         gameAddHighScore(score);
         gameTitle();
     }
+
+    trigger_game_over = false;
+    game_over = true;
+
+    menuAdd("Try again");
+    menuAdd("Return to title screen");
 }
 
 void gamePause() {
     if (action_cooldown > 0) return;
 
     if (action_pause) {
-        if (!paused) paused = true;
-        else paused = false;
+        menuClear();
+        Mix_PlayChannel(-1,sound_menu,0);
+
+        if (!paused) {
+            paused = true;
+            Mix_VolumeMusic(MIX_MAX_VOLUME/2);
+            menuAdd("Continue playing");
+            menuAdd("Quit to title screen");
+        }
+        else {
+            paused = false;
+            Mix_VolumeMusic(MIX_MAX_VOLUME);
+        }
 
         action_pause = false;
     }
@@ -158,3 +211,4 @@ void gameAddHighScore(int _score) {
         }
     }
 }
+

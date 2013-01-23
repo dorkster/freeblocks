@@ -20,6 +20,7 @@
 
 #include "block.h"
 #include "draw.h"
+#include "menu.h"
 #include "sys.h"
 
 void drawEverything() {
@@ -36,6 +37,28 @@ void drawEverything() {
         drawBlocks();
         drawCursor();
         drawInfo();
+    }
+}
+
+void drawMenu(int offset) {
+    SDL_Surface *text;
+    SDL_Color color = {217,217,217};
+    SDL_Rect dest;
+    int i;
+
+    for (i=0;i<menu_size;i++) {
+        dest.x = 0;
+        dest.y = SCREEN_HEIGHT - ((menu_size-i) * surface_bar->h) - offset;
+        if (i == menu_option) SDL_BlitSurface(surface_bar,NULL,screen,&dest);
+        else SDL_BlitSurface(surface_bar_inactive,NULL,screen,&dest);
+
+        text = TTF_RenderText_Blended(font,menu_items[i],color);
+        if (text) {
+            dest.x = SCREEN_WIDTH/2 - text->w/2;
+            dest.y = SCREEN_HEIGHT - ((menu_size-i-1) * surface_bar->h) - 32 - offset;
+            SDL_BlitSurface(text,NULL,screen,&dest);
+            SDL_FreeSurface(text);
+        }
     }
 }
 
@@ -93,8 +116,9 @@ void drawInfo() {
 
     // statusbar background
     dest.x = 0;
-    dest.y = SCREEN_HEIGHT - surface_statusbar->h;
-    SDL_BlitSurface(surface_statusbar,NULL,screen,&dest);
+    dest.y = SCREEN_HEIGHT - surface_bar->h;
+    if (paused || game_over) SDL_BlitSurface(surface_bar_inactive,NULL,screen,&dest);
+    else SDL_BlitSurface(surface_bar,NULL,screen,&dest);
 
     // statusbar text
     if (game_over) sprintf(text,"Score: %-10d  Game Over!",score);
@@ -111,12 +135,12 @@ void drawInfo() {
         SDL_BlitSurface(text_info,NULL,screen,&dest);
         SDL_FreeSurface(text_info);
     }
+
+    // menu
+    if (paused || game_over) drawMenu(surface_bar->h);
 }
 
 void drawTitle() {
-    SDL_Surface *text_title;
-    char text[256];
-    SDL_Color color = {217,217,217};
     SDL_Rect dest;
 
     // title logo
@@ -124,28 +148,12 @@ void drawTitle() {
     dest.y = SCREEN_HEIGHT/2 - surface_title->h/2;
     SDL_BlitSurface(surface_title,NULL,screen,&dest);
 
-    // statusbar background
-    dest.x = 0;
-    dest.y = SCREEN_HEIGHT - surface_statusbar->h;
-    SDL_BlitSurface(surface_statusbar,NULL,screen,&dest);
-
-    if (title_option == TITLE_PLAY) sprintf(text,"Play Game  >");
-    else if (title_option == TITLE_HIGHSCORES) sprintf(text,"<  High Scores  >");
-    else if (title_option == TITLE_QUIT) sprintf(text,"<  Quit Game");
-
-    text_title = TTF_RenderText_Blended(font,text,color);
-    if (text_title) {
-        dest.x = SCREEN_WIDTH/2 - text_title->w/2;
-        dest.y = SCREEN_HEIGHT-32;
-
-        SDL_BlitSurface(text_title,NULL,screen,&dest);
-        SDL_FreeSurface(text_title);
-    }
+    // menu
+    drawMenu(0);
 }
 
 void drawHighScores() {
     SDL_Surface *text_header;
-    SDL_Surface *text_message;
     SDL_Surface *text_score[10];
     char text[256];
     SDL_Color color = {217,217,217};
@@ -181,20 +189,6 @@ void drawHighScores() {
         }
     }
 
-    // statusbar background
-    dest.x = 0;
-    dest.y = SCREEN_HEIGHT - surface_statusbar->h;
-    SDL_BlitSurface(surface_statusbar,NULL,screen,&dest);
-
-    // statusbar text
-    sprintf(text,"Press 'z' to return to the title screen...");
-    text_message = TTF_RenderText_Blended(font,text,color);
-    if (text_message) {
-        dest.x = 8;
-        dest.y = SCREEN_HEIGHT-32;
-
-        SDL_BlitSurface(text_message,NULL,screen,&dest);
-        SDL_FreeSurface(text_message);
-    }
-
+    // "Return to title" text
+    drawMenu(0);
 }
