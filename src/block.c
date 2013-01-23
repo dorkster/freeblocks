@@ -161,6 +161,7 @@ void blockMatch() {
     int i,j,k;
     int match_count = 0;
     int blocks_cleared = 0;
+    bool new_match = false;
 
     if (!animating) {
         // now, clear all the matches
@@ -172,8 +173,10 @@ void blockMatch() {
                 }
             }
         }
-        score += blocks_cleared * POINTS_PER_BLOCK;
-        if (blocks_cleared-3 > 0) score += (blocks_cleared-3) * POINTS_PER_COMBO_BLOCK;
+        if (blocks_cleared > 2) {
+            score += blocks_cleared * POINTS_PER_BLOCK;
+            if (blocks_cleared-3 > 0) score += (blocks_cleared-3) * POINTS_PER_COMBO_BLOCK;
+        }
     }
 
     // next, mark all the blocks that will be cleared
@@ -192,6 +195,7 @@ void blockMatch() {
                 if (match_count > 1) {
                     for(k=j;k<j+match_count+1;k++) {
                         blocks[i][k].matched = true;
+                        new_match = true;
                     }
                 }
                 // vertical matches
@@ -205,15 +209,18 @@ void blockMatch() {
                 if (match_count > 1) {
                     for(k=i;k<i+match_count+1;k++) {
                         blocks[k][j].matched = true;
+                        new_match = true;
                     }
                 }
             }
         }
     }
+
+    if (new_match) Mix_PlayChannel(-1,sound_match,0);
 }
 
-void blockAddLayer() {
-    if (animating) return;
+bool blockAddLayer() {
+    if (animating) return false;
 
     int i,j;
     int new_color = -1;
@@ -246,4 +253,6 @@ void blockAddLayer() {
 
     // reset bump pixels to the previous block level
     bump_pixels -= bump_pixels % BLOCK_SIZE;
+
+    return true;
 }

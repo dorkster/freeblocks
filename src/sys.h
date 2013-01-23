@@ -21,6 +21,7 @@
 
 #include "SDL/SDL.h"
 #include "SDL/SDL_ttf.h"
+#include "SDL/SDL_mixer.h"
 
 typedef enum { false = 0, true = 1 } bool;
 
@@ -78,5 +79,11 @@ SDL_Surface* surface_statusbar;
 SDL_Surface* surface_background;
 SDL_Surface* surface_title;
 SDL_Surface* surface_highscores;
+
+// Music and Sounds
+Mix_Music* music;
+Mix_Chunk* sound_menu;
+Mix_Chunk* sound_switch;
+Mix_Chunk* sound_match;
 
 #endif

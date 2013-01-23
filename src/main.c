@@ -30,6 +30,7 @@ int main(void) {
     if(!sysInit()) return 1;
     if(!sysLoadFiles()) return 1;
 
+    Mix_PlayMusic(music,-1);
     sysClearHighScores(); // TODO: load saved high scores here
     gameTitle();
 

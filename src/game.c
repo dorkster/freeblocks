@@ -50,6 +50,7 @@ void gameLogic() {
     if (title_screen) {
         if (action_switch) {
             action_switch = false;
+            Mix_PlayChannel(-1,sound_menu,0);
             if (title_option == TITLE_PLAY) gameInit();
             else if (title_option == TITLE_HIGHSCORES) gameHighScores();
             else if (title_option == TITLE_QUIT) quit = true;
@@ -67,6 +68,7 @@ void gameLogic() {
     if (high_scores_screen) {
         if (action_switch) {
             action_switch = false;
+            Mix_PlayChannel(-1,sound_menu,0);
             gameTitle();
         }
         return;
@@ -90,11 +92,19 @@ void gameMove() {
     if (cursor_y < 1) cursor_y = 1;
     if (action_cooldown > 0) return;
 
-    if (action_left && cursor_x > 0) cursor_x--;
-    else if (action_right && cursor_x < COLS-2) cursor_x++;
-    else if (action_up && cursor_y > 1) cursor_y--;
-    else if (action_down && cursor_y < ROWS-2) cursor_y++;
-    else return;
+    if (action_left && cursor_x > 0) {
+        cursor_x--;
+        Mix_PlayChannel(-1,sound_switch,0);
+    } else if (action_right && cursor_x < COLS-2) {
+        cursor_x++;
+        Mix_PlayChannel(-1,sound_switch,0);
+    } else if (action_up && cursor_y > 1) {
+        cursor_y--;
+        Mix_PlayChannel(-1,sound_switch,0);
+    } else if (action_down && cursor_y < ROWS-2) {
+        cursor_y++;
+        Mix_PlayChannel(-1,sound_switch,0);
+    } else return;
 
     action_cooldown = 10;
 }
@@ -108,8 +118,7 @@ void gameSwitch() {
 
 void gameBump() {
     if (action_bump) {
-        blockAddLayer();
-        score += POINTS_PER_BUMP;
+        if (blockAddLayer()) score += POINTS_PER_BUMP;
         action_bump = false;
     }
 }

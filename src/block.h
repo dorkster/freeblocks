@@ -60,6 +60,6 @@ void blockInitAll();
 void blockLogic();
 void blockGravity();
 void blockMatch();
-void blockAddLayer();
+bool blockAddLayer();
 
 #endif

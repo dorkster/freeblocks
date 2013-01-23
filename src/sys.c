@@ -19,6 +19,7 @@
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
 #include "SDL/SDL_ttf.h"
+#include "SDL/SDL_mixer.h"
 
 #include "sys.h"
 
@@ -31,6 +32,10 @@ SDL_Surface* surface_statusbar = NULL;
 SDL_Surface* surface_background = NULL;
 SDL_Surface* surface_title = NULL;
 SDL_Surface* surface_highscores = NULL;
+Mix_Music* music = NULL;
+Mix_Chunk* sound_menu = NULL;
+Mix_Chunk* sound_switch = NULL;
+Mix_Chunk* sound_match = NULL;
 
 int score = 0;
 bool high_scores_screen = false;
@@ -59,6 +64,8 @@ bool sysInit() {
     if(screen == NULL) return false;
     
     if(TTF_Init() == -1) return false;
+
+    if(Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) == -1 ) return false;
     
     SDL_WM_SetCaption("FreeBlocks",NULL);
 
@@ -66,11 +73,13 @@ bool sysInit() {
 }
 
 bool sysLoadFiles() {
-    font = TTF_OpenFont("./res/Alegreya-Regular.ttf",20);
+    // font
+    font = TTF_OpenFont("./res/fonts/Alegreya-Regular.ttf",20);
     if(!font) return false;
     else TTF_SetFontHinting(font, TTF_HINTING_LIGHT);
 
-    surface_blocks = IMG_Load("./res/blocks.png");
+    // graphics
+    surface_blocks = IMG_Load("./res/graphics/blocks.png");
     if (!surface_blocks) return false;
     else {
         SDL_Surface *cleanup = surface_blocks;
@@ -78,7 +87,7 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_clear = IMG_Load("./res/clear.png");
+    surface_clear = IMG_Load("./res/graphics/clear.png");
     if (!surface_clear) return false;
     else {
         SDL_Surface *cleanup = surface_clear;
@@ -86,7 +95,7 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_cursor = IMG_Load("./res/cursor.png");
+    surface_cursor = IMG_Load("./res/graphics/cursor.png");
     if (!surface_cursor) return false;
     else {
         SDL_Surface *cleanup = surface_blocks;
@@ -94,7 +103,7 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_statusbar = IMG_Load("./res/statusbar.png");
+    surface_statusbar = IMG_Load("./res/graphics/statusbar.png");
     if (!surface_statusbar) return false;
     else {
         SDL_Surface *cleanup = surface_statusbar;
@@ -102,7 +111,7 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_background = IMG_Load("./res/background.png");
+    surface_background = IMG_Load("./res/graphics/background.png");
     if (!surface_background) return false;
     else {
         SDL_Surface *cleanup = surface_background;
@@ -110,7 +119,7 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_title = IMG_Load("./res/title.png");
+    surface_title = IMG_Load("./res/graphics/title.png");
     if (!surface_title) return false;
     else {
         SDL_Surface *cleanup = surface_title;
@@ -118,13 +127,27 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_highscores = IMG_Load("./res/highscores.png");
+    surface_highscores = IMG_Load("./res/graphics/highscores.png");
     if (!surface_highscores) return false;
     else {
         SDL_Surface *cleanup = surface_highscores;
         surface_highscores = SDL_DisplayFormatAlpha(surface_highscores);
         SDL_FreeSurface(cleanup);
     }
+
+    // background music
+    music = Mix_LoadMUS("res/sounds/music.ogg");
+    if (!music) return false;
+
+    // sound effects
+    sound_menu = Mix_LoadWAV("res/sounds/menu.wav");
+    if (!sound_menu) return false;
+
+    sound_switch = Mix_LoadWAV("res/sounds/switch.wav");
+    if (!sound_switch) return false;
+
+    sound_match = Mix_LoadWAV("res/sounds/match.wav");
+    if (!sound_match) return false;
 
     return true;
 }
@@ -138,6 +161,10 @@ void sysCleanup() {
     SDL_FreeSurface(surface_background);
     SDL_FreeSurface(surface_title);
     SDL_FreeSurface(surface_highscores);
+    Mix_FreeMusic(music);
+    Mix_FreeChunk(sound_menu);
+    Mix_FreeChunk(sound_switch);
+    Mix_FreeChunk(sound_match);
     SDL_Quit();
 }
 
