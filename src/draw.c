@@ -73,7 +73,7 @@ void drawBlocks() {
                 } else {
                     src.x = blocks[i][j].color * BLOCK_SIZE;
 
-                    if (i == ROWS-1) src.y = BLOCK_SIZE;
+                    if (i == ROWS-1 || game_over) src.y = BLOCK_SIZE;
                     else src.y = 0;
 
                     src.w = src.h = BLOCK_SIZE;

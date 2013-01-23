@@ -28,6 +28,7 @@ void gameTitle() {
     game_over = false;
     score = 0;
     title_option = TITLE_PLAY;
+    Mix_FadeOutMusic(2000);
 }
 
 void gameHighScores() {
@@ -41,6 +42,8 @@ void gameInit() {
     cursor_y = ROWS-START_ROWS-1;
 
     blockInitAll();
+
+    Mix_PlayMusic(music,-1);
 }
 
 void gameLogic() {
