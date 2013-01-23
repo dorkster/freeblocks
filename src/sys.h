@@ -29,6 +29,7 @@ typedef enum { false = 0, true = 1 } bool;
 #define SCREEN_HEIGHT 480
 #define SCREEN_BPP 32
 #define FPS 60
+#define JOY_DEADZONE 100
 
 SDL_Surface* screen;
 TTF_Font* font;
@@ -51,6 +52,8 @@ bool action_down;
 bool action_switch;
 bool action_bump;
 bool action_pause;
+
+int options_joystick;
 
 SDL_Event event;
 
@@ -81,5 +84,8 @@ Mix_Music* music;
 Mix_Chunk* sound_menu;
 Mix_Chunk* sound_switch;
 Mix_Chunk* sound_match;
+
+// Joystick
+SDL_Joystick* joy;
 
 #endif

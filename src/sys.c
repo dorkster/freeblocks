@@ -37,6 +37,7 @@ Mix_Music* music = NULL;
 Mix_Chunk* sound_menu = NULL;
 Mix_Chunk* sound_switch = NULL;
 Mix_Chunk* sound_match = NULL;
+SDL_Joystick* joy = NULL;
 
 int score = 0;
 bool high_scores_screen = false;
@@ -56,6 +57,8 @@ bool action_switch = false;
 bool action_bump = false;
 bool action_pause = false;
 
+int options_joystick = -1;
+
 bool sysInit() {
     if(SDL_Init(SDL_INIT_EVERYTHING) == -1) return false;
     
@@ -68,6 +71,8 @@ bool sysInit() {
     if(Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) == -1 ) return false;
     
     SDL_WM_SetCaption("FreeBlocks",NULL);
+
+    /* if (SDL_NumJoysticks() > 0) joy = SDL_JoystickOpen(0); */
 
     return true;
 }
@@ -196,7 +201,7 @@ void sysInput() {
                 action_pause = true;
         }
 
-        if(event.type == SDL_KEYUP) {
+        else if(event.type == SDL_KEYUP) {
             if(event.key.keysym.sym == SDLK_LEFT)
                 action_left = false;
             if(event.key.keysym.sym == SDLK_RIGHT)
@@ -212,9 +217,60 @@ void sysInput() {
             if(event.key.keysym.sym == SDLK_ESCAPE)
                 action_pause = false;
         }
-            
-        if(event.type == SDL_QUIT) {
+
+        else if(event.type == SDL_JOYBUTTONDOWN) {
+            if(event.jbutton.which == 0) {
+                if (event.jbutton.button == 0)
+                    action_switch = true;
+                if (event.jbutton.button == 1)
+                    action_bump = true;
+                if (event.jbutton.button == 9)
+                    action_pause = true;
+            }
+        }
+
+        else if(event.type == SDL_JOYBUTTONUP) {
+            if(event.jbutton.which == 0) {
+                if (event.jbutton.button == 0)
+                    action_switch = false;
+                if (event.jbutton.button == 1)
+                    action_bump = false;
+                if (event.jbutton.button == 9)
+                    action_pause = false;
+            }
+        }
+
+        else if(event.type == SDL_QUIT) {
             quit = true;
+        }
+    }
+
+    if (joy) {
+        int joy_x = SDL_JoystickGetAxis(joy, 0);
+        int joy_y = SDL_JoystickGetAxis(joy, 1);
+
+        // x axis
+        if (joy_x < -JOY_DEADZONE) {
+            action_left = true;
+            action_right = false;
+        } else if (joy_x > JOY_DEADZONE) {
+            action_left = false;
+            action_right = true;
+        } else {
+            action_left = false;
+            action_right = false;
+        }
+
+        // y axis
+        if (joy_y < -JOY_DEADZONE) {
+            action_up = true;
+            action_down = false;
+        } else if (joy_y > JOY_DEADZONE) {
+            action_up = false;
+            action_down = true;
+        } else {
+            action_up = false;
+            action_down = false;
         }
     }
 }
