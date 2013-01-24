@@ -16,6 +16,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "sys/stat.h"
+#include "sys/types.h"
+
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
 #include "SDL/SDL_ttf.h"
@@ -40,13 +47,15 @@ Mix_Chunk* sound_match = NULL;
 SDL_Joystick* joy = NULL;
 
 int score = 0;
+bool title_screen = true;
 bool high_scores_screen = false;
+bool options_screen = false;
+bool options_screen_joystick = false;
 bool game_over = false;
 bool paused = false;
 bool quit = false;
 int cursor_x = 3;
 int cursor_y = 7;
-bool title_screen = true;
 
 int action_cooldown = 0;
 bool action_left = false;
@@ -57,7 +66,8 @@ bool action_switch = false;
 bool action_bump = false;
 bool action_pause = false;
 
-int options_joystick = -1;
+char* config_folder = NULL;
+int option_joystick = -1;
 
 bool sysInit() {
     if(SDL_Init(SDL_INIT_EVERYTHING) == -1) return false;
@@ -72,7 +82,8 @@ bool sysInit() {
     
     SDL_WM_SetCaption("FreeBlocks",NULL);
 
-    /* if (SDL_NumJoysticks() > 0) joy = SDL_JoystickOpen(0); */
+    sysConfigSetFolder();
+    sysConfigLoad();
 
     return true;
 }
@@ -166,7 +177,11 @@ bool sysLoadFiles() {
 }
 
 void sysCleanup() {
+    sysConfigSave();
+    if (config_folder) free(config_folder);
+
     Mix_HaltMusic();
+
     TTF_CloseFont(font);
     SDL_FreeSurface(surface_blocks);
     SDL_FreeSurface(surface_clear);
@@ -278,5 +293,82 @@ void sysInput() {
 void sysClearHighScores() {
     for (int i=0; i<10; i++) {
         high_scores[i] = 0;
+    }
+}
+
+void sysConfigSetFolder() {
+    char *home = malloc(strlen(getenv("HOME"))+1);
+    strcpy(home,getenv("HOME"));
+
+    config_folder = malloc(strlen(home)+strlen("/.freeblocks/")+1);
+    sprintf(config_folder,"%s/.freeblocks/",home);
+
+    free(home);
+}
+
+void sysConfigLoad() {
+    FILE *config_file;
+    char buffer[BUFSIZ];
+    char *key;
+    char *temp;
+
+    mkdir(config_folder, S_IRWXU | S_IRWXG | S_IRWXO);
+    char *config_path = malloc(strlen(config_folder)+strlen("config")+1);
+
+    if (config_path) {
+        sprintf(config_path,"%s/config",config_folder);
+        config_file = fopen(config_path,"r+");
+
+        if (config_file) {
+            while (fgets(buffer,BUFSIZ,config_file)) {
+                temp = buffer;
+                if (temp[0] == '#') continue;
+                key = strtok(temp,"=");
+                if (strcmp(key,"joystick") == 0) option_joystick = atoi(strtok(NULL,"\n"));
+            }
+            fclose(config_file);
+        } else {
+            printf ("Creating config file...\n");
+            config_file = fopen(config_path,"w+");
+
+            if (config_file) {
+                fprintf(config_file,"joystick=-1\n");
+                fclose(config_file);
+            } else printf("Error: Couldn't create config file\n");
+        }
+
+        free(config_path);
+    }
+
+    sysConfigApply();
+}
+
+void sysConfigSave() {
+    FILE *config_file;
+
+    mkdir(config_folder, S_IRWXU | S_IRWXG | S_IRWXO);
+    char *config_path = malloc(strlen(config_folder)+strlen("config")+1);
+
+    if (config_path) {
+        sprintf(config_path,"%s/config",config_folder);
+        config_file = fopen(config_path,"w+");
+
+        if (config_file) {
+            fprintf(config_file,"joystick=%d\n",option_joystick);
+            fclose(config_file);
+        } else printf("Error: Couldn't update config file\n");
+
+        free(config_path);
+    }
+
+    sysConfigApply();
+}
+
+void sysConfigApply() {
+    if (joy) SDL_JoystickClose(joy);
+    if (SDL_NumJoysticks() > 0 && option_joystick > -1) joy = SDL_JoystickOpen(option_joystick);
+    else {
+        option_joystick = -1;
+        joy = NULL;
     }
 }

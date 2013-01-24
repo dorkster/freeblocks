@@ -22,11 +22,17 @@
 #include "menu.h"
 #include "sys.h"
 
-void menuAdd(char *item) {
+void menuAdd(const char *item) {
     menu_items[menu_size] = malloc(strlen(item)+1);
     if (!menu_items[menu_size]) return;
     strcpy(menu_items[menu_size], item);
     menu_size++;
+}
+
+void menuUpdate(int i, const char *item) {
+    menu_items[i] = realloc(menu_items[i], strlen(item)+1);
+    if (!menu_items[i]) return;
+    strcpy(menu_items[i], item);
 }
 
 void menuClear() {

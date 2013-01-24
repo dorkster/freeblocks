@@ -25,7 +25,8 @@ int menu_option;
 int menu_size;
 char *menu_items[MAX_MENU_ITEMS];
 
-void menuAdd(char *item);
+void menuAdd(const char *item);
+void menuUpdate(int i, const char *item);
 void menuClear();
 int menuLogic();
 

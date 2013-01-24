@@ -33,6 +33,8 @@ void drawEverything() {
         drawTitle();
     } else if (high_scores_screen) {
         drawHighScores();
+    } else if (options_screen) {
+        drawOptions();
     } else {
         drawBlocks();
         drawCursor();
@@ -145,7 +147,7 @@ void drawTitle() {
 
     // title logo
     dest.x = 0;
-    dest.y = SCREEN_HEIGHT/2 - surface_title->h/2;
+    dest.y = SCREEN_HEIGHT/2 - surface_title->h/2 - surface_bar->h*2;
     SDL_BlitSurface(surface_title,NULL,screen,&dest);
 
     // menu
@@ -192,3 +194,9 @@ void drawHighScores() {
     // "Return to title" text
     drawMenu(0);
 }
+
+void drawOptions() {
+    // menu
+    drawMenu(0);
+}
+

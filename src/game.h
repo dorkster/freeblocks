@@ -21,6 +21,7 @@
 
 void gameTitle();
 void gameHighScores();
+void gameOptions();
 void gameInit();
 void gameLogic();
 void gameMove();

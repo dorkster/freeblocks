@@ -26,5 +26,6 @@ void drawBlocks();
 void drawInfo();
 void drawTitle();
 void drawHighScores();
+void drawOptions();
 
 #endif

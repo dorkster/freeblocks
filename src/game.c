@@ -26,18 +26,33 @@
 void gameTitle() {
     title_screen = true;
     high_scores_screen = false;
+    options_screen = false;
+
     game_over = false;
     score = 0;
     Mix_FadeOutMusic(2000);
 
     menuAdd("Play Game");
     menuAdd("High Scores");
+    menuAdd("Options");
     menuAdd("Quit");
 }
 
 void gameHighScores() {
     title_screen = false;
     high_scores_screen = true;
+    options_screen = false;
+
+    menuAdd("Return to title screen");
+}
+
+void gameOptions() {
+    title_screen = false;
+    high_scores_screen = false;
+    options_screen = true;
+    options_screen_joystick = false;
+
+    menuAdd("Joystick");
 
     menuAdd("Return to title screen");
 }
@@ -68,7 +83,8 @@ void gameLogic() {
             menuClear();
             if (menu_choice == 0) gameInit();
             else if (menu_choice == 1) gameHighScores();
-            else if (menu_choice == 2) quit = true;
+            else if (menu_choice == 2) gameOptions();
+            else if (menu_choice == 3) quit = true;
         }
         return;
     }
@@ -79,6 +95,36 @@ void gameLogic() {
         if (menu_choice > -1) {
             menuClear();
             if (menu_choice == 0) gameTitle();
+        }
+        return;
+    }
+
+    // handle options screen menu
+    if (options_screen) {
+        menu_choice = menuLogic();
+        if (menu_choice > -1) {
+            if (options_screen_joystick) {
+                option_joystick = menu_option-1;
+                sysConfigApply();
+                menuClear();
+                gameOptions();
+            } else {
+                if (menu_choice == 0) {
+                    options_screen_joystick = true;
+                    menuClear();
+                    menuAdd("(No joystick)");
+                    int i=0;
+                    while (i < SDL_NumJoysticks() && i < MAX_MENU_ITEMS) {
+                        menuAdd(SDL_JoystickName(i));
+                        i++;
+                    }
+                    if (option_joystick+1 < MAX_MENU_ITEMS) menu_option = option_joystick+1;
+                } else if (menu_choice == 1) {
+                    menuClear();
+                    sysConfigSave();
+                    gameTitle();
+                }
+            }
         }
         return;
     }

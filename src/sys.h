@@ -36,13 +36,15 @@ TTF_Font* font;
 
 int score;
 int high_scores[10];
+bool title_screen;
 bool high_scores_screen;
+bool options_screen;
+bool options_screen_joystick;
 bool game_over;
 bool paused;
 bool quit;
 int cursor_x;
 int cursor_y;
-bool title_screen;
 
 int action_cooldown;
 bool action_left;
@@ -53,7 +55,8 @@ bool action_switch;
 bool action_bump;
 bool action_pause;
 
-int options_joystick;
+char* config_folder;
+int option_joystick;
 
 SDL_Event event;
 
@@ -68,6 +71,10 @@ bool sysLoadFiles();
 void sysCleanup();
 void sysInput();
 void sysClearHighScores();
+void sysConfigSetFolder();
+void sysConfigLoad();
+void sysConfigSave();
+void sysConfigApply();
 
 // Images
 SDL_Surface* surface_blocks;
