@@ -33,7 +33,7 @@ void drawEverything() {
         drawTitle();
     } else if (high_scores_screen) {
         drawHighScores();
-    } else if (options_screen) {
+    } else if (options_screen > -1) {
         drawOptions();
     } else {
         drawBlocks();

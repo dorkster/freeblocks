@@ -26,7 +26,7 @@
 void gameTitle() {
     title_screen = true;
     high_scores_screen = false;
-    options_screen = false;
+    options_screen = -1;
 
     game_over = false;
     score = 0;
@@ -41,7 +41,7 @@ void gameTitle() {
 void gameHighScores() {
     title_screen = false;
     high_scores_screen = true;
-    options_screen = false;
+    options_screen = -1;
 
     menuAdd("Return to title screen");
 }
@@ -49,10 +49,11 @@ void gameHighScores() {
 void gameOptions() {
     title_screen = false;
     high_scores_screen = false;
-    options_screen = true;
-    options_screen_joystick = false;
+    options_screen = OPTIONS_MAIN;
 
     menuAdd("Joystick");
+    menuAdd("Sound");
+    menuAdd("Music");
 
     menuAdd("Return to title screen");
 }
@@ -65,7 +66,7 @@ void gameInit() {
 
     blockInitAll();
 
-    Mix_VolumeMusic(MIX_MAX_VOLUME);
+    Mix_VolumeMusic(option_music*16);
     if (!game_over) Mix_PlayMusic(music,-1);
 
     game_over = false;
@@ -100,17 +101,27 @@ void gameLogic() {
     }
 
     // handle options screen menu
-    if (options_screen) {
+    if (options_screen > -1) {
         menu_choice = menuLogic();
         if (menu_choice > -1) {
-            if (options_screen_joystick) {
+            if (options_screen == OPTIONS_JOYSTICK) {
                 option_joystick = menu_option-1;
+                sysConfigApply();
+                menuClear();
+                gameOptions();
+            } else if (options_screen == OPTIONS_SOUND) {
+                option_sound = menu_option;
+                sysConfigApply();
+                menuClear();
+                gameOptions();
+            } else if (options_screen == OPTIONS_MUSIC) {
+                option_music = menu_option;
                 sysConfigApply();
                 menuClear();
                 gameOptions();
             } else {
                 if (menu_choice == 0) {
-                    options_screen_joystick = true;
+                    options_screen = OPTIONS_JOYSTICK;
                     menuClear();
                     menuAdd("(No joystick)");
                     int i=0;
@@ -118,8 +129,44 @@ void gameLogic() {
                         menuAdd(SDL_JoystickName(i));
                         i++;
                     }
-                    if (option_joystick+1 < MAX_MENU_ITEMS) menu_option = option_joystick+1;
+                    if (option_joystick+1 < menu_size) menu_option = option_joystick+1;
                 } else if (menu_choice == 1) {
+                    options_screen = OPTIONS_SOUND;
+                    menuClear();
+                    int i=0;
+                    while (i < 9) {
+                        if (i == 0) {
+                            menuAdd("Sound off");
+                        } else {
+                            char *temp = malloc(strlen("Sound level: ")+2);
+                            if (temp) {
+                                sprintf(temp,"Sound level: %-1d",i);
+                                menuAdd(temp);
+                                free(temp);
+                            }
+                        }
+                        i++;
+                    }
+                    if (option_sound < menu_size) menu_option = option_sound;
+                } else if (menu_choice == 2) {
+                    options_screen = OPTIONS_MUSIC;
+                    menuClear();
+                    int i=0;
+                    while (i < 9) {
+                        if (i == 0) {
+                            menuAdd("Music off");
+                        } else {
+                            char *temp = malloc(strlen("Music level: ")+2);
+                            if (temp) {
+                                sprintf(temp,"Music level: %-1d",i);
+                                menuAdd(temp);
+                                free(temp);
+                            }
+                        }
+                        i++;
+                    }
+                    if (option_music < menu_size) menu_option = option_music;
+                } else if (menu_choice == 3) {
                     menuClear();
                     sysConfigSave();
                     gameTitle();
@@ -157,7 +204,7 @@ void gameLogic() {
                 menuClear();
                 if (menu_choice == 0) {
                     paused = false;
-                    Mix_VolumeMusic(MIX_MAX_VOLUME);
+                    Mix_VolumeMusic(option_music*16);
                 } else if (menu_choice == 1) {
                     paused = false;
                     gameAddHighScore(score);
@@ -233,13 +280,13 @@ void gamePause() {
 
         if (!paused) {
             paused = true;
-            Mix_VolumeMusic(MIX_MAX_VOLUME/2);
+            Mix_VolumeMusic(option_music*8);
             menuAdd("Continue playing");
             menuAdd("Quit to title screen");
         }
         else {
             paused = false;
-            Mix_VolumeMusic(MIX_MAX_VOLUME);
+            Mix_VolumeMusic(option_music*16);
         }
 
         action_pause = false;

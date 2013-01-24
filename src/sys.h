@@ -31,6 +31,11 @@ typedef enum { false = 0, true = 1 } bool;
 #define FPS 60
 #define JOY_DEADZONE 100
 
+#define OPTIONS_MAIN 0
+#define OPTIONS_JOYSTICK 1
+#define OPTIONS_SOUND 2
+#define OPTIONS_MUSIC 3
+
 SDL_Surface* screen;
 TTF_Font* font;
 
@@ -38,8 +43,7 @@ int score;
 int high_scores[10];
 bool title_screen;
 bool high_scores_screen;
-bool options_screen;
-bool options_screen_joystick;
+int options_screen;
 bool game_over;
 bool paused;
 bool quit;
@@ -57,6 +61,8 @@ bool action_pause;
 
 char* config_folder;
 int option_joystick;
+int option_sound;
+int option_music;
 
 SDL_Event event;
 

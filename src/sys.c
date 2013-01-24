@@ -49,8 +49,7 @@ SDL_Joystick* joy = NULL;
 int score = 0;
 bool title_screen = true;
 bool high_scores_screen = false;
-bool options_screen = false;
-bool options_screen_joystick = false;
+int options_screen = -1;
 bool game_over = false;
 bool paused = false;
 bool quit = false;
@@ -68,6 +67,8 @@ bool action_pause = false;
 
 char* config_folder = NULL;
 int option_joystick = -1;
+int option_sound = 8;
+int option_music = 8;
 
 bool sysInit() {
     if(SDL_Init(SDL_INIT_EVERYTHING) == -1) return false;
@@ -325,6 +326,8 @@ void sysConfigLoad() {
                 if (temp[0] == '#') continue;
                 key = strtok(temp,"=");
                 if (strcmp(key,"joystick") == 0) option_joystick = atoi(strtok(NULL,"\n"));
+                if (strcmp(key,"sound") == 0) option_sound = atoi(strtok(NULL,"\n"));
+                if (strcmp(key,"music") == 0) option_music = atoi(strtok(NULL,"\n"));
             }
             fclose(config_file);
         } else {
@@ -333,6 +336,8 @@ void sysConfigLoad() {
 
             if (config_file) {
                 fprintf(config_file,"joystick=-1\n");
+                fprintf(config_file,"sound=8\n");
+                fprintf(config_file,"music=8\n");
                 fclose(config_file);
             } else printf("Error: Couldn't create config file\n");
         }
@@ -355,6 +360,8 @@ void sysConfigSave() {
 
         if (config_file) {
             fprintf(config_file,"joystick=%d\n",option_joystick);
+            fprintf(config_file,"sound=%d\n",option_sound);
+            fprintf(config_file,"music=%d\n",option_music);
             fclose(config_file);
         } else printf("Error: Couldn't update config file\n");
 
@@ -371,4 +378,7 @@ void sysConfigApply() {
         option_joystick = -1;
         joy = NULL;
     }
+
+    Mix_Volume(-1,option_sound*16);
+    Mix_VolumeMusic(option_music*16);
 }

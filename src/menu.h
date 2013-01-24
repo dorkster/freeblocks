@@ -19,7 +19,7 @@
 #ifndef MENU_H
 #define MENU_H
 
-#define MAX_MENU_ITEMS 4
+#define MAX_MENU_ITEMS 15
 
 int menu_option;
 int menu_size;
