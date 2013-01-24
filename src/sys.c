@@ -80,7 +80,7 @@ bool sysInit() {
     
     if(TTF_Init() == -1) return false;
 
-    if(Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) == -1 ) return false;
+    if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) == -1 ) return false;
     
     SDL_WM_SetCaption("FreeBlocks",NULL);
 
