@@ -63,6 +63,7 @@ char* config_folder;
 int option_joystick;
 int option_sound;
 int option_music;
+int option_fullscreen;
 
 SDL_Event event;
 

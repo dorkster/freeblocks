@@ -69,11 +69,12 @@ char* config_folder = NULL;
 int option_joystick = -1;
 int option_sound = 8;
 int option_music = 8;
+int option_fullscreen = 0;
 
 bool sysInit() {
     if(SDL_Init(SDL_INIT_EVERYTHING) == -1) return false;
     
-    screen = SDL_SetVideoMode(SCREEN_WIDTH,SCREEN_HEIGHT,SCREEN_BPP,SDL_SWSURFACE);
+    screen = SDL_SetVideoMode(SCREEN_WIDTH,SCREEN_HEIGHT,SCREEN_BPP,SDL_HWSURFACE);
 
     if(screen == NULL) return false;
     
@@ -328,24 +329,17 @@ void sysConfigLoad() {
                 if (strcmp(key,"joystick") == 0) option_joystick = atoi(strtok(NULL,"\n"));
                 if (strcmp(key,"sound") == 0) option_sound = atoi(strtok(NULL,"\n"));
                 if (strcmp(key,"music") == 0) option_music = atoi(strtok(NULL,"\n"));
+                if (strcmp(key,"fullscreen") == 0) option_fullscreen = atoi(strtok(NULL,"\n"));
             }
             fclose(config_file);
+            sysConfigApply();
         } else {
-            printf ("Creating config file...\n");
-            config_file = fopen(config_path,"w+");
-
-            if (config_file) {
-                fprintf(config_file,"joystick=-1\n");
-                fprintf(config_file,"sound=8\n");
-                fprintf(config_file,"music=8\n");
-                fclose(config_file);
-            } else printf("Error: Couldn't create config file\n");
+            printf ("Error: Couldn't load config file. Creating new config...\n");
+            sysConfigSave();
         }
 
         free(config_path);
     }
-
-    sysConfigApply();
 }
 
 void sysConfigSave() {
@@ -362,8 +356,9 @@ void sysConfigSave() {
             fprintf(config_file,"joystick=%d\n",option_joystick);
             fprintf(config_file,"sound=%d\n",option_sound);
             fprintf(config_file,"music=%d\n",option_music);
+            fprintf(config_file,"fullscreen=%d\n",option_fullscreen);
             fclose(config_file);
-        } else printf("Error: Couldn't update config file\n");
+        } else printf("Error: Couldn't write to config file.\n");
 
         free(config_path);
     }
@@ -381,4 +376,11 @@ void sysConfigApply() {
 
     Mix_Volume(-1,option_sound*16);
     Mix_VolumeMusic(option_music*16);
+
+    if (option_fullscreen == 1) {
+        screen = SDL_SetVideoMode(SCREEN_WIDTH,SCREEN_HEIGHT,SCREEN_BPP,SDL_HWSURFACE|SDL_FULLSCREEN);
+    }
+    if (!screen || option_fullscreen != 1) {
+        screen = SDL_SetVideoMode(SCREEN_WIDTH,SCREEN_HEIGHT,SCREEN_BPP,SDL_HWSURFACE);
+    }
 }
