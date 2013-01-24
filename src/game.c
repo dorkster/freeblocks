@@ -312,6 +312,7 @@ void gameAddHighScore(int _score) {
                 high_scores[j] = high_scores[j-1];
             }
             high_scores[i] = _score;
+            sysHighScoresSave();
             return;
         }
     }

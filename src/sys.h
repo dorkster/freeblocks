@@ -77,11 +77,13 @@ bool sysInit();
 bool sysLoadFiles();
 void sysCleanup();
 void sysInput();
-void sysClearHighScores();
 void sysConfigSetFolder();
 void sysConfigLoad();
 void sysConfigSave();
 void sysConfigApply();
+void sysHighScoresLoad();
+void sysHighScoresSave();
+void sysHighScoresClear();
 
 // Images
 SDL_Surface* surface_blocks;

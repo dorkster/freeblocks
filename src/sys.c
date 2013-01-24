@@ -87,6 +87,9 @@ bool sysInit() {
     sysConfigSetFolder();
     sysConfigLoad();
 
+    sysHighScoresClear();
+    sysHighScoresLoad();
+
     return true;
 }
 
@@ -292,18 +295,12 @@ void sysInput() {
     }
 }
 
-void sysClearHighScores() {
-    for (int i=0; i<10; i++) {
-        high_scores[i] = 0;
-    }
-}
-
 void sysConfigSetFolder() {
     char *home = malloc(strlen(getenv("HOME"))+1);
     strcpy(home,getenv("HOME"));
 
-    config_folder = malloc(strlen(home)+strlen("/.freeblocks/")+1);
-    sprintf(config_folder,"%s/.freeblocks/",home);
+    config_folder = malloc(strlen(home)+strlen("/.freeblocks")+1);
+    sprintf(config_folder,"%s/.freeblocks",home);
 
     free(home);
 }
@@ -315,7 +312,7 @@ void sysConfigLoad() {
     char *temp;
 
     mkdir(config_folder, S_IRWXU | S_IRWXG | S_IRWXO);
-    char *config_path = malloc(strlen(config_folder)+strlen("config")+1);
+    char *config_path = malloc(strlen(config_folder)+strlen("/config")+1);
 
     if (config_path) {
         sprintf(config_path,"%s/config",config_folder);
@@ -346,7 +343,7 @@ void sysConfigSave() {
     FILE *config_file;
 
     mkdir(config_folder, S_IRWXU | S_IRWXG | S_IRWXO);
-    char *config_path = malloc(strlen(config_folder)+strlen("config")+1);
+    char *config_path = malloc(strlen(config_folder)+strlen("/config")+1);
 
     if (config_path) {
         sprintf(config_path,"%s/config",config_folder);
@@ -384,3 +381,62 @@ void sysConfigApply() {
         screen = SDL_SetVideoMode(SCREEN_WIDTH,SCREEN_HEIGHT,SCREEN_BPP,SDL_HWSURFACE);
     }
 }
+
+void sysHighScoresLoad() {
+    FILE *file;
+    char buffer[BUFSIZ];
+    char *temp;
+    int i = 0;
+
+    mkdir(config_folder, S_IRWXU | S_IRWXG | S_IRWXO);
+    char *path = malloc(strlen(config_folder)+strlen("/highscores")+1);
+
+    if (path) {
+        sprintf(path,"%s/highscores",config_folder);
+        file = fopen(path,"r+");
+
+        if (file) {
+            while (fgets(buffer,BUFSIZ,file)) {
+                temp = buffer;
+                if (i < 10) high_scores[i] = atoi(strtok(temp,"\n"));
+                else break;
+                i++;
+            }
+            fclose(file);
+        } else {
+            printf ("Error: Couldn't load high scores.\n");
+            sysHighScoresSave();
+        }
+
+        free(path);
+    }
+}
+
+void sysHighScoresSave() {
+    FILE *file;
+    int i = 0;
+
+    mkdir(config_folder, S_IRWXU | S_IRWXG | S_IRWXO);
+    char *path = malloc(strlen(config_folder)+strlen("/highscores")+1);
+
+    if (path) {
+        sprintf(path,"%s/highscores",config_folder);
+        file = fopen(path,"w+");
+
+        if (file) {
+            for (i=0;i<10;i++) {
+                fprintf(file,"%d\n",high_scores[i]);
+            }
+            fclose(file);
+        } else printf("Error: Couldn't save high scores.\n");
+
+        free(path);
+    }
+}
+
+void sysHighScoresClear() {
+    for (int i=0; i<10; i++) {
+        high_scores[i] = 0;
+    }
+}
+
