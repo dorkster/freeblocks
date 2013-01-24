@@ -268,14 +268,6 @@ void gameBump() {
 }
 
 void gameOver() {
-    if (action_cooldown > 0) return;
-
-    if (action_switch) {
-        action_switch = false;
-        gameAddHighScore(score);
-        gameTitle();
-    }
-
     trigger_game_over = false;
     game_over = true;
 
