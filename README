@@ -32,9 +32,8 @@ To compile FreeBlocks, simply run `make` in the base directory.
 
 ## Controls
 
-* Arrow keys = Move cursor
-* Z = Switch blocks
-* X = Manually bump up the stack
-* P = Pause the game
-* ESC = Quit
+* Arrow keys / Joystick D-pad = Move cursor
+* Z / Joystick Button 0 = Switch blocks / Confirm menu selection
+* X / Joystick Button 1 = Manually bump up the stack
+* ESC / Joystick Button 9 = Pause the game
 
