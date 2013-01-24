@@ -144,7 +144,7 @@ bool sysLoadFiles() {
     if (!surface_background) return false;
     else {
         SDL_Surface *cleanup = surface_background;
-        surface_background = SDL_DisplayFormatAlpha(surface_background);
+        surface_background = SDL_DisplayFormat(surface_background);
         SDL_FreeSurface(cleanup);
     }
 

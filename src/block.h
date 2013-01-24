@@ -27,9 +27,9 @@
 #define START_ROWS 4
 #define CLEAR_TIME 4
 #define BUMP_TIME 30
-#define SPEED_TIME 3600
+#define SPEED_TIME 2700
 #define SPEED_PER_LEVEL 1
-#define MAX_SPEED 15
+#define MAX_SPEED 20
 
 const int POINTS_PER_BLOCK;
 const int POINTS_PER_BUMP;

@@ -250,7 +250,7 @@ void gameMove() {
         Mix_PlayChannel(-1,sound_switch,0);
     } else return;
 
-    action_cooldown = 10;
+    action_cooldown = ACTION_COOLDOWN;
 }
 
 void gameSwitch() {
