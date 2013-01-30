@@ -28,9 +28,9 @@ typedef enum { false = 0, true = 1 } bool;
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
 #define SCREEN_BPP 32
-#define FPS 60
+#define FPS 30
 #define JOY_DEADZONE 100
-#define ACTION_COOLDOWN 10
+#define ACTION_COOLDOWN 10 / (60/FPS)
 
 #define OPTIONS_MAIN 0
 #define OPTIONS_JOYSTICK 1

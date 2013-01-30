@@ -25,9 +25,9 @@
 #define ROWS 15
 #define COLS 20
 #define START_ROWS 4
-#define CLEAR_TIME 4
-#define BUMP_TIME 30
-#define SPEED_TIME 2700
+#define CLEAR_TIME 4 / (60/FPS)
+#define BUMP_TIME 30 / (60/FPS)
+#define SPEED_TIME 2700 / (60/FPS)
 #define SPEED_PER_LEVEL 1
 #define MAX_SPEED 20
 
