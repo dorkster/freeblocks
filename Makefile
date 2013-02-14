@@ -49,13 +49,13 @@ clean:
 install:
 	$(INSTALLDIR) $(DESTDIR)$(BINDIR)
 	$(INSTALLBIN) $(PROJNAME) $(DESTDIR)$(BINDIR)
-	$(INSTALLDIR) $(DESTDIR)$(PKGDATADIR)/res/fonts
-	$(INSTALLDAT) res/fonts/*.ttf $(DESTDIR)$(PKGDATADIR)/res/fonts
-	$(INSTALLDIR) $(DESTDIR)$(PKGDATADIR)/res/graphics
-	$(INSTALLDAT) res/graphics/*.png $(DESTDIR)$(PKGDATADIR)/res/graphics
-	$(INSTALLDIR) $(DESTDIR)$(PKGDATADIR)/res/sounds
-	$(INSTALLDAT) res/sounds/*.wav $(DESTDIR)$(PKGDATADIR)/res/sounds
-	$(INSTALLDAT) res/sounds/*.ogg $(DESTDIR)$(PKGDATADIR)/res/sounds
+	$(INSTALLDIR) $(DESTDIR)$(PKGDATADIR)/fonts
+	$(INSTALLDAT) res/fonts/*.ttf $(DESTDIR)$(PKGDATADIR)/fonts
+	$(INSTALLDIR) $(DESTDIR)$(PKGDATADIR)/graphics
+	$(INSTALLDAT) res/graphics/*.png $(DESTDIR)$(PKGDATADIR)/graphics
+	$(INSTALLDIR) $(DESTDIR)$(PKGDATADIR)/sounds
+	$(INSTALLDAT) res/sounds/*.wav $(DESTDIR)$(PKGDATADIR)/sounds
+	$(INSTALLDAT) res/sounds/*.ogg $(DESTDIR)$(PKGDATADIR)/sounds
 	$(INSTALLDIR) $(DESTDIR)$(APPDATADIR)
 	$(INSTALLDAT) $(PROJNAME).desktop $(DESTDIR)$(APPDATADIR)
 
