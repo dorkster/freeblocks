@@ -1,0 +1,22 @@
+[Desktop Entry]
+Version=1.0
+
+Type=Application
+
+Name=FreeBlocks
+Comment=A puzzle game similar to Tetris Attack
+Comment[da]=Et puslespil ligner Tetris Attack
+Comment[de]=Ein Rätselspiel ähnlich wie Tetris Attack
+Comment[es]=Un juego de puzzle similar al Tetris Attack
+Comment[fr]=Un puzzle similaire à Tetris Attack
+Comment[it]=Un giocho di puzzle simile a Tetris Attack
+Comment[nb]=Et puslespill som ligner på Tetris Attack
+Comment[nl]=Een puzzel spel vergelijkbaar met Tetris Attack
+Comment[sv]=Ett pusselspel som liknar Tetris Attack
+Icon=
+
+Categories=SDL;Game;BlocksGame;
+
+Exec=freeblocks
+Terminal=false
+StartupNotify=false

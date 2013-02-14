@@ -37,6 +37,10 @@ typedef enum { false = 0, true = 1 } bool;
 #define OPTIONS_SOUND 2
 #define OPTIONS_MUSIC 3
 
+#ifndef PKGDATADIR
+#define PKGDATADIR "./res"
+#endif
+
 SDL_Surface* screen;
 TTF_Font* font;
 
