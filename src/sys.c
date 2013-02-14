@@ -95,12 +95,12 @@ bool sysInit() {
 
 bool sysLoadFiles() {
     // font
-    font = TTF_OpenFont("./res/fonts/Alegreya-Regular.ttf",20);
+    font = TTF_OpenFont(PKGDATADIR "/fonts/Alegreya-Regular.ttf",20);
     if(!font) return false;
     else TTF_SetFontHinting(font, TTF_HINTING_LIGHT);
 
     // graphics
-    surface_blocks = IMG_Load("./res/graphics/blocks.png");
+    surface_blocks = IMG_Load(PKGDATADIR "/graphics/blocks.png");
     if (!surface_blocks) return false;
     else {
         SDL_Surface *cleanup = surface_blocks;
@@ -108,7 +108,7 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_clear = IMG_Load("./res/graphics/clear.png");
+    surface_clear = IMG_Load(PKGDATADIR "/graphics/clear.png");
     if (!surface_clear) return false;
     else {
         SDL_Surface *cleanup = surface_clear;
@@ -116,7 +116,7 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_cursor = IMG_Load("./res/graphics/cursor.png");
+    surface_cursor = IMG_Load(PKGDATADIR "/graphics/cursor.png");
     if (!surface_cursor) return false;
     else {
         SDL_Surface *cleanup = surface_blocks;
@@ -124,7 +124,7 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_bar = IMG_Load("./res/graphics/bar.png");
+    surface_bar = IMG_Load(PKGDATADIR "/graphics/bar.png");
     if (!surface_bar) return false;
     else {
         SDL_Surface *cleanup = surface_bar;
@@ -132,7 +132,7 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_bar_inactive = IMG_Load("./res/graphics/bar_inactive.png");
+    surface_bar_inactive = IMG_Load(PKGDATADIR "/graphics/bar_inactive.png");
     if (!surface_bar_inactive) return false;
     else {
         SDL_Surface *cleanup = surface_bar_inactive;
@@ -140,7 +140,7 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_background = IMG_Load("./res/graphics/background.png");
+    surface_background = IMG_Load(PKGDATADIR "/graphics/background.png");
     if (!surface_background) return false;
     else {
         SDL_Surface *cleanup = surface_background;
@@ -148,7 +148,7 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_title = IMG_Load("./res/graphics/title.png");
+    surface_title = IMG_Load(PKGDATADIR "/graphics/title.png");
     if (!surface_title) return false;
     else {
         SDL_Surface *cleanup = surface_title;
@@ -156,7 +156,7 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_highscores = IMG_Load("./res/graphics/highscores.png");
+    surface_highscores = IMG_Load(PKGDATADIR "/graphics/highscores.png");
     if (!surface_highscores) return false;
     else {
         SDL_Surface *cleanup = surface_highscores;
@@ -165,17 +165,17 @@ bool sysLoadFiles() {
     }
 
     // background music
-    music = Mix_LoadMUS("res/sounds/music.ogg");
+    music = Mix_LoadMUS(PKGDATADIR "/sounds/music.ogg");
     if (!music) return false;
 
     // sound effects
-    sound_menu = Mix_LoadWAV("res/sounds/menu.wav");
+    sound_menu = Mix_LoadWAV(PKGDATADIR "/sounds/menu.wav");
     if (!sound_menu) return false;
 
-    sound_switch = Mix_LoadWAV("res/sounds/switch.wav");
+    sound_switch = Mix_LoadWAV(PKGDATADIR "/sounds/switch.wav");
     if (!sound_switch) return false;
 
-    sound_match = Mix_LoadWAV("res/sounds/match.wav");
+    sound_match = Mix_LoadWAV(PKGDATADIR "/sounds/match.wav");
     if (!sound_match) return false;
 
     return true;
