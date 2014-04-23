@@ -296,13 +296,10 @@ void sysInput() {
 }
 
 void sysConfigSetFolder() {
-    char *home = malloc(strlen(getenv("HOME"))+1);
-    strcpy(home,getenv("HOME"));
+    char *home = getenv("HOME");
 
     config_folder = malloc(strlen(home)+strlen("/.freeblocks")+1);
     sprintf(config_folder,"%s/.freeblocks",home);
-
-    free(home);
 }
 
 void sysConfigLoad() {

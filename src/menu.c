@@ -38,7 +38,7 @@ void menuUpdate(int i, const char *item) {
 void menuClear() {
     int i;
     for (i=0;i<MAX_MENU_ITEMS;i++) {
-        if (!menu_items[i]) {
+        if (menu_items[i]) {
             free(menu_items[i]);
             menu_items[i] = NULL;
         }
