@@ -303,6 +303,8 @@ void sysConfigSetFolder() {
 }
 
 void sysConfigLoad() {
+    if (!config_folder) return;
+
     FILE *config_file;
     char buffer[BUFSIZ];
     char *key;
@@ -337,6 +339,8 @@ void sysConfigLoad() {
 }
 
 void sysConfigSave() {
+    if (!config_folder) return;
+
     FILE *config_file;
 
     mkdir(config_folder, S_IRWXU | S_IRWXG | S_IRWXO);
@@ -380,6 +384,8 @@ void sysConfigApply() {
 }
 
 void sysHighScoresLoad() {
+    if (!config_folder) return;
+
     FILE *file;
     char buffer[BUFSIZ];
     char *temp;
@@ -410,6 +416,8 @@ void sysHighScoresLoad() {
 }
 
 void sysHighScoresSave() {
+    if (!config_folder) return;
+
     FILE *file;
     int i = 0;
 
