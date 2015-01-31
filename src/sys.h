@@ -25,8 +25,13 @@
 
 typedef enum { false = 0, true = 1 } bool;
 
+#ifdef __GCW0__
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 240
+#else
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
+#endif
 #define SCREEN_BPP 32
 #define FPS 30
 #define JOY_DEADZONE 100

@@ -69,7 +69,12 @@ char* config_folder = NULL;
 int option_joystick = -1;
 int option_sound = 8;
 int option_music = 8;
-int option_fullscreen = 0;
+int option_fullscreen =
+#ifdef __GCW0__
+    1;
+#else
+    0;
+#endif
 
 bool sysInit() {
     if(SDL_Init(SDL_INIT_EVERYTHING) == -1) return false;
@@ -140,7 +145,12 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_background = IMG_Load(PKGDATADIR "/graphics/background.png");
+    surface_background = IMG_Load(PKGDATADIR
+#ifdef __GCW0__
+        "/graphics/background_320x240.png");
+#else
+        "/graphics/background.png");
+#endif
     if (!surface_background) return false;
     else {
         SDL_Surface *cleanup = surface_background;
@@ -148,7 +158,12 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_title = IMG_Load(PKGDATADIR "/graphics/title.png");
+    surface_title = IMG_Load(PKGDATADIR
+#ifdef __GCW0__
+        "/graphics/title_320x240.png");
+#else
+        "/graphics/title.png");
+#endif
     if (!surface_title) return false;
     else {
         SDL_Surface *cleanup = surface_title;
