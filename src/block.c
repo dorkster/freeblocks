@@ -20,12 +20,6 @@
 #include "sys.h"
 
 Block blocks[ROWS][COLS];
-bool animating = false;
-int bump_timer = 0;
-int bump_pixels = 0;
-int speed = 1;
-int speed_timer = SPEED_TIME;
-bool trigger_game_over = false;
 const int POINTS_PER_BLOCK = 10;
 const int POINTS_PER_BUMP = 5;
 const int POINTS_PER_COMBO_BLOCK = 15;
@@ -128,7 +122,7 @@ void blockLogic() {
     if (bump_timer > 0 && !animating) bump_timer--;
     if (bump_timer == 0) {
         bump_pixels++;
-        bump_timer = BUMP_TIME - speed*SPEED_PER_LEVEL;
+        bump_timer = BUMP_TIME - speed;
         if (bump_timer < 0) bump_timer = 0;
     }
     if (bump_pixels > 0 && bump_pixels % BLOCK_SIZE == 0) {

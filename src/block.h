@@ -31,10 +31,9 @@
 #define COLS 20
 #define START_ROWS 4
 #define CLEAR_TIME 4 / (60/FPS)
-#define BUMP_TIME 30 / (60/FPS)
-#define SPEED_TIME 2700 / (60/FPS)
-#define SPEED_PER_LEVEL 1
-#define MAX_SPEED 20
+#define BUMP_TIME 60 / (60/FPS)
+#define SPEED_TIME 1800 / (60/FPS)
+#define MAX_SPEED 25
 
 const int POINTS_PER_BLOCK;
 const int POINTS_PER_BUMP;
