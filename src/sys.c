@@ -89,7 +89,6 @@ int option_fullscreen =
 bool sysInit() {
     if(SDL_Init(SDL_INIT_EVERYTHING) == -1) return false;
    
-    const int sdl_flags =
     screen = SDL_SetVideoMode(SCREEN_WIDTH,SCREEN_HEIGHT,SCREEN_BPP,SDL_FLAGS);
 
     if(screen == NULL) return false;
