@@ -57,7 +57,7 @@ void drawMenu(int offset) {
         text = TTF_RenderText_Blended(font,menu_items[i],color);
         if (text) {
             dest.x = SCREEN_WIDTH/2 - text->w/2;
-            dest.y = SCREEN_HEIGHT - ((menu_size-i-1) * surface_bar->h) - 32 - offset;
+            dest.y = SCREEN_HEIGHT - ((menu_size-i-1) * surface_bar->h) - surface_bar->h - offset;
             SDL_BlitSurface(text,NULL,screen,&dest);
             SDL_FreeSurface(text);
         }
@@ -131,8 +131,8 @@ void drawInfo() {
 
     text_info = TTF_RenderText_Blended(font,text,color);
     if(text_info) {
-        dest.x = 8;
-        dest.y = SCREEN_HEIGHT-32;
+        dest.x = surface_bar->h / 4;
+        dest.y = SCREEN_HEIGHT-surface_bar->h;
 
         SDL_BlitSurface(text_info,NULL,screen,&dest);
         SDL_FreeSurface(text_info);
@@ -171,7 +171,7 @@ void drawHighScores() {
     text_header = TTF_RenderText_Blended(font,text,color);
     if (text_header) {
         dest.x = SCREEN_WIDTH/2 - text_header->w/2;
-        dest.y = 8;
+        dest.y = surface_bar->h/4;
 
         SDL_BlitSurface(text_header,NULL,screen,&dest);
         SDL_FreeSurface(text_header);
@@ -183,8 +183,8 @@ void drawHighScores() {
         else sprintf(text,"%d.",i+1);
         text_score[i] = TTF_RenderText_Blended(font,text,color);
         if (text_score[i]) {
-            dest.x = 240;
-            dest.y = (32*i) + 64;
+            dest.x = surface_highscores->w;
+            dest.y = (surface_bar->h*i) + surface_bar->h*2;
 
             SDL_BlitSurface(text_score[i],NULL,screen,&dest);
             SDL_FreeSurface(text_score[i]);

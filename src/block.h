@@ -21,9 +21,14 @@
 
 #include "sys.h"
 
+#ifdef HALF_GFX
+#define BLOCK_SIZE 16
+#else
 #define BLOCK_SIZE 32
-#define ROWS (SCREEN_HEIGHT/BLOCK_SIZE)
-#define COLS (SCREEN_WIDTH/BLOCK_SIZE)
+#endif
+
+#define ROWS 15
+#define COLS 20
 #define START_ROWS 4
 #define CLEAR_TIME 4 / (60/FPS)
 #define BUMP_TIME 30 / (60/FPS)

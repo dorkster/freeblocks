@@ -79,11 +79,11 @@ char* config_folder = NULL;
 int option_joystick = -1;
 int option_sound = 8;
 int option_music = 8;
-int option_fullscreen =
+
 #ifdef __GCW0__
-    1;
+int option_fullscreen = 1;
 #else
-    0;
+int option_fullscreen = 0;
 #endif
 
 bool sysInit() {
@@ -109,13 +109,22 @@ bool sysInit() {
 }
 
 bool sysLoadFiles() {
+// pick between 320x240 and 640x480
+#ifdef HALF_GFX
+#define GFX_PREFIX PKGDATADIR "/graphics/320x240/"
+    int font_size = 12;
+#else
+#define GFX_PREFIX PKGDATADIR "/graphics/"
+    int font_size = 24;
+#endif
+
     // font
-    font = TTF_OpenFont(PKGDATADIR "/fonts/Alegreya-Regular.ttf",20);
+    font = TTF_OpenFont(PKGDATADIR "/fonts/Alegreya-Regular.ttf",font_size);
     if(!font) return false;
     else TTF_SetFontHinting(font, TTF_HINTING_LIGHT);
 
     // graphics
-    surface_blocks = IMG_Load(PKGDATADIR "/graphics/blocks.png");
+    surface_blocks = IMG_Load(GFX_PREFIX "blocks.png");
     if (!surface_blocks) return false;
     else {
         SDL_Surface *cleanup = surface_blocks;
@@ -123,7 +132,7 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_clear = IMG_Load(PKGDATADIR "/graphics/clear.png");
+    surface_clear = IMG_Load(GFX_PREFIX "clear.png");
     if (!surface_clear) return false;
     else {
         SDL_Surface *cleanup = surface_clear;
@@ -131,7 +140,7 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_cursor = IMG_Load(PKGDATADIR "/graphics/cursor.png");
+    surface_cursor = IMG_Load(GFX_PREFIX "cursor.png");
     if (!surface_cursor) return false;
     else {
         SDL_Surface *cleanup = surface_blocks;
@@ -139,7 +148,7 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_bar = IMG_Load(PKGDATADIR "/graphics/bar.png");
+    surface_bar = IMG_Load(GFX_PREFIX "bar.png");
     if (!surface_bar) return false;
     else {
         SDL_Surface *cleanup = surface_bar;
@@ -147,7 +156,7 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_bar_inactive = IMG_Load(PKGDATADIR "/graphics/bar_inactive.png");
+    surface_bar_inactive = IMG_Load(GFX_PREFIX "bar_inactive.png");
     if (!surface_bar_inactive) return false;
     else {
         SDL_Surface *cleanup = surface_bar_inactive;
@@ -155,12 +164,7 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_background = IMG_Load(PKGDATADIR
-#ifdef __GCW0__
-        "/graphics/background_320x240.png");
-#else
-        "/graphics/background.png");
-#endif
+    surface_background = IMG_Load(GFX_PREFIX "background.png");
     if (!surface_background) return false;
     else {
         SDL_Surface *cleanup = surface_background;
@@ -168,12 +172,7 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_title = IMG_Load(PKGDATADIR
-#ifdef __GCW0__
-        "/graphics/title_320x240.png");
-#else
-        "/graphics/title.png");
-#endif
+    surface_title = IMG_Load(GFX_PREFIX "title.png");
     if (!surface_title) return false;
     else {
         SDL_Surface *cleanup = surface_title;
@@ -181,7 +180,7 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_highscores = IMG_Load(PKGDATADIR "/graphics/highscores.png");
+    surface_highscores = IMG_Load(GFX_PREFIX "highscores.png");
     if (!surface_highscores) return false;
     else {
         SDL_Surface *cleanup = surface_highscores;
