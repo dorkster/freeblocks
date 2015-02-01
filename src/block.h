@@ -22,8 +22,8 @@
 #include "sys.h"
 
 #define BLOCK_SIZE 32
-#define ROWS 15
-#define COLS 20
+#define ROWS (SCREEN_HEIGHT/BLOCK_SIZE)
+#define COLS (SCREEN_WIDTH/BLOCK_SIZE)
 #define START_ROWS 4
 #define CLEAR_TIME 4 / (60/FPS)
 #define BUMP_TIME 30 / (60/FPS)

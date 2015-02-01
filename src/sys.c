@@ -30,6 +30,16 @@
 
 #include "sys.h"
 
+#ifdef __GCW0__
+#define KEY_SWITCH SDLK_LCTRL
+#define KEY_BUMP SDLK_LALT
+#define SDL_FLAGS (SDL_HWSURFACE|SDL_TRIPLEBUF)
+#else
+#define KEY_SWITCH 'z'
+#define KEY_BUMP 'x'
+#define SDL_FLAGS (SDL_HWSURFACE)
+#endif
+
 SDL_Surface* screen = NULL;
 TTF_Font* font = NULL;
 SDL_Surface* surface_blocks = NULL;
@@ -69,12 +79,18 @@ char* config_folder = NULL;
 int option_joystick = -1;
 int option_sound = 8;
 int option_music = 8;
-int option_fullscreen = 0;
+int option_fullscreen =
+#ifdef __GCW0__
+    1;
+#else
+    0;
+#endif
 
 bool sysInit() {
     if(SDL_Init(SDL_INIT_EVERYTHING) == -1) return false;
-    
-    screen = SDL_SetVideoMode(SCREEN_WIDTH,SCREEN_HEIGHT,SCREEN_BPP,SDL_HWSURFACE);
+   
+    const int sdl_flags =
+    screen = SDL_SetVideoMode(SCREEN_WIDTH,SCREEN_HEIGHT,SCREEN_BPP,SDL_FLAGS);
 
     if(screen == NULL) return false;
     
@@ -140,7 +156,12 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_background = IMG_Load(PKGDATADIR "/graphics/background.png");
+    surface_background = IMG_Load(PKGDATADIR
+#ifdef __GCW0__
+        "/graphics/background_320x240.png");
+#else
+        "/graphics/background.png");
+#endif
     if (!surface_background) return false;
     else {
         SDL_Surface *cleanup = surface_background;
@@ -148,7 +169,12 @@ bool sysLoadFiles() {
         SDL_FreeSurface(cleanup);
     }
 
-    surface_title = IMG_Load(PKGDATADIR "/graphics/title.png");
+    surface_title = IMG_Load(PKGDATADIR
+#ifdef __GCW0__
+        "/graphics/title_320x240.png");
+#else
+        "/graphics/title.png");
+#endif
     if (!surface_title) return false;
     else {
         SDL_Surface *cleanup = surface_title;
@@ -213,9 +239,9 @@ void sysInput() {
                 action_up = true;
             if(event.key.keysym.sym == SDLK_DOWN)
                 action_down = true;
-            if(event.key.keysym.sym == 'z')
+            if(event.key.keysym.sym == KEY_SWITCH)
                 action_switch = true;
-            if(event.key.keysym.sym == 'x')
+            if(event.key.keysym.sym == KEY_BUMP)
                 action_bump = true;
             if(event.key.keysym.sym == SDLK_ESCAPE)
                 action_pause = true;
@@ -230,9 +256,9 @@ void sysInput() {
                 action_up = false;
             if(event.key.keysym.sym == SDLK_DOWN)
                 action_down = false;
-            if(event.key.keysym.sym == 'z')
+            if(event.key.keysym.sym == KEY_SWITCH)
                 action_switch = false;
-            if(event.key.keysym.sym == 'x')
+            if(event.key.keysym.sym == KEY_BUMP)
                 action_bump = false;
             if(event.key.keysym.sym == SDLK_ESCAPE)
                 action_pause = false;
@@ -376,10 +402,10 @@ void sysConfigApply() {
     Mix_VolumeMusic(option_music*16);
 
     if (option_fullscreen == 1) {
-        screen = SDL_SetVideoMode(SCREEN_WIDTH,SCREEN_HEIGHT,SCREEN_BPP,SDL_HWSURFACE|SDL_FULLSCREEN);
+        screen = SDL_SetVideoMode(SCREEN_WIDTH,SCREEN_HEIGHT,SCREEN_BPP,SDL_FLAGS|SDL_FULLSCREEN);
     }
     if (!screen || option_fullscreen != 1) {
-        screen = SDL_SetVideoMode(SCREEN_WIDTH,SCREEN_HEIGHT,SCREEN_BPP,SDL_HWSURFACE);
+        screen = SDL_SetVideoMode(SCREEN_WIDTH,SCREEN_HEIGHT,SCREEN_BPP,SDL_FLAGS);
     }
 }
 

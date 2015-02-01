@@ -55,8 +55,10 @@ void gameOptions() {
     menuAdd("Sound");
     menuAdd("Music");
 
+#ifndef __GCW0__
     if (option_fullscreen == 0) menuAdd("Fullscreen: Off");
     else menuAdd("Fullscreen: On");
+#endif
 
     menuAdd("Return to title screen");
 }
@@ -170,6 +172,7 @@ void gameLogic() {
                     }
                     if (option_music < menu_size) menu_option = option_music;
                 } else if (menu_choice == 3) {
+#ifndef __GCW0__
                     if (option_fullscreen == 0) {
                         option_fullscreen = 1;
                         menuUpdate(3,"Fullscreen: On");
@@ -179,6 +182,7 @@ void gameLogic() {
                     }
                     sysConfigApply();
                 } else if (menu_choice == 4) {
+#endif
                     menuClear();
                     sysConfigSave();
                     gameTitle();

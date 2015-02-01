@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Free Blocks
+Comment=Puzzle game; Tetris Attack clone
+Type=Application
+Exec=freeblocks
+Icon=freeblocks
+Terminal=false
+Categories=games;
+
