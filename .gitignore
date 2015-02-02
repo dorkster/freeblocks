@@ -2,3 +2,8 @@ freeblocks
 .depend
 build/
 freeblocks.opk
+
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile

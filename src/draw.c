@@ -44,7 +44,7 @@ void drawEverything() {
 
 void drawMenu(int offset) {
     SDL_Surface *text;
-    SDL_Color color = {217,217,217};
+    SDL_Color color = {217,217,217,255};
     SDL_Rect dest;
     int i;
 
@@ -113,7 +113,7 @@ void drawBlocks() {
 void drawInfo() {
     SDL_Surface *text_info;
     char text[256];
-    SDL_Color color = {217,217,217};
+    SDL_Color color = {217,217,217,255};
     SDL_Rect dest;
 
     // statusbar background
@@ -158,7 +158,7 @@ void drawHighScores() {
     SDL_Surface *text_header;
     SDL_Surface *text_score[10];
     char text[256];
-    SDL_Color color = {217,217,217};
+    SDL_Color color = {217,217,217,255};
     SDL_Rect dest;
 
     // list background
