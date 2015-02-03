@@ -19,9 +19,9 @@
 #ifndef SYS_H
 #define SYS_H
 
-#include "SDL/SDL.h"
-#include "SDL/SDL_ttf.h"
-#include "SDL/SDL_mixer.h"
+#include <SDL.h>
+#include <SDL_ttf.h>
+#include <SDL_mixer.h>
 
 typedef enum { false = 0, true = 1 } bool;
 
@@ -51,6 +51,23 @@ typedef enum { false = 0, true = 1 } bool;
 
 #ifndef PKGDATADIR
 #define PKGDATADIR "./res"
+#endif
+
+#ifdef _MSC_VER
+#define HOME_DIR_ENV "AppData"
+#else
+#define HOME_DIR_ENV "HOME"
+#endif
+
+#ifdef _MSC_VER
+#define MKDIR_MODE 0
+#define mkdir(p, a) _mkdir(p)
+#elif defined(_WIN32)
+#define MKDIR_MODE (S_IRWXU | S_IRWXG | S_IRWXO)
+#define mkdir(p, a) mkdir(p)
+#else
+#include <sys/stat.h>
+#include <sys/types.h>
 #endif
 
 SDL_Surface* screen;

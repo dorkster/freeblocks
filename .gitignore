@@ -7,3 +7,11 @@ CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
 Makefile
+
+# Windows
+*.vcxproj*
+*.opensdf
+*.sdf
+*.sln
+freeblocks.dir/
+Win32/

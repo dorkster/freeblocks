@@ -6,9 +6,20 @@ Set (VERSION "0.1")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
+if(CMAKE_CROSSCOMPILING)
+	# check for gcw0
+	if(CMAKE_C_COMPILER MATCHES ".*gcw0-linux.*")
+		add_definitions(-D__GCW0__)
+	endif()
+endif()
+
 # Default definitions
-set(CMAKE_C_FLAGS "-Wall -Wextra -Wunused -Wshadow -Wunreachable-code -std=c99 ${CMAKE_C_FLAGS}")
-set(CMAKE_C_FLAGS "-fno-math-errno -fno-exceptions ${CMAKE_C_FLAGS}")
+if(MSVC)
+    add_definitions(-Wall -W4 -wd"4996")
+else()
+    add_definitions(-Wall -Wextra -Wunused -Wshadow -Wunreachable-code -std=c99)
+    add_definitions(-fno-math-errno -fno-exceptions)
+endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CMAKE_C_FLAGS_RELEASE "-O2 -g0")
