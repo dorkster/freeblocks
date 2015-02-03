@@ -20,13 +20,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sys/stat.h"
-#include "sys/types.h"
-
-#include "SDL/SDL.h"
-#include "SDL/SDL_image.h"
-#include "SDL/SDL_ttf.h"
-#include "SDL/SDL_mixer.h"
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_ttf.h>
+#include <SDL_mixer.h>
 
 #include "sys.h"
 
@@ -320,7 +317,7 @@ void sysInput() {
 }
 
 void sysConfigSetFolder() {
-    char *home = getenv("HOME");
+    char *home = getenv(HOME_DIR_ENV);
 
     config_folder = malloc(strlen(home)+strlen("/.freeblocks")+1);
     sprintf(config_folder,"%s/.freeblocks",home);
@@ -334,7 +331,7 @@ void sysConfigLoad() {
     char *key;
     char *temp;
 
-    mkdir(config_folder, S_IRWXU | S_IRWXG | S_IRWXO);
+    mkdir(config_folder, MKDIR_MODE);
     char *config_path = malloc(strlen(config_folder)+strlen("/config")+1);
 
     if (config_path) {
@@ -367,7 +364,7 @@ void sysConfigSave() {
 
     FILE *config_file;
 
-    mkdir(config_folder, S_IRWXU | S_IRWXG | S_IRWXO);
+    mkdir(config_folder, MKDIR_MODE);
     char *config_path = malloc(strlen(config_folder)+strlen("/config")+1);
 
     if (config_path) {
@@ -415,7 +412,7 @@ void sysHighScoresLoad() {
     char *temp;
     int i = 0;
 
-    mkdir(config_folder, S_IRWXU | S_IRWXG | S_IRWXO);
+    mkdir(config_folder, MKDIR_MODE);
     char *path = malloc(strlen(config_folder)+strlen("/highscores")+1);
 
     if (path) {
@@ -445,7 +442,7 @@ void sysHighScoresSave() {
     FILE *file;
     int i = 0;
 
-    mkdir(config_folder, S_IRWXU | S_IRWXG | S_IRWXO);
+    mkdir(config_folder, MKDIR_MODE);
     char *path = malloc(strlen(config_folder)+strlen("/highscores")+1);
 
     if (path) {

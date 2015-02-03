@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "SDL/SDL_ttf.h"
+#include <SDL_ttf.h>
 
 #include "block.h"
 #include "draw.h"

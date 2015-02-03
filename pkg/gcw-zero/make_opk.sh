@@ -13,9 +13,9 @@ else
 fi
 
 cd ${datadir}
-cmake .
+cmake -DCMAKE_TOOLCHAIN_FILE="/opt/gcw0-toolchain/usr/share/buildroot/toolchainfile.cmake" .
 make clean
-CC=/opt/gcw0-toolchain/usr/bin/mipsel-linux-gcc make -e CFLAGS="-Wall -O2 -std=c99 -D__GCW0__"
+make
 cd -
 
 bin="${datadir}/freeblocks"
