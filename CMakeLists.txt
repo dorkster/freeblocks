@@ -7,10 +7,10 @@ Set (VERSION "0.1")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 if(CMAKE_CROSSCOMPILING)
-	# check for gcw0
-	if(CMAKE_C_COMPILER MATCHES ".*gcw0-linux.*")
-		add_definitions(-D__GCW0__)
-	endif()
+    # check for gcw0
+    if(CMAKE_C_COMPILER MATCHES ".*gcw0-linux.*")
+        add_definitions(-D__GCW0__)
+    endif()
 endif()
 
 # Default definitions

@@ -317,7 +317,7 @@ void sysInput() {
 }
 
 void sysConfigSetFolder() {
-	char *home = getenv(HOME_DIR_ENV);
+    char *home = getenv(HOME_DIR_ENV);
 
     config_folder = malloc(strlen(home)+strlen("/.freeblocks")+1);
     sprintf(config_folder,"%s/.freeblocks",home);
@@ -331,7 +331,7 @@ void sysConfigLoad() {
     char *key;
     char *temp;
 
-	mkdir(config_folder, MKDIR_MODE);
+    mkdir(config_folder, MKDIR_MODE);
     char *config_path = malloc(strlen(config_folder)+strlen("/config")+1);
 
     if (config_path) {
@@ -364,7 +364,7 @@ void sysConfigSave() {
 
     FILE *config_file;
 
-	mkdir(config_folder, MKDIR_MODE);
+    mkdir(config_folder, MKDIR_MODE);
     char *config_path = malloc(strlen(config_folder)+strlen("/config")+1);
 
     if (config_path) {
@@ -412,7 +412,7 @@ void sysHighScoresLoad() {
     char *temp;
     int i = 0;
 
-	mkdir(config_folder, MKDIR_MODE);
+    mkdir(config_folder, MKDIR_MODE);
     char *path = malloc(strlen(config_folder)+strlen("/highscores")+1);
 
     if (path) {
@@ -442,7 +442,7 @@ void sysHighScoresSave() {
     FILE *file;
     int i = 0;
 
-	mkdir(config_folder, MKDIR_MODE);
+    mkdir(config_folder, MKDIR_MODE);
     char *path = malloc(strlen(config_folder)+strlen("/highscores")+1);
 
     if (path) {
