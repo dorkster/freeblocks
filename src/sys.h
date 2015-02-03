@@ -62,8 +62,13 @@ typedef enum { false = 0, true = 1 } bool;
 #ifdef _MSC_VER
 #define MKDIR_MODE 0
 #define mkdir(p, a) _mkdir(p)
-#elif defined(_WIN32)
+#else
 #define MKDIR_MODE (S_IRWXU | S_IRWXG | S_IRWXO)
+#endif
+
+#ifdef _MSC_VER
+#define mkdir(p, a) _mkdir(p)
+#elif defined(_WIN32)
 #define mkdir(p, a) mkdir(p)
 #else
 #include <sys/stat.h>
