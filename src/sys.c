@@ -94,7 +94,7 @@ bool sysInit() {
 
     if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) == -1 ) return false;
     
-    SDL_WM_SetCaption("FreeBlocks",NULL);
+    SDL_WM_SetCaption("FreeBlocks v0.3",NULL);
 
     sysConfigSetFolder();
     sysConfigLoad();
