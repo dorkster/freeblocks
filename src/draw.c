@@ -98,7 +98,7 @@ void drawBlocks() {
                 } else {
                     src.x = blocks[i][j].color * BLOCK_SIZE;
 
-                    if (i == ROWS-1 || game_over) src.y = BLOCK_SIZE;
+                    if (i == ROWS-1 || game_over || game_over_timer > 0) src.y = BLOCK_SIZE;
                     else src.y = 0;
 
                     src.w = src.h = BLOCK_SIZE;
@@ -119,11 +119,11 @@ void drawInfo() {
     // statusbar background
     dest.x = 0;
     dest.y = SCREEN_HEIGHT - surface_bar->h;
-    if (paused || game_over) SDL_BlitSurface(surface_bar_inactive,NULL,screen,&dest);
+    if (paused || game_over || game_over_timer > 0) SDL_BlitSurface(surface_bar_inactive,NULL,screen,&dest);
     else SDL_BlitSurface(surface_bar,NULL,screen,&dest);
 
     // statusbar text
-    if (game_over) sprintf(text,"Score: %-10d  Game Over!",score);
+    if (game_over || game_over_timer > 0) sprintf(text,"Score: %-10d  Game Over!",score);
     else {
         if (paused) sprintf(text,"Score: %-10d  *Paused*",score);
         else sprintf(text,"Score: %-10d  Speed: %d",score,speed);

@@ -94,6 +94,7 @@ void blockInitAll() {
     bump_pixels = 0;
     speed = 1;
     speed_timer = SPEED_TIME;
+    game_over_timer = 0;
 
     for(i=0;i<ROWS;i++) {
         for(j=0;j<COLS;j++) {
@@ -223,9 +224,10 @@ bool blockAddLayer() {
 
     // check if one of the columns is full
     // if so, set game over state
+    // display the "try again" menu after 2 seconds
     for (j=0;j<COLS;j++) {
         if (blocks[1][j].alive) {
-            trigger_game_over = true;
+            game_over_timer = FPS*2;
         }
     }
 

@@ -54,7 +54,7 @@ int bump_timer;
 int bump_pixels;
 int speed;
 int speed_timer;
-bool trigger_game_over;
+int game_over_timer;
 
 void blockSet(int i, int j, bool alive, int color);
 void blockClear(int i, int j);

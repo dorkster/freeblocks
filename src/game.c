@@ -209,7 +209,7 @@ void gameLogic() {
     }
 
     // handle gameplay input
-    if (trigger_game_over) {
+    if (game_over_timer > 0) {
         gameOver();
     } else {
         gamePause(); // check if the pause key is pressed
@@ -272,11 +272,13 @@ void gameBump() {
 }
 
 void gameOver() {
-    trigger_game_over = false;
-    game_over = true;
+    game_over_timer--;
 
-    menuAdd("Try again");
-    menuAdd("Return to title screen");
+    if (game_over_timer == 0) {
+        game_over = true;
+        menuAdd("Try again");
+        menuAdd("Return to title screen");
+    }
 }
 
 void gamePause() {
