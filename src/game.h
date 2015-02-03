@@ -19,6 +19,11 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "sys.h"
+
+bool cursor_moving;
+int cursor_timer;
+
 void gameTitle();
 void gameHighScores();
 void gameOptions();

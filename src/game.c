@@ -69,6 +69,9 @@ void gameInit() {
     cursor_x = (COLS/2)-1;
     cursor_y = ROWS-START_ROWS-1;
 
+    cursor_moving = false;
+    cursor_timer = -1;
+
     blockInitAll();
 
     Mix_VolumeMusic(option_music*16);
@@ -237,24 +240,53 @@ void gameLogic() {
 }
 
 void gameMove() {
+    cursor_moving = false;
     if (cursor_y < 1) cursor_y = 1;
     if (action_cooldown > 0) return;
 
     if (action_left && cursor_x > 0) {
         cursor_x--;
-        Mix_PlayChannel(-1,sound_switch,0);
-    } else if (action_right && cursor_x < COLS-2) {
+        cursor_moving = true;
+        if (action_right || action_up || action_down)
+            cursor_timer = -1;
+    }
+    if (action_right && cursor_x < COLS-2) {
         cursor_x++;
-        Mix_PlayChannel(-1,sound_switch,0);
-    } else if (action_up && cursor_y > 1) {
+        cursor_moving = true;
+        if (action_left || action_up || action_down)
+            cursor_timer = -1;
+    }
+    if (action_up && cursor_y > 1) {
         cursor_y--;
-        Mix_PlayChannel(-1,sound_switch,0);
-    } else if (action_down && cursor_y < ROWS-2) {
+        cursor_moving = true;
+        if (action_left || action_right || action_down)
+            cursor_timer = -1;
+    }
+    if (action_down && cursor_y < ROWS-2) {
         cursor_y++;
-        Mix_PlayChannel(-1,sound_switch,0);
-    } else return;
+        cursor_moving = true;
+        if (action_left || action_right || action_up)
+            cursor_timer = -1;
+    }
 
-    action_cooldown = ACTION_COOLDOWN;
+    if (cursor_moving) {
+        if (!(action_left && action_right) && !(action_up && action_down))
+            Mix_PlayChannel(-1,sound_switch,0);
+
+        if (cursor_timer == -1)
+            cursor_timer = FPS/5;
+
+        if (cursor_timer > 0)
+            cursor_timer--;
+
+        if (cursor_timer == 0)
+            action_cooldown = ACTION_COOLDOWN/2;
+        else
+            action_cooldown = ACTION_COOLDOWN;
+    }
+    else {
+        cursor_timer = -1;
+    }
 }
 
 void gameSwitch() {
@@ -297,6 +329,9 @@ void gamePause() {
         else {
             paused = false;
             Mix_VolumeMusic(option_music*16);
+
+            // to prevent "pre-loading" directional input while paused
+            cursor_timer = -1;
         }
 
         action_pause = false;
