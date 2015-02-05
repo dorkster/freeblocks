@@ -22,6 +22,7 @@
 
 #include "draw.h"
 #include "game.h"
+#include "menu.h"
 #include "sys.h"
 
 int main(void) {
@@ -30,6 +31,7 @@ int main(void) {
     if(!sysInit()) return 1;
     if(!sysLoadFiles()) return 1;
 
+    menuInit();
     gameTitle();
 
     while(!quit) {

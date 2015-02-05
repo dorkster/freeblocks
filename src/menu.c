@@ -22,35 +22,174 @@
 #include "menu.h"
 #include "sys.h"
 
-void menuAdd(const char *item) {
-    menu_items[menu_size] = malloc(strlen(item)+1);
-    if (!menu_items[menu_size]) return;
-    strcpy(menu_items[menu_size], item);
-    menu_size++;
-}
+MenuItem** menu_items = NULL;
+int menu_size = 0;
+int menu_option = 0;
 
-void menuUpdate(int i, const char *item) {
-    menu_items[i] = realloc(menu_items[i], strlen(item)+1);
-    if (!menu_items[i]) return;
-    strcpy(menu_items[i], item);
-}
+void menuItemUpdate(int i) {
+    if (i < 0 || i >= menu_size)
+        return;
 
-void menuClear() {
-    int i;
-    for (i=0;i<MAX_MENU_ITEMS;i++) {
-        if (menu_items[i]) {
-            free(menu_items[i]);
-            menu_items[i] = NULL;
+    unsigned int val = menu_items[i]->val - menu_items[i]->val_min;
+    unsigned int val_max = menu_items[i]->val_max - menu_items[i]->val_min;
+
+    Dork_StringClear(&menu_items[i]->full_text);
+    Dork_StringAppend(&menu_items[i]->full_text, menu_items[i]->prefix.data);
+
+    if (val_max > 0) {
+        Dork_StringAppend(&menu_items[i]->full_text, ": ");
+        if (menu_items[i]->val > menu_items[i]->val_min) {
+            Dork_StringAppend(&menu_items[i]->full_text, "< ");
+        }
+        Dork_StringAppend(&menu_items[i]->full_text, menu_items[i]->options[val].data);
+        if (menu_items[i]->val < menu_items[i]->val_max) {
+            Dork_StringAppend(&menu_items[i]->full_text, " >");
         }
     }
+}
 
+char* menuItemGetText(int i) {
+    if (i < 0 || i >= menu_size)
+        return NULL;
+
+    return Dork_StringGetData(&menu_items[i]->full_text);
+}
+
+bool menuItemIncreaseVal(int i) {
+    if (i < 0 || i >= menu_size)
+        return false;
+
+    if (menu_items[i]->val < menu_items[i]->val_max) {
+        menu_items[i]->val++;
+        menuItemUpdate(i);
+        return true;
+    }
+    return false;
+}
+
+bool menuItemDecreaseVal(int i) {
+    if (i < 0 || i >= menu_size)
+        return false;
+
+    if (menu_items[i]->val > menu_items[i]->val_min) {
+        menu_items[i]->val--;
+        menuItemUpdate(i);
+        return true;
+    }
+    return false;
+}
+
+unsigned int menuItemGetVal(int i) {
+    if (i < 0 || i >= menu_size)
+        return 0;
+
+    return menu_items[i]->val;
+}
+
+void menuItemSetVal(int i, unsigned int val) {
+    if (i < 0 || i >= menu_size)
+        return;
+
+    if (val < menu_items[i]->val_min)
+        val = menu_items[i]->val_min;
+    else if (val > menu_items[i]->val_max)
+        val = menu_items[i]->val_max;
+
+    menu_items[i]->val = val;
+    menuItemUpdate(i);
+}
+
+void menuItemSetOptionText(int i, int opt, const char* text) {
+    if (i < 0 || i >= menu_size || (unsigned)opt > (menu_items[i]->val_max - menu_items[i]->val_min))
+        return;
+
+    Dork_StringClear(&menu_items[i]->options[opt]);
+    Dork_StringAppend(&menu_items[i]->options[opt], text);
+
+    if ((unsigned)opt == menu_items[i]->val - menu_items[i]->val_min)
+        menuItemUpdate(i);
+}
+
+void menuInit() {
+    menu_items = NULL;
     menu_size = 0;
     menu_option = 0;
 }
 
+void menuAdd(const char *item, unsigned int val_min, unsigned int val_max) {
+    if (menu_size + 1 == MAX_MENU_ITEMS)
+        return;
+
+    menu_items = realloc(menu_items, sizeof(MenuItem*)*(menu_size+1));
+    if (menu_items != NULL) {
+        menu_items[menu_size] = NULL;
+        menu_items[menu_size] = malloc(sizeof(MenuItem));
+    }
+    else
+        return;
+
+    Dork_StringInit(&menu_items[menu_size]->prefix);
+    menu_items[menu_size]->options = NULL;
+    Dork_StringInit(&menu_items[menu_size]->full_text);
+
+    menu_items[menu_size]->val = 0;
+    menu_items[menu_size]->val_min = 0;
+    menu_items[menu_size]->val_max = 0;
+
+    if (val_max < val_min)
+        val_max = val_min;
+
+    menu_items[menu_size]->val = menu_items[menu_size]->val_min = val_min;
+    menu_items[menu_size]->val_max = val_max;
+
+    Dork_StringAppend(&menu_items[menu_size]->prefix, item);
+
+    // create default options if this is a "spinner" menu item
+    if (val_max > 0) {
+        menu_items[menu_size]->options = malloc(sizeof(Dork_String)*(val_max+1));
+        unsigned int i;
+        for (i=val_min; i<=val_max; i++) {
+            Dork_StringInit(&menu_items[menu_size]->options[i-val_min]);
+            Dork_StringAppendNumber(&menu_items[menu_size]->options[i-val_min], i);
+        }
+    }
+
+    menu_size++;
+
+    // make final string
+    menuItemUpdate(menu_size-1);
+}
+
+void menuClear() {
+    int i;
+    for (i=0;i<menu_size;i++) {
+        if (menu_items[i] == NULL)
+            continue;
+
+        Dork_StringClear(&menu_items[i]->prefix);
+        Dork_StringClear(&menu_items[i]->full_text);
+
+        if (menu_items[i]->options != NULL) {
+            unsigned int j;
+            for (j=0; j<=menu_items[i]->val_max-menu_items[i]->val_min; j++) {
+                Dork_StringClear(&menu_items[i]->options[j]);
+            }
+            free(menu_items[i]->options);
+        }
+
+        free(menu_items[i]);
+    }
+
+    if (menu_items != NULL) {
+        free(menu_items);
+    }
+
+    menuInit();
+}
+
 int menuLogic() {
     if (menu_size > 0) {
-        if (action_switch) {
+        if (action_switch && menu_items[menu_option]->val_max == 0) {
             action_switch = false;
             Mix_PlayChannel(-1,sound_menu,0);
             return menu_option;
@@ -62,6 +201,18 @@ int menuLogic() {
             menu_option++;
             action_cooldown = ACTION_COOLDOWN;
             Mix_PlayChannel(-1,sound_switch,0);
+        }
+        else if (action_left && action_cooldown == 0) {
+            if (menuItemDecreaseVal(menu_option)) {
+                Mix_PlayChannel(-1,sound_switch,0);
+            }
+            action_cooldown = ACTION_COOLDOWN;
+        }
+        else if (action_right && action_cooldown == 0) {
+            if (menuItemIncreaseVal(menu_option)) {
+                Mix_PlayChannel(-1,sound_switch,0);
+            }
+            action_cooldown = ACTION_COOLDOWN;
         }
     }
     return -1;

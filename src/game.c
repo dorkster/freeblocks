@@ -32,10 +32,11 @@ void gameTitle() {
     score = 0;
     Mix_FadeOutMusic(2000);
 
-    menuAdd("Play Game");
-    menuAdd("High Scores");
-    menuAdd("Options");
-    menuAdd("Quit");
+    menuAdd("Play Game", 0, 0);
+    menuAdd("Speed Level", 1, MAX_SPEED);
+    menuAdd("High Scores", 0, 0);
+    menuAdd("Options", 0, 0);
+    menuAdd("Quit", 0, 0);
 }
 
 void gameHighScores() {
@@ -43,7 +44,7 @@ void gameHighScores() {
     high_scores_screen = true;
     options_screen = -1;
 
-    menuAdd("Return to title screen");
+    menuAdd("Return to title screen", 0, 0);
 }
 
 void gameOptions() {
@@ -51,16 +52,36 @@ void gameOptions() {
     high_scores_screen = false;
     options_screen = OPTIONS_MAIN;
 
-    menuAdd("Joystick");
-    menuAdd("Sound");
-    menuAdd("Music");
+    // 0 joystick
+    menuAdd("Joystick", 0, SDL_NumJoysticks());
+    menuItemSetVal(0, option_joystick+1);
+    menuItemSetOptionText(0, 0, "(no joystick)");
+    int i;
+    for (i=0; i < SDL_NumJoysticks(); i++) {
+        menuItemSetOptionText(0, i+1, SDL_JoystickName(i));
+    }
+
+    // 1 sound level
+    menuAdd("Sound", 0, 8);
+    menuItemSetVal(1, option_sound);
+    menuItemSetOptionText(1, 0, "Off");
+    menuItemSetOptionText(1, 8, "Max");
+
+    // 2 music level
+    menuAdd("Music", 0, 8);
+    menuItemSetVal(2, option_music);
+    menuItemSetOptionText(2, 0, "Off");
+    menuItemSetOptionText(2, 8, "Max");
 
 #ifndef __GCW0__
-    if (option_fullscreen == 0) menuAdd("Fullscreen: Off");
-    else menuAdd("Fullscreen: On");
+    // 3 fullscreen toggle
+    menuAdd("Fullscreen", 0, 1);
+    menuItemSetVal(3, option_fullscreen);
+    menuItemSetOptionText(3, 0, "Off");
+    menuItemSetOptionText(3, 1, "On");
 #endif
 
-    menuAdd("Return to title screen");
+    menuAdd("Return to title screen", 0, 0);
 }
 
 void gameInit() {
@@ -89,11 +110,15 @@ void gameLogic() {
     if (title_screen) {
         menu_choice = menuLogic();
         if (menu_choice > -1) {
+            // get the "Speed Level" value
+            speed_init = menuItemGetVal(1);
+
             menuClear();
             if (menu_choice == 0) gameInit();
-            else if (menu_choice == 1) gameHighScores();
-            else if (menu_choice == 2) gameOptions();
-            else if (menu_choice == 3) quit = true;
+            // menu_choice == 1 speed selection
+            else if (menu_choice == 2) gameHighScores();
+            else if (menu_choice == 3) gameOptions();
+            else if (menu_choice == 4) quit = true;
         }
         return;
     }
@@ -112,84 +137,22 @@ void gameLogic() {
     if (options_screen > -1) {
         menu_choice = menuLogic();
         if (menu_choice > -1) {
-            if (options_screen == OPTIONS_JOYSTICK) {
-                option_joystick = menu_option-1;
-                sysConfigApply();
-                menuClear();
-                gameOptions();
-            } else if (options_screen == OPTIONS_SOUND) {
-                option_sound = menu_option;
-                sysConfigApply();
-                menuClear();
-                gameOptions();
-            } else if (options_screen == OPTIONS_MUSIC) {
-                option_music = menu_option;
-                sysConfigApply();
-                menuClear();
-                gameOptions();
-            } else {
-                if (menu_choice == 0) {
-                    options_screen = OPTIONS_JOYSTICK;
-                    menuClear();
-                    menuAdd("(No joystick)");
-                    int i=0;
-                    while (i < SDL_NumJoysticks() && i < MAX_MENU_ITEMS) {
-                        menuAdd(SDL_JoystickName(i));
-                        i++;
-                    }
-                    if (option_joystick+1 < menu_size) menu_option = option_joystick+1;
-                } else if (menu_choice == 1) {
-                    options_screen = OPTIONS_SOUND;
-                    menuClear();
-                    int i=0;
-                    while (i < 9) {
-                        if (i == 0) {
-                            menuAdd("Sound off");
-                        } else {
-                            char *temp = malloc(strlen("Sound level: ")+2);
-                            if (temp) {
-                                sprintf(temp,"Sound level: %-1d",i);
-                                menuAdd(temp);
-                                free(temp);
-                            }
-                        }
-                        i++;
-                    }
-                    if (option_sound < menu_size) menu_option = option_sound;
-                } else if (menu_choice == 2) {
-                    options_screen = OPTIONS_MUSIC;
-                    menuClear();
-                    int i=0;
-                    while (i < 9) {
-                        if (i == 0) {
-                            menuAdd("Music off");
-                        } else {
-                            char *temp = malloc(strlen("Music level: ")+2);
-                            if (temp) {
-                                sprintf(temp,"Music level: %-1d",i);
-                                menuAdd(temp);
-                                free(temp);
-                            }
-                        }
-                        i++;
-                    }
-                    if (option_music < menu_size) menu_option = option_music;
-                } else if (menu_choice == 3) {
-#ifndef __GCW0__
-                    if (option_fullscreen == 0) {
-                        option_fullscreen = 1;
-                        menuUpdate(3,"Fullscreen: On");
-                    } else {
-                        option_fullscreen = 0;
-                        menuUpdate(3,"Fullscreen: Off");
-                    }
-                    sysConfigApply();
-                } else if (menu_choice == 4) {
+#ifdef __GCW0__
+            if (menu_choice == 3) {
+#else
+            if (menu_choice == 4) {
 #endif
-                    menuClear();
-                    sysConfigSave();
-                    gameTitle();
-                }
+                option_joystick = (int)menuItemGetVal(0)-1;
+                option_sound = menuItemGetVal(1);
+                option_music = menuItemGetVal(2);
+#ifndef __GCW0__
+                option_fullscreen = menuItemGetVal(3);
+#endif
+
+                menuClear();
+                sysConfigApply();
+                sysConfigSave();
+                gameTitle();
             }
         }
         return;
@@ -308,8 +271,8 @@ void gameOver() {
 
     if (game_over_timer == 0) {
         game_over = true;
-        menuAdd("Try again");
-        menuAdd("Return to title screen");
+        menuAdd("Try again", 0, 0);
+        menuAdd("Return to title screen", 0, 0);
     }
 }
 
@@ -323,8 +286,8 @@ void gamePause() {
         if (!paused) {
             paused = true;
             Mix_VolumeMusic(option_music*8);
-            menuAdd("Continue playing");
-            menuAdd("Quit to title screen");
+            menuAdd("Continue playing", 0, 0);
+            menuAdd("Quit to title screen", 0, 0);
         }
         else {
             paused = false;

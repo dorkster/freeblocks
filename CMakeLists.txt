@@ -84,6 +84,7 @@ EndIf (NOT SDLTTF_FOUND)
 # Sources
 
 Set (FREEBLOCKS_SOURCES
+    ./src/dork/dork_string.c
     ./src/block.c
     ./src/draw.c
     ./src/game.c
@@ -93,6 +94,7 @@ Set (FREEBLOCKS_SOURCES
 )
 
 Set (FREEBLOCKS_HEADERS
+    ./src/dork/dork_string.h
     ./src/block.h
     ./src/draw.h
     ./src/game.h

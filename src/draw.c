@@ -54,7 +54,7 @@ void drawMenu(int offset) {
         if (i == menu_option) SDL_BlitSurface(surface_bar,NULL,screen,&dest);
         else SDL_BlitSurface(surface_bar_inactive,NULL,screen,&dest);
 
-        text = TTF_RenderText_Blended(font,menu_items[i],color);
+        text = TTF_RenderText_Blended(font, menuItemGetText(i), color);
         if (text) {
             dest.x = SCREEN_WIDTH/2 - text->w/2;
             dest.y = SCREEN_HEIGHT - ((menu_size-i-1) * surface_bar->h) - surface_bar->h - offset;

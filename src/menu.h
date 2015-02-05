@@ -19,14 +19,35 @@
 #ifndef MENU_H
 #define MENU_H
 
+#include "sys.h"
+#include "dork/dork_string.h"
+
 #define MAX_MENU_ITEMS 15
 
+typedef struct {
+    Dork_String prefix;
+    Dork_String* options;
+    Dork_String full_text;
+
+    unsigned int val;
+    unsigned int val_min;
+    unsigned int val_max;
+}MenuItem;
+
+MenuItem** menu_items;
 int menu_option;
 int menu_size;
-char *menu_items[MAX_MENU_ITEMS];
 
-void menuAdd(const char *item);
-void menuUpdate(int i, const char *item);
+void menuItemUpdate(int i);
+char* menuItemGetText(int i);
+bool menuItemIncreaseVal(int i);
+bool menuItemDecreaseVal(int i);
+unsigned int menuItemGetVal(int i);
+void menuItemSetVal(int i, unsigned int val);
+void menuItemSetOptionText(int i, int opt, const char* text);
+
+void menuInit();
+void menuAdd(const char *item, unsigned int val_min, unsigned int val_max);
 void menuClear();
 int menuLogic();
 

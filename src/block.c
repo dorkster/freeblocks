@@ -1,6 +1,6 @@
 /*
     FreeBlocks -  A simple puzzle game, similar to Tetris Attack
-    Copyright (C) 2012 Justin Jacobs
+    Copyright (C) 2012-2015 Justin Jacobs
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@ Block blocks[ROWS][COLS];
 const int POINTS_PER_BLOCK = 10;
 const int POINTS_PER_BUMP = 5;
 const int POINTS_PER_COMBO_BLOCK = 15;
+
+int speed_init = 1;
 
 void blockSet(int i, int j, bool alive, int color) {
     blocks[i][j].x = j*BLOCK_SIZE;
@@ -92,7 +94,7 @@ void blockInitAll() {
     animating = false;
     bump_timer = 0;
     bump_pixels = 0;
-    speed = 1;
+    speed = speed_init;
     speed_timer = SPEED_TIME;
     game_over_timer = 0;
 
