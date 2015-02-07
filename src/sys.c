@@ -286,7 +286,7 @@ void sysInput() {
         }
     }
 
-    if (joy) {
+    if (joy && event.type != SDL_KEYDOWN && event.type != SDL_KEYUP) {
         int joy_x = SDL_JoystickGetAxis(joy, 0);
         int joy_y = SDL_JoystickGetAxis(joy, 1);
 
