@@ -81,7 +81,8 @@ void gameOptions() {
     menuItemSetOptionText(3, 1, "On");
 #endif
 
-    menuAdd("Return to title screen", 0, 0);
+    menuAdd("Cancel", 0, 0);
+    menuAdd("Save settings", 0, 0);
 }
 
 void gameInit() {
@@ -108,7 +109,14 @@ void gameLogic() {
 
     // handle the title screen menu
     if (title_screen) {
-        menu_choice = menuLogic();
+        if (action_exit) {
+            action_exit = false;
+            menu_choice = menu_size-1; // quit game
+        }
+        else {
+            menu_choice = menuLogic();
+        }
+
         if (menu_choice > -1) {
             // get the "Speed Level" value
             speed_init = menuItemGetVal(1);
@@ -125,7 +133,14 @@ void gameLogic() {
 
     // handle high scores screen menu
     if (high_scores_screen) {
-        menu_choice = menuLogic();
+        if (action_bump) {
+            action_bump = false;
+            menu_choice = menu_size-1; // return to title
+        }
+        else {
+            menu_choice = menuLogic();
+        }
+
         if (menu_choice > -1) {
             menuClear();
             if (menu_choice == 0) gameTitle();
@@ -135,13 +150,20 @@ void gameLogic() {
 
     // handle options screen menu
     if (options_screen > -1) {
-        menu_choice = menuLogic();
+        if (action_bump) {
+            action_bump = false;
+            menu_choice = menu_size-2; // exit without saving changes
+        }
+        else {
+            menu_choice = menuLogic();
+        }
+
         if (menu_choice > -1) {
-#ifdef __GCW0__
-            if (menu_choice == 3) {
-#else
-            if (menu_choice == 4) {
-#endif
+            if (menu_choice == menu_size-2) {
+                menuClear();
+                gameTitle();
+            }
+            else if (menu_choice == menu_size-1) {
                 option_joystick = (int)menuItemGetVal(0)-1;
                 option_sound = menuItemGetVal(1);
                 option_music = menuItemGetVal(2);
@@ -160,7 +182,14 @@ void gameLogic() {
 
     // handle game over menu
     if (game_over) {
-        menu_choice = menuLogic();
+        if (action_bump) {
+            action_bump = false;
+            menu_choice = menu_size-1; // return to title
+        }
+        else {
+            menu_choice = menuLogic();
+        }
+
         if (menu_choice > -1) {
             menuClear();
             if (menu_choice == 0) {
@@ -181,7 +210,14 @@ void gameLogic() {
         gamePause(); // check if the pause key is pressed
         // handle pause screen menu
         if (paused) {
-            menu_choice = menuLogic();
+            if (action_bump) {
+                action_bump = false;
+                menu_choice = 0; // return to gameplay
+            }
+            else {
+                menu_choice = menuLogic();
+            }
+
             if (menu_choice > -1) {
                 menuClear();
                 if (menu_choice == 0) {

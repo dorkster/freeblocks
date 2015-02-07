@@ -97,6 +97,7 @@ bool action_down;
 bool action_switch;
 bool action_bump;
 bool action_pause;
+bool action_exit;
 
 char* config_folder;
 int option_joystick;

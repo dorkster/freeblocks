@@ -30,10 +30,14 @@
 #ifdef __GCW0__
 #define KEY_SWITCH SDLK_LCTRL
 #define KEY_BUMP SDLK_LALT
+#define KEY_PAUSE SDLK_RETURN
+#define KEY_EXIT SDLK_ESCAPE
 #define SDL_FLAGS (SDL_HWSURFACE|SDL_TRIPLEBUF)
 #else
 #define KEY_SWITCH 'z'
 #define KEY_BUMP 'x'
+#define KEY_PAUSE SDLK_ESCAPE
+#define KEY_EXIT SDLK_ESCAPE
 #define SDL_FLAGS (SDL_HWSURFACE)
 #endif
 
@@ -71,6 +75,7 @@ bool action_down = false;
 bool action_switch = false;
 bool action_bump = false;
 bool action_pause = false;
+bool action_exit = false;
 
 char* config_folder = NULL;
 int option_joystick = -1;
@@ -238,8 +243,10 @@ void sysInput() {
                 action_switch = true;
             if(event.key.keysym.sym == KEY_BUMP)
                 action_bump = true;
-            if(event.key.keysym.sym == SDLK_ESCAPE)
+            if(event.key.keysym.sym == KEY_PAUSE)
                 action_pause = true;
+            if(event.key.keysym.sym == KEY_EXIT)
+                action_exit = true;
         }
 
         else if(event.type == SDL_KEYUP) {
@@ -255,8 +262,10 @@ void sysInput() {
                 action_switch = false;
             if(event.key.keysym.sym == KEY_BUMP)
                 action_bump = false;
-            if(event.key.keysym.sym == SDLK_ESCAPE)
+            if(event.key.keysym.sym == KEY_PAUSE)
                 action_pause = false;
+            if(event.key.keysym.sym == KEY_EXIT)
+                action_exit = false;
         }
 
         else if(event.type == SDL_JOYBUTTONDOWN) {
