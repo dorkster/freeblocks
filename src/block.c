@@ -122,7 +122,10 @@ void blockLogic() {
     blockGravity();
     blockMatch();
 
-    if (bump_timer > 0 && !animating) bump_timer--;
+    if (animating)
+        return;
+
+    if (bump_timer > 0) bump_timer--;
     if (bump_timer == 0) {
         bump_pixels++;
         bump_timer = BUMP_TIME - speed;
@@ -130,7 +133,7 @@ void blockLogic() {
     }
     if (bump_pixels > 0 && bump_pixels % BLOCK_SIZE == 0) {
         blockAddLayer();
-        bump_pixels -= BLOCK_SIZE+1;
+        bump_pixels -= BLOCK_SIZE;
     }
     if (speed_timer > 0) speed_timer--;
     if (speed < MAX_SPEED && speed_timer == 0) {
