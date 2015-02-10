@@ -23,6 +23,8 @@
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
 
+#include "dork/dork_string.h"
+
 typedef enum { false = 0, true = 1 } bool;
 
 #ifdef __GCW0__
@@ -35,9 +37,13 @@ typedef enum { false = 0, true = 1 } bool;
 #ifdef HALF_GFX
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
+#define GFX_PREFIX "/graphics/320x240/"
+#define FONT_SIZE 12
 #else
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
+#define GFX_PREFIX "/graphics/"
+#define FONT_SIZE 24
 #endif
 
 #define FPS 30
@@ -114,6 +120,11 @@ unsigned int deltaTimer;
 
 // Functions
 bool sysInit();
+char* sysGetFilePath(Dork_String *dest, const char* path, bool is_gfx);
+bool sysLoadImage(SDL_Surface** dest, const char* path);
+bool sysLoadFont(TTF_Font** dest, const char* path, int font_size);
+bool sysLoadMusic(Mix_Music** dest, const char* path);
+bool sysLoadSound(Mix_Chunk** dest, const char* path);
 bool sysLoadFiles();
 void sysCleanup();
 void sysInput();

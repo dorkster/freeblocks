@@ -110,99 +110,120 @@ bool sysInit() {
     return true;
 }
 
-bool sysLoadFiles() {
-// pick between 320x240 and 640x480
-#ifdef HALF_GFX
-#define GFX_PREFIX PKGDATADIR "/graphics/320x240/"
-    int font_size = 12;
-#else
-#define GFX_PREFIX PKGDATADIR "/graphics/"
-    int font_size = 24;
-#endif
+char* sysGetFilePath(Dork_String *dest, const char* path, bool is_gfx) {
+    if (dest == NULL) return NULL;
 
+    struct stat st;
+
+    // try current directory
+    Dork_StringClear(dest);
+    Dork_StringAppend(dest, "./res");
+    if (is_gfx) {
+        Dork_StringAppend(dest, GFX_PREFIX);
+    }
+    Dork_StringAppend(dest, path);
+
+    if (stat(Dork_StringGetData(dest), &st) == 0)
+        return Dork_StringGetData(dest);
+
+    // try install directory
+    Dork_StringClear(dest);
+    Dork_StringAppend(dest, PKGDATADIR);
+    if (is_gfx) {
+        Dork_StringAppend(dest, GFX_PREFIX);
+    }
+    Dork_StringAppend(dest, path);
+
+    if (stat(Dork_StringGetData(dest), &st) == 0)
+        return Dork_StringGetData(dest);
+
+    // failure, just return NULL
+    return NULL;
+}
+
+bool sysLoadImage(SDL_Surface** dest, const char* path) {
+    Dork_String temp;
+    Dork_StringInit(&temp);
+
+    *dest = IMG_Load(sysGetFilePath(&temp, path, true));
+    if (*dest == NULL) {
+        Dork_StringClear(&temp);
+        return false;
+    }
+    else {
+        SDL_Surface *cleanup = *dest;
+        *dest = SDL_DisplayFormatAlpha(cleanup);
+        SDL_FreeSurface(cleanup);
+    }
+
+    Dork_StringClear(&temp);
+    return true;
+}
+
+bool sysLoadFont(TTF_Font** dest, const char* path, int font_size) {
+    Dork_String temp;
+    Dork_StringInit(&temp);
+
+    *dest = TTF_OpenFont(sysGetFilePath(&temp, path, false), font_size);
+    if(*dest == NULL) {
+        Dork_StringClear(&temp);
+        return false;
+    }
+    else TTF_SetFontHinting(*dest, TTF_HINTING_LIGHT);
+
+    Dork_StringClear(&temp);
+    return true;
+}
+
+bool sysLoadMusic(Mix_Music** dest, const char* path) {
+    Dork_String temp;
+    Dork_StringInit(&temp);
+
+    *dest = Mix_LoadMUS(sysGetFilePath(&temp, path, false));
+    if (*dest == NULL) {
+        Dork_StringClear(&temp);
+        return false;
+    }
+
+    Dork_StringClear(&temp);
+    return true;
+}
+
+bool sysLoadSound(Mix_Chunk** dest, const char* path) {
+    Dork_String temp;
+    Dork_StringInit(&temp);
+
+    *dest = Mix_LoadWAV(sysGetFilePath(&temp, path, false));
+    if (*dest == NULL) {
+        Dork_StringClear(&temp);
+        return false;
+    }
+
+    Dork_StringClear(&temp);
+    return true;
+}
+
+bool sysLoadFiles() {
     // font
-    font = TTF_OpenFont(PKGDATADIR "/fonts/Alegreya-Regular.ttf",font_size);
-    if(!font) return false;
-    else TTF_SetFontHinting(font, TTF_HINTING_LIGHT);
+    if (!sysLoadFont(&font, "/fonts/Alegreya-Regular.ttf", FONT_SIZE)) return false;
 
     // graphics
-    surface_blocks = IMG_Load(GFX_PREFIX "blocks.png");
-    if (!surface_blocks) return false;
-    else {
-        SDL_Surface *cleanup = surface_blocks;
-        surface_blocks = SDL_DisplayFormatAlpha(surface_blocks);
-        SDL_FreeSurface(cleanup);
-    }
-
-    surface_clear = IMG_Load(GFX_PREFIX "clear.png");
-    if (!surface_clear) return false;
-    else {
-        SDL_Surface *cleanup = surface_clear;
-        surface_clear = SDL_DisplayFormatAlpha(surface_clear);
-        SDL_FreeSurface(cleanup);
-    }
-
-    surface_cursor = IMG_Load(GFX_PREFIX "cursor.png");
-    if (!surface_cursor) return false;
-    else {
-        SDL_Surface *cleanup = surface_blocks;
-        surface_blocks = SDL_DisplayFormatAlpha(surface_blocks);
-        SDL_FreeSurface(cleanup);
-    }
-
-    surface_bar = IMG_Load(GFX_PREFIX "bar.png");
-    if (!surface_bar) return false;
-    else {
-        SDL_Surface *cleanup = surface_bar;
-        surface_bar = SDL_DisplayFormatAlpha(surface_bar);
-        SDL_FreeSurface(cleanup);
-    }
-
-    surface_bar_inactive = IMG_Load(GFX_PREFIX "bar_inactive.png");
-    if (!surface_bar_inactive) return false;
-    else {
-        SDL_Surface *cleanup = surface_bar_inactive;
-        surface_bar_inactive = SDL_DisplayFormatAlpha(surface_bar_inactive);
-        SDL_FreeSurface(cleanup);
-    }
-
-    surface_background = IMG_Load(GFX_PREFIX "background.png");
-    if (!surface_background) return false;
-    else {
-        SDL_Surface *cleanup = surface_background;
-        surface_background = SDL_DisplayFormat(surface_background);
-        SDL_FreeSurface(cleanup);
-    }
-
-    surface_title = IMG_Load(GFX_PREFIX "title.png");
-    if (!surface_title) return false;
-    else {
-        SDL_Surface *cleanup = surface_title;
-        surface_title = SDL_DisplayFormatAlpha(surface_title);
-        SDL_FreeSurface(cleanup);
-    }
-
-    surface_highscores = IMG_Load(GFX_PREFIX "highscores.png");
-    if (!surface_highscores) return false;
-    else {
-        SDL_Surface *cleanup = surface_highscores;
-        surface_highscores = SDL_DisplayFormatAlpha(surface_highscores);
-        SDL_FreeSurface(cleanup);
-    }
+    if (!sysLoadImage(&surface_blocks, "blocks.png")) return false;
+    if (!sysLoadImage(&surface_clear, "clear.png")) return false;
+    if (!sysLoadImage(&surface_cursor, "cursor.png")) return false;
+    if (!sysLoadImage(&surface_bar, "bar.png")) return false;
+    if (!sysLoadImage(&surface_bar_inactive, "bar_inactive.png")) return false;
+    if (!sysLoadImage(&surface_background, "background.png")) return false;
+    if (!sysLoadImage(&surface_title, "title.png")) return false;
+    if (!sysLoadImage(&surface_highscores, "highscores.png")) return false;
 
     // background music
-    music = Mix_LoadMUS(PKGDATADIR "/sounds/music.ogg");
-    if (!music) return false;
+    if (!sysLoadMusic(&music, "/sounds/music.ogg")) return false;
 
     // sound effects
-    sound_menu = Mix_LoadWAV(PKGDATADIR "/sounds/menu.wav");
-    if (!sound_menu) return false;
-
-    sound_switch = Mix_LoadWAV(PKGDATADIR "/sounds/switch.wav");
-    if (!sound_switch) return false;
-
-    sound_match = Mix_LoadWAV(PKGDATADIR "/sounds/match.wav");
-    if (!sound_match) return false;
+    if (!sysLoadSound(&sound_menu, "/sounds/menu.wav")) return false;
+    if (!sysLoadSound(&sound_switch, "/sounds/switch.wav")) return false;
+    if (!sysLoadSound(&sound_match, "/sounds/match.wav")) return false;
 
     return true;
 }
