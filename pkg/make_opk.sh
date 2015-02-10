@@ -7,7 +7,7 @@
 mydir=`dirname $0`
 
 if [ -z "$1" ]; then
-  datadir=${mydir}/../..
+  datadir=${mydir}/..
 else
   datadir=$1
 fi
