@@ -34,6 +34,7 @@
 #define BUMP_TIME (60 / (60/FPS)) / (BLOCK_SIZE / 16)
 #define SPEED_TIME 1800 / (60/FPS)
 #define MAX_SPEED 25
+#define BLOCK_MOVE_SPEED BLOCK_SIZE / 2
 
 const int POINTS_PER_BLOCK;
 const int POINTS_PER_BUMP;
@@ -41,6 +42,7 @@ const int POINTS_PER_COMBO_BLOCK;
 
 typedef struct Block{
     int x,y;
+    int dest_x, dest_y;
     bool alive;
     int color;
     bool matched;
@@ -56,10 +58,11 @@ int speed;
 int speed_init;
 int speed_timer;
 int game_over_timer;
+int moving_blocks;
 
 void blockSet(int i, int j, bool alive, int color);
 void blockClear(int i, int j);
-void blockSwitch(int i, int j, int k, int l);
+void blockSwitch(int i, int j, int k, int l, bool animate);
 bool blockCompare(int i, int j, int k, int l);
 void blockInitAll();
 
@@ -67,5 +70,6 @@ void blockLogic();
 void blockGravity();
 void blockMatch();
 bool blockAddLayer();
+void blockSwitchCursor();
 
 #endif

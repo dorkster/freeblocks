@@ -290,7 +290,7 @@ void gameMove() {
 
 void gameSwitch() {
     if (action_switch) {
-        blockSwitch(cursor_y, cursor_x, cursor_y, cursor_x+1);
+        blockSwitchCursor();
         action_switch = false;
     }
 }

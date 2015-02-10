@@ -29,6 +29,8 @@ int speed_init = 1;
 void blockSet(int i, int j, bool alive, int color) {
     blocks[i][j].x = j*BLOCK_SIZE;
     blocks[i][j].y = i*BLOCK_SIZE;
+    blocks[i][j].dest_x = j*BLOCK_SIZE;
+    blocks[i][j].dest_y = i*BLOCK_SIZE;
     blocks[i][j].alive = alive;
     blocks[i][j].color = color;
     blocks[i][j].matched = false;
@@ -44,7 +46,7 @@ void blockClear(int i, int j) {
     blocks[i][j].frame = -1;
 }
 
-void blockSwitch(int i, int j, int k, int l) {
+void blockSwitch(int i, int j, int k, int l, bool animate) {
     if (blocks[i][j].matched || blocks[k][l].matched) return;
 
     int b1_color = blocks[i][j].color;
@@ -56,6 +58,13 @@ void blockSwitch(int i, int j, int k, int l) {
     blocks[i][j].alive = b2_alive;
     blocks[k][l].color = b1_color;
     blocks[k][l].alive = b1_alive;
+
+    if (animate) {
+        blocks[i][j].x = blocks[k][l].dest_x;
+        blocks[i][j].y = blocks[k][l].dest_y;
+        blocks[k][l].x = blocks[i][j].dest_x;
+        blocks[k][l].y = blocks[i][j].dest_y;
+    }
 }
 
 bool blockCompare(int i, int j, int k, int l) {
@@ -69,6 +78,7 @@ bool blockCompare(int i, int j, int k, int l) {
 bool blockAnimate() {
     int i,j;
     bool anim = false;
+    moving_blocks = false;
 
     for (i=0;i<ROWS;i++) {
         for (j=0;j<COLS;j++) {
@@ -78,6 +88,29 @@ bool blockAnimate() {
                     blocks[i][j].clear_timer = CLEAR_TIME;
                     blocks[i][j].frame++;
                 }
+                anim = true;
+            }
+
+            // move blocks
+            if (blocks[i][j].dest_x < blocks[i][j].x) {
+                blocks[i][j].x -= BLOCK_MOVE_SPEED;
+                moving_blocks = true;
+                anim = true;
+            }
+            else if (blocks[i][j].dest_x > blocks[i][j].x) {
+                blocks[i][j].x += BLOCK_MOVE_SPEED;
+                moving_blocks = true;
+                anim = true;
+            }
+
+            if (blocks[i][j].dest_y < blocks[i][j].y) {
+                blocks[i][j].y -= BLOCK_MOVE_SPEED;
+                moving_blocks = true;
+                anim = true;
+            }
+            else if (blocks[i][j].dest_y > blocks[i][j].y) {
+                blocks[i][j].y += BLOCK_MOVE_SPEED;
+                moving_blocks = true;
                 anim = true;
             }
         }
@@ -97,6 +130,7 @@ void blockInitAll() {
     speed = speed_init;
     speed_timer = SPEED_TIME;
     game_over_timer = 0;
+    moving_blocks = false;
 
     for(i=0;i<ROWS;i++) {
         for(j=0;j<COLS;j++) {
@@ -119,11 +153,10 @@ void blockInitAll() {
 void blockLogic() {
     animating = blockAnimate();
 
-    blockGravity();
-    blockMatch();
-
     if (animating)
         return;
+
+    blockMatch();
 
     if (bump_timer > 0) bump_timer--;
     if (bump_timer == 0) {
@@ -140,19 +173,33 @@ void blockLogic() {
         speed++;
         speed_timer = SPEED_TIME;
     }
+
+    blockGravity();
 }
 
 void blockGravity() {
-    int i,j;
+    int i,j,k;
 
     for (j=0;j<COLS;j++) {
-        for (i=ROWS-2;i>0;i--) {
-            if (blocks[i][j].alive && !blocks[i+1][j].alive) {
-                blockSwitch(i,j,i+1,j);
+        int gap_size = 0;
+        int first_empty = -1;
+        for (k=ROWS-1; k>1; k--) {
+            if (first_empty == -1 && !blocks[k][j].alive)
+                first_empty = k;
 
-                // return to the bottom of the column
-                // this process will be repeated until no more blocks need to fall in this column
-                i=ROWS-2;
+            if (first_empty != -1) {
+                if (!blocks[k][j].alive)
+                    gap_size++;
+                else
+                    break;
+            }
+        }
+
+        if (gap_size > 0) {
+            for (i=first_empty-gap_size;i>0;i--) {
+                if (blocks[i][j].alive) {
+                    blockSwitch(i,j,i+gap_size,j, true);
+                }
             }
         }
     }
@@ -240,7 +287,7 @@ bool blockAddLayer() {
 
     for (j=0;j<COLS;j++) {
         for (i=1;i<ROWS;i++) {
-            blockSwitch(i,j,i-1,j);
+            blockSwitch(i,j,i-1,j, false);
         }
     }
 
@@ -257,4 +304,9 @@ bool blockAddLayer() {
     bump_pixels -= bump_pixels % BLOCK_SIZE;
 
     return true;
+}
+
+void blockSwitchCursor() {
+    if (moving_blocks == false)
+        blockSwitch(cursor_y, cursor_x, cursor_y, cursor_x+1, true);
 }
