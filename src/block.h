@@ -31,7 +31,8 @@
 #define COLS 20
 #define START_ROWS 4
 #define CLEAR_TIME 4 / (60/FPS)
-#define BUMP_TIME (60 / (60/FPS)) / (BLOCK_SIZE / 16)
+#define SPEED_FACTOR 32 / BLOCK_SIZE
+#define BUMP_TIME (60 / (60/FPS)) * SPEED_FACTOR
 #define SPEED_TIME 1800 / (60/FPS)
 #define MAX_SPEED 25
 #define BLOCK_MOVE_SPEED BLOCK_SIZE / 2

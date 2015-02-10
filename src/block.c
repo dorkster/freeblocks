@@ -161,7 +161,7 @@ void blockLogic() {
     if (bump_timer > 0) bump_timer--;
     if (bump_timer == 0) {
         bump_pixels++;
-        bump_timer = BUMP_TIME - speed;
+        bump_timer = BUMP_TIME - (speed*SPEED_FACTOR);
         if (bump_timer < 0) bump_timer = 0;
     }
     if (bump_pixels > 0 && bump_pixels % BLOCK_SIZE == 0) {
