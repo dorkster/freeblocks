@@ -73,12 +73,14 @@ typedef enum { false = 0, true = 1 } bool;
 #endif
 
 #ifdef _MSC_VER
+#include <direct.h>
 #define mkdir(p, a) _mkdir(p)
 #elif defined(_WIN32)
 #define mkdir(p, a) mkdir(p)
-#else
-#include <sys/stat.h>
-#include <sys/types.h>
+#endif
+
+#ifdef _MSC_VER
+#define stat _stat
 #endif
 
 SDL_Surface* screen;

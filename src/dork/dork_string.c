@@ -22,6 +22,10 @@
 
 #include "dork_string.h"
 
+#ifdef _MSC_VER
+#define snprintf _snprintf
+#endif
+
 void Dork_StringInit(Dork_String *dest) {
     if (dest == NULL)
         return;
