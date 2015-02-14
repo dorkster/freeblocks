@@ -241,36 +241,41 @@ void gameLogic() {
 void gameMove() {
     cursor_moving = false;
     if (cursor_y < 1) cursor_y = 1;
-    if (action_cooldown > 0) return;
+    if (action_move == action_last_move && action_cooldown > 0) return;
 
-    if (action_left && cursor_x > 0) {
-        cursor_x--;
-        cursor_moving = true;
-        if (action_right || action_up || action_down)
+    switch (action_move) {
+    case ACTION_LEFT:
+        if (cursor_x > 0) {
+            cursor_x--;
+            cursor_moving = true;
             cursor_timer = -1;
-    }
-    if (action_right && cursor_x < COLS-2) {
-        cursor_x++;
-        cursor_moving = true;
-        if (action_left || action_up || action_down)
+        }
+        break;
+    case ACTION_RIGHT:
+        if (cursor_x < COLS - 2) {
+            cursor_x++;
+            cursor_moving = true;
             cursor_timer = -1;
-    }
-    if (action_up && cursor_y > 1) {
-        cursor_y--;
-        cursor_moving = true;
-        if (action_left || action_right || action_down)
+        }
+        break;
+    case ACTION_UP:
+        if (cursor_y > 1) {
+            cursor_y--;
+            cursor_moving = true;
             cursor_timer = -1;
-    }
-    if (action_down && cursor_y < ROWS-2) {
-        cursor_y++;
-        cursor_moving = true;
-        if (action_left || action_right || action_up)
+        }
+        break;
+    case ACTION_DOWN:
+        if (cursor_y < ROWS - 2) {
+            cursor_y++;
+            cursor_moving = true;
             cursor_timer = -1;
+        }
+        break;
     }
 
     if (cursor_moving) {
-        if (!(action_left && action_right) && !(action_up && action_down))
-            Mix_PlayChannel(-1,sound_switch,0);
+        Mix_PlayChannel(-1,sound_switch,0);
 
         if (cursor_timer == -1)
             cursor_timer = FPS/5;
@@ -282,6 +287,8 @@ void gameMove() {
             action_cooldown = ACTION_COOLDOWN/2;
         else
             action_cooldown = ACTION_COOLDOWN;
+
+        action_last_move = action_move;
     }
     else {
         cursor_timer = -1;

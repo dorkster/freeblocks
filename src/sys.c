@@ -255,13 +255,13 @@ void sysInput() {
     while(SDL_PollEvent(&event)) {
         if(event.type == SDL_KEYDOWN) {
             if(event.key.keysym.sym == SDLK_LEFT)
-                action_left = true;
+                action_move = ACTION_LEFT;
             if(event.key.keysym.sym == SDLK_RIGHT)
-                action_right = true;
+                action_move = ACTION_RIGHT;
             if(event.key.keysym.sym == SDLK_UP)
-                action_up = true;
+                action_move = ACTION_UP;
             if(event.key.keysym.sym == SDLK_DOWN)
-                action_down = true;
+                action_move = ACTION_DOWN;
             if(event.key.keysym.sym == KEY_SWITCH)
                 action_switch = true;
             if(event.key.keysym.sym == KEY_BUMP)
@@ -273,14 +273,13 @@ void sysInput() {
         }
 
         else if(event.type == SDL_KEYUP) {
-            if(event.key.keysym.sym == SDLK_LEFT)
-                action_left = false;
-            if(event.key.keysym.sym == SDLK_RIGHT)
-                action_right = false;
-            if(event.key.keysym.sym == SDLK_UP)
-                action_up = false;
-            if(event.key.keysym.sym == SDLK_DOWN)
-                action_down = false;
+            if(event.key.keysym.sym == SDLK_LEFT && action_move == ACTION_LEFT ||
+               event.key.keysym.sym == SDLK_RIGHT && action_move == ACTION_RIGHT ||
+               event.key.keysym.sym == SDLK_UP && action_move == ACTION_UP ||
+               event.key.keysym.sym == SDLK_DOWN && action_move == ACTION_DOWN) {
+                action_move = ACTION_NONE;
+                action_last_move = ACTION_NONE;
+            }
             if(event.key.keysym.sym == KEY_SWITCH)
                 action_switch = false;
             if(event.key.keysym.sym == KEY_BUMP)

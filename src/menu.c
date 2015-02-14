@@ -193,22 +193,20 @@ int menuLogic() {
             action_switch = false;
             Mix_PlayChannel(-1,sound_menu,0);
             return menu_option;
-        } else if (action_up && action_cooldown == 0 && menu_option > 0) {
+        } else if (action_move == ACTION_UP && action_cooldown == 0 && menu_option > 0) {
             menu_option--;
             action_cooldown = ACTION_COOLDOWN;
             Mix_PlayChannel(-1,sound_switch,0);
-        } else if (action_down && action_cooldown == 0 && menu_option < menu_size-1) {
+        } else if (action_move == ACTION_DOWN && action_cooldown == 0 && menu_option < menu_size-1) {
             menu_option++;
             action_cooldown = ACTION_COOLDOWN;
             Mix_PlayChannel(-1,sound_switch,0);
-        }
-        else if (action_left && action_cooldown == 0) {
+        } else if (action_move == ACTION_LEFT && action_cooldown == 0) {
             if (menuItemDecreaseVal(menu_option)) {
                 Mix_PlayChannel(-1,sound_switch,0);
             }
             action_cooldown = ACTION_COOLDOWN;
-        }
-        else if (action_right && action_cooldown == 0) {
+        } else if (action_move == ACTION_RIGHT && action_cooldown == 0) {
             if (menuItemIncreaseVal(menu_option)) {
                 Mix_PlayChannel(-1,sound_switch,0);
             }
