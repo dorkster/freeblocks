@@ -98,10 +98,11 @@ int cursor_x;
 int cursor_y;
 
 int action_cooldown;
-bool action_left;
-bool action_right;
-bool action_up;
-bool action_down;
+typedef enum {
+    ACTION_NONE, ACTION_LEFT, ACTION_RIGHT, ACTION_UP, ACTION_DOWN
+}ActionMove;
+ActionMove action_move;
+ActionMove action_last_move;
 bool action_switch;
 bool action_bump;
 bool action_pause;
