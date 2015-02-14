@@ -70,10 +70,8 @@ int cursor_x = 3;
 int cursor_y = 7;
 
 int action_cooldown = 0;
-bool action_left = false;
-bool action_right = false;
-bool action_up = false;
-bool action_down = false;
+ActionMove action_move = ACTION_NONE;
+ActionMove action_last_move = ACTION_NONE;
 bool action_switch = false;
 bool action_bump = false;
 bool action_pause = false;
@@ -273,10 +271,10 @@ void sysInput() {
         }
 
         else if(event.type == SDL_KEYUP) {
-            if(event.key.keysym.sym == SDLK_LEFT && action_move == ACTION_LEFT ||
-               event.key.keysym.sym == SDLK_RIGHT && action_move == ACTION_RIGHT ||
-               event.key.keysym.sym == SDLK_UP && action_move == ACTION_UP ||
-               event.key.keysym.sym == SDLK_DOWN && action_move == ACTION_DOWN) {
+            if((event.key.keysym.sym == SDLK_LEFT && action_move == ACTION_LEFT) ||
+               (event.key.keysym.sym == SDLK_RIGHT && action_move == ACTION_RIGHT) ||
+               (event.key.keysym.sym == SDLK_UP && action_move == ACTION_UP) ||
+               (event.key.keysym.sym == SDLK_DOWN && action_move == ACTION_DOWN)) {
                 action_move = ACTION_NONE;
                 action_last_move = ACTION_NONE;
             }
@@ -323,26 +321,20 @@ void sysInput() {
 
         // x axis
         if (joy_x < -JOY_DEADZONE) {
-            action_left = true;
-            action_right = false;
+            action_move = ACTION_LEFT;
         } else if (joy_x > JOY_DEADZONE) {
-            action_left = false;
-            action_right = true;
-        } else {
-            action_left = false;
-            action_right = false;
+            action_move = ACTION_RIGHT;
         }
 
         // y axis
         if (joy_y < -JOY_DEADZONE) {
-            action_up = true;
-            action_down = false;
+            action_move = ACTION_UP;
         } else if (joy_y > JOY_DEADZONE) {
-            action_up = false;
-            action_down = true;
-        } else {
-            action_up = false;
-            action_down = false;
+            action_move = ACTION_DOWN;
+        }
+
+        if (joy_x >= -JOY_DEADZONE && joy_x <= JOY_DEADZONE && joy_y >= -JOY_DEADZONE && joy_y <= JOY_DEADZONE) {
+            action_move = ACTION_NONE;
         }
     }
 }

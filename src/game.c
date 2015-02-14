@@ -241,6 +241,7 @@ void gameLogic() {
 void gameMove() {
     cursor_moving = false;
     if (cursor_y < 1) cursor_y = 1;
+    if (action_move != action_last_move) cursor_timer = -1;
     if (action_move == action_last_move && action_cooldown > 0) return;
 
     switch (action_move) {
@@ -248,29 +249,27 @@ void gameMove() {
         if (cursor_x > 0) {
             cursor_x--;
             cursor_moving = true;
-            cursor_timer = -1;
         }
         break;
     case ACTION_RIGHT:
         if (cursor_x < COLS - 2) {
             cursor_x++;
             cursor_moving = true;
-            cursor_timer = -1;
         }
         break;
     case ACTION_UP:
         if (cursor_y > 1) {
             cursor_y--;
             cursor_moving = true;
-            cursor_timer = -1;
         }
         break;
     case ACTION_DOWN:
         if (cursor_y < ROWS - 2) {
             cursor_y++;
             cursor_moving = true;
-            cursor_timer = -1;
         }
+        break;
+    case ACTION_NONE:
         break;
     }
 
