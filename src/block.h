@@ -68,6 +68,7 @@ bool blockCompare(int i, int j, int k, int l);
 void blockInitAll();
 
 void blockLogic();
+void blockRise();
 void blockGravity();
 void blockMatch();
 bool blockAddLayer();
