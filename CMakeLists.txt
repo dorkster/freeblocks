@@ -105,14 +105,20 @@ Set (FREEBLOCKS_HEADERS
     ./src/sys.h
 )
 
-Add_Executable (freeblocks ${FREEBLOCKS_SOURCES} ${FREEBLOCKS_HEADERS})
+if(APPLE)
+	set(FREEBLOCKS_EXTRA ./pkg/osx/SDLMain.m ./pkg/osx/SDLMain.h)
+	set_source_files_properties(./pkg/osx/SDLMain.m PROPERTIES LANGUAGE C)
+	set(EXTRA_LIBRARIES "-framework Carbon -framework IOKit")
+endif()
+
+Add_Executable (freeblocks ${FREEBLOCKS_SOURCES} ${FREEBLOCKS_HEADERS} ${FREEBLOCKS_EXTRA})
 
 # libSDLMain comes with libSDL if needed on certain platforms
 If (NOT SDLMAIN_LIBRARY)
   Set (SDLMAIN_LIBRARY "")
 EndIf (NOT SDLMAIN_LIBRARY)
 
-Target_Link_Libraries (freeblocks ${CMAKE_LD_FLAGS} ${SDL_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLTTF_LIBRARY} ${SDLMAIN_LIBRARY})
+Target_Link_Libraries (freeblocks ${CMAKE_LD_FLAGS} ${SDL_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLTTF_LIBRARY} ${SDLMAIN_LIBRARY} ${EXTRA_LIBRARIES})
 
 # installing to the proper places
 install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/freeblocks DESTINATION ${BINDIR})

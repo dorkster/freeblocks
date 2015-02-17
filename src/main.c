@@ -25,7 +25,7 @@
 #include "menu.h"
 #include "sys.h"
 
-int main(void) {
+int main(int argc, char *argv[]) {
     srand(time(0));
 
     if(!sysInit()) return 1;
