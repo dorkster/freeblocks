@@ -158,6 +158,12 @@ void blockLogic() {
 
     blockMatch();
 
+    blockRise();
+
+    blockGravity();
+}
+
+void blockRise() {
     if (bump_timer > 0) bump_timer--;
     if (bump_timer == 0) {
         bump_pixels++;
@@ -173,8 +179,6 @@ void blockLogic() {
         speed++;
         speed_timer = SPEED_TIME;
     }
-
-    blockGravity();
 }
 
 void blockGravity() {
@@ -196,7 +200,7 @@ void blockGravity() {
         }
 
         if (gap_size > 0) {
-            for (i=first_empty-gap_size;i>0;i--) {
+            for (i=first_empty-gap_size;i>=0;i--) {
                 if (blocks[i][j].alive) {
                     blockSwitch(i,j,i+gap_size,j, true);
                 }

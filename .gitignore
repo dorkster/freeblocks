@@ -16,3 +16,8 @@ install_manifest.txt
 *.sln
 freeblocks.dir/
 Win32/
+
+# OSX
+CMakeScripts/
+Debug/
+*.xcodeproj
