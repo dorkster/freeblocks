@@ -59,7 +59,6 @@ int speed;
 int speed_init;
 int speed_timer;
 int game_over_timer;
-int moving_blocks;
 
 void blockSet(int i, int j, bool alive, int color);
 void blockClear(int i, int j);

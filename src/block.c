@@ -78,7 +78,6 @@ bool blockCompare(int i, int j, int k, int l) {
 bool blockAnimate() {
     int i,j;
     bool anim = false;
-    moving_blocks = false;
 
     for (i=0;i<ROWS;i++) {
         for (j=0;j<COLS;j++) {
@@ -94,23 +93,19 @@ bool blockAnimate() {
             // move blocks
             if (blocks[i][j].dest_x < blocks[i][j].x) {
                 blocks[i][j].x -= BLOCK_MOVE_SPEED;
-                moving_blocks = true;
                 anim = true;
             }
             else if (blocks[i][j].dest_x > blocks[i][j].x) {
                 blocks[i][j].x += BLOCK_MOVE_SPEED;
-                moving_blocks = true;
                 anim = true;
             }
 
             if (blocks[i][j].dest_y < blocks[i][j].y) {
                 blocks[i][j].y -= BLOCK_MOVE_SPEED;
-                moving_blocks = true;
                 anim = true;
             }
             else if (blocks[i][j].dest_y > blocks[i][j].y) {
                 blocks[i][j].y += BLOCK_MOVE_SPEED;
-                moving_blocks = true;
                 anim = true;
             }
         }
@@ -130,7 +125,6 @@ void blockInitAll() {
     speed = speed_init;
     speed_timer = SPEED_TIME;
     game_over_timer = 0;
-    moving_blocks = false;
 
     for(i=0;i<ROWS;i++) {
         for(j=0;j<COLS;j++) {
@@ -311,6 +305,5 @@ bool blockAddLayer() {
 }
 
 void blockSwitchCursor() {
-    if (moving_blocks == false)
-        blockSwitch(cursor_y, cursor_x, cursor_y, cursor_x+1, true);
+    blockSwitch(cursor_y, cursor_x, cursor_y, cursor_x+1, true);
 }
