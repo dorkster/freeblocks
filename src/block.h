@@ -38,6 +38,7 @@
 #define SPEED_TIME 1800 / (60/FPS)
 #define MAX_SPEED 25
 #define BLOCK_MOVE_SPEED BLOCK_SIZE / 2
+#define CURSOR_MIN_Y 1
 
 const int POINTS_PER_BLOCK;
 const int POINTS_PER_BUMP;
