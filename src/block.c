@@ -289,7 +289,7 @@ bool blockAddLayer() {
         }
     }
 
-    if (cursor_y > 1) cursor_y--;
+    if (cursor_y > CURSOR_MIN_Y) cursor_y--;
 
     for (j=0;j<COLS;j++) {
         for (i=1;i<ROWS;i++) {

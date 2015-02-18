@@ -240,7 +240,7 @@ void gameLogic() {
 
 void gameMove() {
     cursor_moving = false;
-    if (cursor_y < 1) cursor_y = 1;
+    if (cursor_y < CURSOR_MIN_Y) cursor_y = CURSOR_MIN_Y;
     if (action_move != action_last_move) cursor_timer = -1;
     if (action_move == action_last_move && action_cooldown > 0) return;
 
@@ -258,7 +258,7 @@ void gameMove() {
         }
         break;
     case ACTION_UP:
-        if (cursor_y > 1) {
+        if (cursor_y > CURSOR_MIN_Y) {
             cursor_y--;
             cursor_moving = true;
         }
