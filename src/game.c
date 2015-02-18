@@ -90,6 +90,7 @@ void gameInit() {
     score = 0;
     cursor_x = (COLS/2)-1;
     cursor_y = ROWS-START_ROWS-1;
+    if (cursor_y > CURSOR_MAX_Y) cursor_y = CURSOR_MAX_Y;
 
     cursor_moving = false;
     cursor_timer = -1;
@@ -264,7 +265,7 @@ void gameMove() {
         }
         break;
     case ACTION_DOWN:
-        if (cursor_y < ROWS - 2) {
+        if (cursor_y < CURSOR_MAX_Y) {
             cursor_y++;
             cursor_moving = true;
         }
