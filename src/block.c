@@ -36,6 +36,7 @@ void blockSet(int i, int j, bool alive, int color) {
     blocks[i][j].matched = false;
     blocks[i][j].clear_timer = 0;
     blocks[i][j].frame = -1;
+    blocks[i][j].moving = false;
 }
 
 void blockClear(int i, int j) {
@@ -44,6 +45,7 @@ void blockClear(int i, int j) {
     blocks[i][j].matched = false;
     blocks[i][j].clear_timer = 0;
     blocks[i][j].frame = -1;
+    blocks[i][j].moving = false;
 }
 
 void blockSwitch(int i, int j, int k, int l, bool animate) {
@@ -78,10 +80,11 @@ bool blockCompare(int i, int j, int k, int l) {
 bool blockAnimate() {
     int i,j;
     bool anim = false;
-    moving_blocks = false;
 
     for (i=0;i<ROWS;i++) {
         for (j=0;j<COLS;j++) {
+            blocks[i][j].moving = false;
+
             if (blocks[i][j].matched && blocks[i][j].frame < 8) {
                 if (blocks[i][j].clear_timer > 0) blocks[i][j].clear_timer--;
                 if (blocks[i][j].clear_timer == 0) {
@@ -94,23 +97,23 @@ bool blockAnimate() {
             // move blocks
             if (blocks[i][j].dest_x < blocks[i][j].x) {
                 blocks[i][j].x -= BLOCK_MOVE_SPEED;
-                moving_blocks = true;
+                blocks[i][j].moving = true;
                 anim = true;
             }
             else if (blocks[i][j].dest_x > blocks[i][j].x) {
                 blocks[i][j].x += BLOCK_MOVE_SPEED;
-                moving_blocks = true;
+                blocks[i][j].moving = true;
                 anim = true;
             }
 
             if (blocks[i][j].dest_y < blocks[i][j].y) {
                 blocks[i][j].y -= BLOCK_MOVE_SPEED;
-                moving_blocks = true;
+                blocks[i][j].moving = true;
                 anim = true;
             }
             else if (blocks[i][j].dest_y > blocks[i][j].y) {
                 blocks[i][j].y += BLOCK_MOVE_SPEED;
-                moving_blocks = true;
+                blocks[i][j].moving = true;
                 anim = true;
             }
         }
@@ -130,7 +133,6 @@ void blockInitAll() {
     speed = speed_init;
     speed_timer = SPEED_TIME;
     game_over_timer = 0;
-    moving_blocks = false;
 
     for(i=0;i<ROWS;i++) {
         for(j=0;j<COLS;j++) {
@@ -311,6 +313,7 @@ bool blockAddLayer() {
 }
 
 void blockSwitchCursor() {
-    if (moving_blocks == false)
+    // don't allow switching blocks that are already moving
+    if (blocks[cursor_y][cursor_x].moving == false && blocks[cursor_y][cursor_x+1].moving == false)
         blockSwitch(cursor_y, cursor_x, cursor_y, cursor_x+1, true);
 }

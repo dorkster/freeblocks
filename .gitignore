@@ -2,6 +2,7 @@ freeblocks
 .depend
 build/
 freeblocks.opk
+gmon.out
 
 CMakeFiles/
 CMakeCache.txt
