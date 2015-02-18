@@ -69,8 +69,8 @@ void drawCursor() {
     if (paused) return;
 
     SDL_Rect dest;
-    dest.x = cursor_x*BLOCK_SIZE;
-    dest.y = (cursor_y*BLOCK_SIZE) - bump_pixels;
+    dest.x = cursor_x*BLOCK_SIZE + DRAW_OFFSET_X;
+    dest.y = (cursor_y*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
     SDL_BlitSurface(surface_cursor,NULL,screen,&dest);
 }
 
@@ -85,8 +85,8 @@ void drawBlocks() {
             if(blocks[i][j].alive) {
                 SDL_Rect src,dest;
 
-                dest.x = blocks[i][j].x;
-                dest.y = blocks[i][j].y - bump_pixels;
+                dest.x = blocks[i][j].x + DRAW_OFFSET_X;
+                dest.y = blocks[i][j].y - bump_pixels + DRAW_OFFSET_Y;
 
                 if (blocks[i][j].matched) {
                     src.x = blocks[i][j].frame * BLOCK_SIZE;
