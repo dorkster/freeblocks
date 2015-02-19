@@ -219,7 +219,7 @@ void blockMatch() {
 
     if (!animating) {
         // now, clear all the matches
-        for (i=0;i<ROWS-1;i++) {
+        for (i=0;i<ROWS-DISABLED_ROWS;i++) {
             for(j=0;j<COLS;j++) {
                 if (blocks[i][j].matched) {
                     blockClear(i,j);
