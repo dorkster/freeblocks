@@ -160,7 +160,9 @@ void blockLogic() {
 
     blockMatch();
 
+#ifndef __JEWELS__
     blockRise();
+#endif
 
     blockGravity();
 }

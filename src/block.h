@@ -27,18 +27,26 @@
 #define BLOCK_SIZE 32
 #endif
 
+#ifdef __JEWELS__
+#define ROWS 9
+#define COLS 9
+#define START_ROWS ROWS
+#define DISABLED_ROWS 0
+#else
 #define ROWS 15
 #define COLS 20
+#define START_ROWS 4
+#define DISABLED_ROWS 1
+#endif
+
 #define DRAW_OFFSET_X ((SCREEN_WIDTH - COLS*BLOCK_SIZE) / 2)
 #define DRAW_OFFSET_Y ((SCREEN_HEIGHT - ROWS*BLOCK_SIZE) / 2)
-#define START_ROWS 4
 #define CLEAR_TIME 4 / (60/FPS)
 #define SPEED_FACTOR 32 / BLOCK_SIZE
 #define BUMP_TIME (60 / (60/FPS)) * SPEED_FACTOR
 #define SPEED_TIME 1800 / (60/FPS)
 #define MAX_SPEED 25
 #define BLOCK_MOVE_SPEED BLOCK_SIZE / 2
-#define DISABLED_ROWS 1
 #define CURSOR_MIN_Y 1
 #define CURSOR_MAX_Y (ROWS-1-DISABLED_ROWS)
 
