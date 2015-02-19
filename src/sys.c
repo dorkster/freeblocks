@@ -72,7 +72,7 @@ int cursor_y = 7;
 int action_cooldown = 0;
 ActionMove action_move = ACTION_NONE;
 ActionMove action_last_move = ACTION_NONE;
-bool action_switch = false;
+ActionMove action_switch = ACTION_NONE;
 bool action_bump = false;
 bool action_pause = false;
 bool action_exit = false;
@@ -210,7 +210,11 @@ bool sysLoadFiles() {
     // graphics
     if (!sysLoadImage(&surface_blocks, "blocks.png")) return false;
     if (!sysLoadImage(&surface_clear, "clear.png")) return false;
+#ifdef __JEWELS__
+    if (!sysLoadImage(&surface_cursor, "cursor_single.png")) return false;
+#else
     if (!sysLoadImage(&surface_cursor, "cursor.png")) return false;
+#endif
     if (!sysLoadImage(&surface_bar, "bar.png")) return false;
     if (!sysLoadImage(&surface_bar_inactive, "bar_inactive.png")) return false;
     if (!sysLoadImage(&surface_background, "background.png")) return false;
@@ -260,8 +264,19 @@ void sysInput() {
                 action_move = ACTION_UP;
             if(event.key.keysym.sym == SDLK_DOWN)
                 action_move = ACTION_DOWN;
+#ifdef __JEWELS__
+            if(event.key.keysym.sym == SDLK_a)
+                action_switch = ACTION_LEFT;
+            if(event.key.keysym.sym == SDLK_d)
+                action_switch = ACTION_RIGHT;
+            if(event.key.keysym.sym == SDLK_w)
+                action_switch = ACTION_UP;
+            if(event.key.keysym.sym == SDLK_s)
+                action_switch = ACTION_DOWN;
+#else
             if(event.key.keysym.sym == KEY_SWITCH)
-                action_switch = true;
+                action_switch = ACTION_RIGHT;
+#endif
             if(event.key.keysym.sym == KEY_BUMP)
                 action_bump = true;
             if(event.key.keysym.sym == KEY_PAUSE)
@@ -278,8 +293,12 @@ void sysInput() {
                 action_move = ACTION_NONE;
                 action_last_move = ACTION_NONE;
             }
-            if(event.key.keysym.sym == KEY_SWITCH)
-                action_switch = false;
+#ifdef __JEWELS__
+            if(event.key.keysym.sym == SDLK_a || event.key.keysym.sym == SDLK_d || event.key.keysym.sym == SDLK_w || event.key.keysym.sym == SDLK_s)
+#else
+			if(event.key.keysym.sym == KEY_SWITCH)
+#endif
+                action_switch = ACTION_NONE;
             if(event.key.keysym.sym == KEY_BUMP)
                 action_bump = false;
             if(event.key.keysym.sym == KEY_PAUSE)
@@ -291,7 +310,7 @@ void sysInput() {
         else if(event.type == SDL_JOYBUTTONDOWN) {
             if(event.jbutton.which == 0) {
                 if (event.jbutton.button == 0)
-                    action_switch = true;
+                    action_switch = ACTION_RIGHT;
                 if (event.jbutton.button == 1)
                     action_bump = true;
                 if (event.jbutton.button == 9)
@@ -302,7 +321,7 @@ void sysInput() {
         else if(event.type == SDL_JOYBUTTONUP) {
             if(event.jbutton.which == 0) {
                 if (event.jbutton.button == 0)
-                    action_switch = false;
+                    action_switch = ACTION_NONE;
                 if (event.jbutton.button == 1)
                     action_bump = false;
                 if (event.jbutton.button == 9)

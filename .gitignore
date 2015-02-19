@@ -21,4 +21,5 @@ Win32/
 # OSX
 CMakeScripts/
 Debug/
+freeblocks.build/
 *.xcodeproj

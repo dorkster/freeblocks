@@ -162,6 +162,8 @@ void blockLogic() {
 
 #ifndef __JEWELS__
     blockRise();
+#else
+    blockAddFromTop();
 #endif
 
     blockGravity();
@@ -183,6 +185,12 @@ void blockRise() {
         speed++;
         speed_timer = SPEED_TIME;
     }
+}
+
+void blockAddFromTop() {
+    for(int j=0;j<COLS;j++)
+        if (!blocks[0][j].alive)
+            blockSet(0,j,true,rand() % 6);
 }
 
 void blockGravity() {
@@ -314,8 +322,18 @@ bool blockAddLayer() {
     return true;
 }
 
-void blockSwitchCursor() {
+void blockSwitchCursor(ActionMove dir) {
+    int dx,dy;
+    switch (dir) {
+        case ACTION_LEFT: dx = -1; dy = 0; break;
+        case ACTION_RIGHT: dx = 1; dy = 0; break;
+        case ACTION_UP: dx = 0; dy = -1; break;
+        case ACTION_DOWN: dx = 0; dy = 1; break;
+        default: return;
+    }
+    if (cursor_x+dx < 0 || cursor_x+dx >= COLS || cursor_y+dy < 0 || cursor_y+dy >= ROWS) return;
+    Block *other = &blocks[cursor_y+dy][cursor_x+dx];
     // don't allow switching blocks that are already moving
-    if (blocks[cursor_y][cursor_x].moving == false && blocks[cursor_y][cursor_x+1].moving == false)
-        blockSwitch(cursor_y, cursor_x, cursor_y, cursor_x+1, true);
+    if (blocks[cursor_y][cursor_x].moving == false && other->moving == false)
+        blockSwitch(cursor_y, cursor_x, cursor_y+dy, cursor_x+dx, true);
 }

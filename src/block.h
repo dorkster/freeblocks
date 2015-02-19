@@ -32,11 +32,15 @@
 #define COLS 9
 #define START_ROWS ROWS
 #define DISABLED_ROWS 0
+#define CURSOR_MAX_X (COLS-1)
+#define CURSOR_MIN_Y 0
 #else
 #define ROWS 15
 #define COLS 20
 #define START_ROWS 4
 #define DISABLED_ROWS 1
+#define CURSOR_MAX_X (COLS-2)
+#define CURSOR_MIN_Y 1
 #endif
 
 #define DRAW_OFFSET_X ((SCREEN_WIDTH - COLS*BLOCK_SIZE) / 2)
@@ -47,7 +51,6 @@
 #define SPEED_TIME 1800 / (60/FPS)
 #define MAX_SPEED 25
 #define BLOCK_MOVE_SPEED BLOCK_SIZE / 2
-#define CURSOR_MIN_Y 1
 #define CURSOR_MAX_Y (ROWS-1-DISABLED_ROWS)
 
 const int POINTS_PER_BLOCK;
@@ -82,9 +85,10 @@ void blockInitAll();
 
 void blockLogic();
 void blockRise();
+void blockAddFromTop();
 void blockGravity();
 void blockMatch();
 bool blockAddLayer();
-void blockSwitchCursor();
+void blockSwitchCursor(ActionMove dir);
 
 #endif

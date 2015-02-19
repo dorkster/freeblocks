@@ -103,7 +103,7 @@ typedef enum {
 }ActionMove;
 ActionMove action_move;
 ActionMove action_last_move;
-bool action_switch;
+ActionMove action_switch;
 bool action_bump;
 bool action_pause;
 bool action_exit;

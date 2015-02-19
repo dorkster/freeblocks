@@ -253,7 +253,7 @@ void gameMove() {
         }
         break;
     case ACTION_RIGHT:
-        if (cursor_x < COLS - 2) {
+        if (cursor_x < CURSOR_MAX_X) {
             cursor_x++;
             cursor_moving = true;
         }
@@ -296,9 +296,9 @@ void gameMove() {
 }
 
 void gameSwitch() {
-    if (action_switch) {
-        blockSwitchCursor();
-        action_switch = false;
+    if (action_switch != ACTION_NONE) {
+        blockSwitchCursor(action_switch);
+        action_switch = ACTION_NONE;
     }
 }
 
