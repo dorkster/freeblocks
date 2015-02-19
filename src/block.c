@@ -234,8 +234,8 @@ void blockMatch() {
     }
 
     // next, mark all the blocks that will be cleared
-    // skip the bottom row because blocks there aren't fully "in" the block field
-    for (i=0;i<ROWS-1;i++) {
+    // skip the bottom rows because blocks there aren't fully "in" the block field
+    for (i=0;i<ROWS-DISABLED_ROWS;i++) {
         for(j=0;j<COLS;j++) {
             if (blocks[i][j].alive) {
                 // horizontal matches
@@ -254,7 +254,7 @@ void blockMatch() {
                 }
                 // vertical matches
                 match_count = 0;
-                for(k=i+1;k<ROWS-1;k++) {
+                for(k=i+1;k<ROWS-DISABLED_ROWS;k++) {
                     if (blockCompare(i,j,k,j))
                         match_count++;
                     else

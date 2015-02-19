@@ -98,7 +98,7 @@ void drawBlocks() {
                 } else {
                     src.x = blocks[i][j].color * BLOCK_SIZE;
 
-                    if (i > CURSOR_MAX_Y || game_over || game_over_timer > 0) src.y = BLOCK_SIZE;
+                    if (i > ROWS-1-DISABLED_ROWS || game_over || game_over_timer > 0) src.y = BLOCK_SIZE;
                     else src.y = 0;
 
                     src.w = src.h = BLOCK_SIZE;
