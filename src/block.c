@@ -31,6 +31,10 @@ void blockSet(int i, int j, bool alive, int color) {
     blocks[i][j].y = i*BLOCK_SIZE;
     blocks[i][j].dest_x = j*BLOCK_SIZE;
     blocks[i][j].dest_y = i*BLOCK_SIZE;
+#ifdef __JEWELS__
+    blocks[i][j].return_row = -1;
+    blocks[i][j].return_col = -1;
+#endif
     blocks[i][j].alive = alive;
     blocks[i][j].color = color;
     blocks[i][j].matched = false;
@@ -40,6 +44,10 @@ void blockSet(int i, int j, bool alive, int color) {
 }
 
 void blockClear(int i, int j) {
+#ifdef __JEWELS__
+    blocks[i][j].return_row = -1;
+    blocks[i][j].return_col = -1;
+#endif
     blocks[i][j].alive = false;
     blocks[i][j].color = 1;
     blocks[i][j].matched = false;
@@ -122,6 +130,22 @@ bool blockAnimate() {
     return anim;
 }
 
+void blockReturn() {
+    int i,j;
+
+    for (i=0;i<ROWS;i++) {
+        for (j=0;j<COLS;j++) {
+            // If we attempted to switch this block but
+            // there is no match, move it back
+            if (blocks[i][j].dest_x == blocks[i][j].x && blocks[i][j].dest_y == blocks[i][j].y && !blocks[i][j].matched && !blocks[i][j].moving && blocks[i][j].return_row != -1) {
+                blockSwitch(i, j, blocks[i][j].return_row, blocks[i][j].return_col, true);
+                blocks[i][j].return_row = -1;
+                blocks[i][j].return_col = -1;
+            }
+        }
+    }
+}
+
 void blockInitAll() {
     int i,j;
     int new_color = -1;
@@ -163,6 +187,7 @@ void blockLogic() {
 #ifndef __JEWELS__
     blockRise();
 #else
+    blockReturn();
     blockAddFromTop();
 #endif
 
@@ -334,6 +359,11 @@ void blockSwitchCursor(ActionMove dir) {
     if (cursor_x+dx < 0 || cursor_x+dx >= COLS || cursor_y+dy < 0 || cursor_y+dy >= ROWS) return;
     Block *other = &blocks[cursor_y+dy][cursor_x+dx];
     // don't allow switching blocks that are already moving
-    if (blocks[cursor_y][cursor_x].moving == false && other->moving == false)
+    if (blocks[cursor_y][cursor_x].moving == false && other->moving == false) {
         blockSwitch(cursor_y, cursor_x, cursor_y+dy, cursor_x+dx, true);
+#ifdef __JEWELS__
+        blocks[cursor_y][cursor_x].return_row = cursor_y+dy;
+        blocks[cursor_y][cursor_x].return_col = cursor_x+dx;
+#endif
+    }
 }

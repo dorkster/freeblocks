@@ -28,12 +28,13 @@
 #endif
 
 #ifdef __JEWELS__
-#define ROWS 9
-#define COLS 9
+#define ROWS 8
+#define COLS 8
 #define START_ROWS ROWS
 #define DISABLED_ROWS 0
 #define CURSOR_MAX_X (COLS-1)
 #define CURSOR_MIN_Y 0
+#define BLOCK_MOVE_SPEED BLOCK_SIZE / 4
 #else
 #define ROWS 15
 #define COLS 20
@@ -41,6 +42,7 @@
 #define DISABLED_ROWS 1
 #define CURSOR_MAX_X (COLS-2)
 #define CURSOR_MIN_Y 1
+#define BLOCK_MOVE_SPEED BLOCK_SIZE / 2
 #endif
 
 #define DRAW_OFFSET_X ((SCREEN_WIDTH - COLS*BLOCK_SIZE) / 2)
@@ -50,7 +52,6 @@
 #define BUMP_TIME (60 / (60/FPS)) * SPEED_FACTOR
 #define SPEED_TIME 1800 / (60/FPS)
 #define MAX_SPEED 25
-#define BLOCK_MOVE_SPEED BLOCK_SIZE / 2
 #define CURSOR_MAX_Y (ROWS-1-DISABLED_ROWS)
 
 const int POINTS_PER_BLOCK;
@@ -60,6 +61,9 @@ const int POINTS_PER_COMBO_BLOCK;
 typedef struct Block{
     int x,y;
     int dest_x, dest_y;
+#ifdef __JEWELS__
+    int return_row, return_col;
+#endif
     bool alive;
     int color;
     bool matched;
