@@ -199,7 +199,7 @@ void blockGravity() {
     for (j=0;j<COLS;j++) {
         int gap_size = 0;
         int first_empty = -1;
-        for (k=ROWS-1; k>1; k--) {
+        for (k=ROWS-1; k>0; k--) {
             if (first_empty == -1 && !blocks[k][j].alive)
                 first_empty = k;
 
