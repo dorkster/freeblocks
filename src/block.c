@@ -146,10 +146,21 @@ void blockReturn() {
     }
 }
 
+void blockAddLayerRandom(int i) {
+    int j;
+    int last_color = -1;
+    for(j=0;j<COLS;j++) {
+        int new_color = rand() % 6;
+        while (new_color == last_color || (i > 0 && new_color == blocks[i-1][j].color)) {
+            new_color = rand() % 6;
+        }
+        last_color = new_color;
+        blockSet(i,j,true,new_color);
+    }
+}
+
 void blockInitAll() {
     int i,j;
-    int new_color = -1;
-    int last_color = -1;
 
     animating = false;
     bump_timer = 0;
@@ -165,14 +176,7 @@ void blockInitAll() {
     }
 
     for(i=ROWS-START_ROWS;i<ROWS;i++) {
-        for(j=0;j<COLS;j++) {
-            new_color = rand() % 6;
-            while (new_color == last_color || new_color == blocks[i-1][j].color) {
-                new_color = rand() % 6;
-            }
-            last_color = new_color;
-            blockSet(i,j,true,new_color);
-        }
+        blockAddLayerRandom(i);
     }
 }
 
@@ -322,8 +326,6 @@ bool blockAddLayer() {
     if (animating) return false;
 
     int i,j;
-    int new_color = -1;
-    int last_color = -1;
 
     // check if one of the columns is full
     // if so, set game over state
@@ -342,14 +344,7 @@ bool blockAddLayer() {
         }
     }
 
-    for(j=0;j<COLS;j++) {
-        new_color = rand() % 6;
-        while (new_color == last_color || new_color == blocks[ROWS-2][j].color) {
-            new_color = rand() % 6;
-        }
-        last_color = new_color;
-        blockSet(ROWS-1,j,true,new_color);
-    }
+    blockAddLayerRandom(ROWS-1);
 
     // reset bump pixels to the previous block level
     bump_pixels -= bump_pixels % BLOCK_SIZE;
