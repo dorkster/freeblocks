@@ -93,6 +93,8 @@ void blockAddFromTop();
 void blockGravity();
 void blockMatch();
 bool blockAddLayer();
+bool blockHasSwitchMatch();
+bool blockHasGaps();
 void blockSwitchCursor(ActionMove dir);
 
 #endif

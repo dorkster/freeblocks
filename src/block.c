@@ -58,6 +58,7 @@ void blockClear(int i, int j) {
 
 void blockSwitch(int i, int j, int k, int l, bool animate) {
     if (blocks[i][j].matched || blocks[k][l].matched) return;
+    if (i < 0 || i >= ROWS || j < 0 || j >= COLS || k < 0 || k >= ROWS || l < 0 || l >= COLS) return;
 
     int b1_color = blocks[i][j].color;
     int b1_alive = blocks[i][j].alive;
@@ -244,6 +245,10 @@ void blockLogic() {
 #endif
 
     blockGravity();
+
+#ifdef __JEWELS__
+    if (!blockHasGaps() && !blockHasSwitchMatch()) game_over_timer = FPS * 2;
+#endif
 }
 
 void blockRise() {
@@ -376,6 +381,36 @@ bool blockAddLayer() {
     bump_pixels -= bump_pixels % BLOCK_SIZE;
 
     return true;
+}
+
+bool blockHasSwitchMatch() {
+    // check if no moves will result in any matches
+    // do this by performing every possible switch and checking for matches
+    int i,j;
+    bool has_switch_match;
+
+    for (j=0;j<COLS;j++) {
+        for (i=0;i<ROWS;i++) {
+            blockSwitch(i,j,i+1,j,false);
+            has_switch_match = has_switch_match || blockHasMatches();
+            blockSwitch(i,j,i+1,j,false);
+            blockSwitch(i,j,i,j+1,false);
+            has_switch_match = has_switch_match || blockHasMatches();
+            blockSwitch(i,j,i,j+1,false);
+            if (has_switch_match) return true;
+        }
+        if (has_switch_match) return true;
+    }
+    return false;
+}
+
+bool blockHasGaps() {
+    int i,j;
+
+    for (j=0;j<COLS;j++)
+        for (i=0;i<ROWS;i++)
+            if (!blocks[i][j].alive) return true;
+    return false;
 }
 
 void blockSwitchCursor(ActionMove dir) {
