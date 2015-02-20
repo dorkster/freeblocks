@@ -246,9 +246,31 @@ void blockGravity() {
     }
 }
 
+int blockMatchHorizontal(int i, int j) {
+    int match_count = 0;
+    for(int k=j+1;k<COLS;k++) {
+        if (blockCompare(i,j,i,k))
+            match_count++;
+        else
+            break;
+    }
+    return match_count;
+}
+
+int blockMatchVertical(int i, int j) {
+    int match_count = 0;
+    for(int k=i+1;k<ROWS-DISABLED_ROWS;k++) {
+        if (blockCompare(i,j,k,j))
+            match_count++;
+        else
+            break;
+    }
+    return match_count;
+}
+
 void blockMatch() {
     int i,j,k;
-    int match_count = 0;
+    int match_count;
     int blocks_cleared = 0;
     bool new_match = false;
 
@@ -274,13 +296,7 @@ void blockMatch() {
         for(j=0;j<COLS;j++) {
             if (blocks[i][j].alive) {
                 // horizontal matches
-                match_count = 0;
-                for(k=j+1;k<COLS;k++) {
-                    if (blockCompare(i,j,i,k))
-                        match_count++;
-                    else
-                        break;
-                }
+                match_count = blockMatchHorizontal(i,j);
                 if (match_count > 1) {
                     for(k=j;k<j+match_count+1;k++) {
                         blocks[i][k].matched = true;
@@ -288,13 +304,7 @@ void blockMatch() {
                     }
                 }
                 // vertical matches
-                match_count = 0;
-                for(k=i+1;k<ROWS-DISABLED_ROWS;k++) {
-                    if (blockCompare(i,j,k,j))
-                        match_count++;
-                    else
-                        break;
-                }
+                match_count = blockMatchVertical(i,j);
                 if (match_count > 1) {
                     for(k=i;k<i+match_count+1;k++) {
                         blocks[k][j].matched = true;
