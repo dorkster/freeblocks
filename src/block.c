@@ -154,6 +154,7 @@ bool blockAnimate() {
 }
 
 void blockReturn() {
+#ifdef __JEWELS__
     int i,j;
 
     for (i=0;i<ROWS;i++) {
@@ -167,6 +168,7 @@ void blockReturn() {
             }
         }
     }
+#endif
 }
 
 void blockAddLayerRandom(int i) {
