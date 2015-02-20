@@ -85,6 +85,28 @@ bool blockCompare(int i, int j, int k, int l) {
     return true;
 }
 
+int blockMatchHorizontal(int i, int j) {
+    int match_count = 0;
+    for(int k=j+1;k<COLS;k++) {
+        if (blockCompare(i,j,i,k))
+            match_count++;
+        else
+            break;
+    }
+    return match_count;
+}
+
+int blockMatchVertical(int i, int j) {
+    int match_count = 0;
+    for(int k=i+1;k<ROWS-DISABLED_ROWS;k++) {
+        if (blockCompare(i,j,k,j))
+            match_count++;
+        else
+            break;
+    }
+    return match_count;
+}
+
 bool blockAnimate() {
     int i,j;
     bool anim = false;
@@ -159,6 +181,22 @@ void blockAddLayerRandom(int i) {
     }
 }
 
+bool blockHasMatches() {
+    // Check if there are any matches on the board
+    int i,j;
+
+    for (i=0;i<ROWS;i++) {
+        for(j=0;j<COLS;j++) {
+            if (blocks[i][j].alive) {
+                // horizontal matches
+                if (blockMatchHorizontal(i,j) > 1) return true;
+                if (blockMatchVertical(i,j) > 1) return true;
+            }
+        }
+    }
+	return false;
+}
+
 void blockInitAll() {
     int i,j;
 
@@ -175,9 +213,19 @@ void blockInitAll() {
         }
     }
 
+#ifndef __JEWELS__
     for(i=ROWS-START_ROWS;i<ROWS;i++) {
         blockAddLayerRandom(i);
     }
+#else
+    do {
+        for(i=ROWS-START_ROWS;i<ROWS;i++) {
+            for(j=0;j<COLS;j++) {
+                blockSet(i,j,true,rand() % 6);
+            }
+        }
+    } while (blockHasMatches());
+#endif
 }
 
 void blockLogic() {
@@ -248,28 +296,6 @@ void blockGravity() {
             }
         }
     }
-}
-
-int blockMatchHorizontal(int i, int j) {
-    int match_count = 0;
-    for(int k=j+1;k<COLS;k++) {
-        if (blockCompare(i,j,i,k))
-            match_count++;
-        else
-            break;
-    }
-    return match_count;
-}
-
-int blockMatchVertical(int i, int j) {
-    int match_count = 0;
-    for(int k=i+1;k<ROWS-DISABLED_ROWS;k++) {
-        if (blockCompare(i,j,k,j))
-            match_count++;
-        else
-            break;
-    }
-    return match_count;
 }
 
 void blockMatch() {
