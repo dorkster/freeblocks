@@ -88,14 +88,14 @@ void gameOptions() {
 void gameInit() {
     title_screen = false;
     score = 0;
-    cursor_x = (COLS/2)-1;
-    cursor_y = ROWS-START_ROWS-1;
-    if (cursor_y > CURSOR_MAX_Y) cursor_y = CURSOR_MAX_Y;
-
     cursor_moving = false;
     cursor_timer = -1;
 
     blockInitAll();
+    cursor.x1 = (COLS/2)-1;
+    cursor.y1 = ROWS-START_ROWS;
+    if (cursor.y1 > CURSOR_MAX_Y) cursor.y1 = CURSOR_MAX_Y;
+
 
     Mix_VolumeMusic(option_music*16);
     if (!game_over) Mix_PlayMusic(music,-1);
@@ -241,37 +241,80 @@ void gameLogic() {
 
 void gameMove() {
     cursor_moving = false;
-    if (cursor_y < CURSOR_MIN_Y) cursor_y = CURSOR_MIN_Y;
+    if (cursor.y1 < CURSOR_MIN_Y) cursor.y1 = CURSOR_MIN_Y;
     if (action_move != action_last_move) cursor_timer = -1;
     if (action_move == action_last_move && action_cooldown > 0) return;
 
-    switch (action_move) {
-    case ACTION_LEFT:
-        if (cursor_x > 0) {
-            cursor_x--;
-            cursor_moving = true;
+    if (game_mode == GAME_MODE_JEWELS && jewels_cursor_select) {
+        switch (action_move) {
+        case ACTION_LEFT:
+            if (cursor.x1 > 0) {
+                cursor.x2 = cursor.x1 - 1;
+                cursor.y2 = cursor.y1;
+                cursor_moving = true;
+                blockSwitchCursor();
+            }
+            break;
+        case ACTION_RIGHT:
+            if (cursor.x1 < CURSOR_MAX_X) {
+                cursor.x2 = cursor.x1 + 1;
+                cursor.y2 = cursor.y1;
+                cursor_moving = true;
+                blockSwitchCursor();
+            }
+            break;
+        case ACTION_UP:
+            if (cursor.y1 > CURSOR_MIN_Y) {
+                cursor.y2 = cursor.y1 - 1;
+                cursor.x2 = cursor.x1;
+                cursor_moving = true;
+                blockSwitchCursor();
+            }
+            break;
+        case ACTION_DOWN:
+            if (cursor.y1 < CURSOR_MAX_Y) {
+                cursor.y2 = cursor.y1 + 1;
+                cursor.x2 = cursor.x1;
+                cursor_moving = true;
+                blockSwitchCursor();
+            }
+            break;
+        case ACTION_NONE:
+            break;
         }
-        break;
-    case ACTION_RIGHT:
-        if (cursor_x < CURSOR_MAX_X) {
-            cursor_x++;
-            cursor_moving = true;
+    }
+    else {
+        switch (action_move) {
+        case ACTION_LEFT:
+            if (cursor.x1 > 0) {
+                cursor.x1--;
+                cursor_moving = true;
+            }
+            break;
+        case ACTION_RIGHT:
+            if (cursor.x1 < CURSOR_MAX_X) {
+                cursor.x1++;
+                cursor_moving = true;
+            }
+            break;
+        case ACTION_UP:
+            if (cursor.y1 > CURSOR_MIN_Y) {
+                cursor.y1--;
+                cursor_moving = true;
+            }
+            break;
+        case ACTION_DOWN:
+            if (cursor.y1 < CURSOR_MAX_Y) {
+                cursor.y1++;
+                cursor_moving = true;
+            }
+            break;
+        case ACTION_NONE:
+            break;
         }
-        break;
-    case ACTION_UP:
-        if (cursor_y > CURSOR_MIN_Y) {
-            cursor_y--;
-            cursor_moving = true;
-        }
-        break;
-    case ACTION_DOWN:
-        if (cursor_y < CURSOR_MAX_Y) {
-            cursor_y++;
-            cursor_moving = true;
-        }
-        break;
-    case ACTION_NONE:
-        break;
+
+        cursor.x2 = (game_mode == GAME_MODE_JEWELS) ? cursor.x1 : cursor.x1+1;
+        cursor.y2 = cursor.y1;
     }
 
     if (cursor_moving) {
@@ -296,15 +339,21 @@ void gameMove() {
 }
 
 void gameSwitch() {
-    if (action_switch != ACTION_NONE) {
-        blockSwitchCursor(action_switch);
-        action_switch = ACTION_NONE;
+    if (action_switch) {
+        blockSwitchCursor();
+        action_switch = false;
     }
 }
 
 void gameBump() {
     if (action_bump) {
-        if (blockAddLayer()) score += POINTS_PER_BUMP;
+        if (game_mode == GAME_MODE_JEWELS) {
+            jewels_cursor_select = false;
+        }
+        else {
+            if (blockAddLayer())
+                score += POINTS_PER_BUMP;
+        }
         action_bump = false;
     }
 }

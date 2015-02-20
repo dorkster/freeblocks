@@ -48,6 +48,7 @@ TTF_Font* font = NULL;
 SDL_Surface* surface_blocks = NULL;
 SDL_Surface* surface_clear = NULL;
 SDL_Surface* surface_cursor = NULL;
+SDL_Surface* surface_cursor_single = NULL;
 SDL_Surface* surface_bar = NULL;
 SDL_Surface* surface_bar_inactive = NULL;
 SDL_Surface* surface_background = NULL;
@@ -66,8 +67,12 @@ int options_screen = -1;
 bool game_over = false;
 bool paused = false;
 bool quit = false;
-int cursor_x = 3;
-int cursor_y = 7;
+
+#ifdef __JEWELS__
+int game_mode = GAME_MODE_JEWELS;
+#else
+int game_mode = GAME_MODE_DEFAULT;
+#endif
 
 int action_cooldown = 0;
 ActionMove action_move = ACTION_NONE;
@@ -210,11 +215,8 @@ bool sysLoadFiles() {
     // graphics
     if (!sysLoadImage(&surface_blocks, "blocks.png")) return false;
     if (!sysLoadImage(&surface_clear, "clear.png")) return false;
-#ifdef __JEWELS__
-    if (!sysLoadImage(&surface_cursor, "cursor_single.png")) return false;
-#else
     if (!sysLoadImage(&surface_cursor, "cursor.png")) return false;
-#endif
+    if (!sysLoadImage(&surface_cursor_highlight, "cursor_highlight.png")) return false;
     if (!sysLoadImage(&surface_bar, "bar.png")) return false;
     if (!sysLoadImage(&surface_bar_inactive, "bar_inactive.png")) return false;
     if (!sysLoadImage(&surface_background, "background.png")) return false;
@@ -242,6 +244,7 @@ void sysCleanup() {
     SDL_FreeSurface(surface_blocks);
     SDL_FreeSurface(surface_clear);
     SDL_FreeSurface(surface_cursor);
+    SDL_FreeSurface(surface_cursor_highlight);
     SDL_FreeSurface(surface_bar);
     SDL_FreeSurface(surface_background);
     SDL_FreeSurface(surface_title);
@@ -264,19 +267,8 @@ void sysInput() {
                 action_move = ACTION_UP;
             if(event.key.keysym.sym == SDLK_DOWN)
                 action_move = ACTION_DOWN;
-#ifdef __JEWELS__
-            if(event.key.keysym.sym == SDLK_a)
-                action_switch = ACTION_LEFT;
-            if(event.key.keysym.sym == SDLK_d)
-                action_switch = ACTION_RIGHT;
-            if(event.key.keysym.sym == SDLK_w)
-                action_switch = ACTION_UP;
-            if(event.key.keysym.sym == SDLK_s)
-                action_switch = ACTION_DOWN;
-#else
             if(event.key.keysym.sym == KEY_SWITCH)
-                action_switch = ACTION_RIGHT;
-#endif
+                action_switch = true;
             if(event.key.keysym.sym == KEY_BUMP)
                 action_bump = true;
             if(event.key.keysym.sym == KEY_PAUSE)
@@ -293,12 +285,8 @@ void sysInput() {
                 action_move = ACTION_NONE;
                 action_last_move = ACTION_NONE;
             }
-#ifdef __JEWELS__
-            if(event.key.keysym.sym == SDLK_a || event.key.keysym.sym == SDLK_d || event.key.keysym.sym == SDLK_w || event.key.keysym.sym == SDLK_s)
-#else
 			if(event.key.keysym.sym == KEY_SWITCH)
-#endif
-                action_switch = ACTION_NONE;
+                action_switch = false;
             if(event.key.keysym.sym == KEY_BUMP)
                 action_bump = false;
             if(event.key.keysym.sym == KEY_PAUSE)
@@ -310,7 +298,7 @@ void sysInput() {
         else if(event.type == SDL_JOYBUTTONDOWN) {
             if(event.jbutton.which == 0) {
                 if (event.jbutton.button == 0)
-                    action_switch = ACTION_RIGHT;
+                    action_switch = true;
                 if (event.jbutton.button == 1)
                     action_bump = true;
                 if (event.jbutton.button == 9)
@@ -321,7 +309,7 @@ void sysInput() {
         else if(event.type == SDL_JOYBUTTONUP) {
             if(event.jbutton.which == 0) {
                 if (event.jbutton.button == 0)
-                    action_switch = ACTION_NONE;
+                    action_switch = false;
                 if (event.jbutton.button == 1)
                     action_bump = false;
                 if (event.jbutton.button == 9)

@@ -27,6 +27,9 @@
 
 typedef enum { false = 0, true = 1 } bool;
 
+#define GAME_MODE_DEFAULT 0
+#define GAME_MODE_JEWELS 1
+
 #ifdef __GCW0__
 #define HALF_GFX
 #define SCREEN_BPP 16
@@ -94,8 +97,14 @@ int options_screen;
 bool game_over;
 bool paused;
 bool quit;
-int cursor_x;
-int cursor_y;
+int game_mode;
+
+struct Cursor {
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+}cursor;
 
 int action_cooldown;
 typedef enum {
@@ -143,6 +152,7 @@ void sysHighScoresClear();
 SDL_Surface* surface_blocks;
 SDL_Surface* surface_clear;
 SDL_Surface* surface_cursor;
+SDL_Surface* surface_cursor_highlight;
 SDL_Surface* surface_bar;
 SDL_Surface* surface_bar_inactive;
 SDL_Surface* surface_background;

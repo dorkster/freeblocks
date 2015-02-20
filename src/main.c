@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "block.h"
 #include "draw.h"
 #include "game.h"
 #include "menu.h"
@@ -50,5 +51,6 @@ int main(int argc, char *argv[]) {
         if(deltaTimer < (1000/FPS))
             SDL_Delay((1000/FPS)-deltaTimer);
     }
+    blockCleanup();
     sysCleanup();
 }

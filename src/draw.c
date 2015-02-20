@@ -69,9 +69,39 @@ void drawCursor() {
     if (paused) return;
 
     SDL_Rect dest;
-    dest.x = cursor_x*BLOCK_SIZE + DRAW_OFFSET_X;
-    dest.y = (cursor_y*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
+    dest.x = cursor.x1*BLOCK_SIZE + DRAW_OFFSET_X;
+    dest.y = (cursor.y1*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
+
     SDL_BlitSurface(surface_cursor,NULL,screen,&dest);
+
+    if (game_mode == GAME_MODE_JEWELS && jewels_cursor_select) {
+        if (cursor.x1 > 0) {
+            dest.x = (cursor.x1-1)*BLOCK_SIZE + DRAW_OFFSET_X;
+            dest.y = (cursor.y1*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
+            SDL_BlitSurface(surface_cursor_highlight,NULL,screen,&dest);
+        }
+        if (cursor.x1 < CURSOR_MAX_X) {
+            dest.x = (cursor.x1+1)*BLOCK_SIZE + DRAW_OFFSET_X;
+            dest.y = (cursor.y1*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
+            SDL_BlitSurface(surface_cursor_highlight,NULL,screen,&dest);
+        }
+        if (cursor.y1 > CURSOR_MIN_Y) {
+            dest.x = cursor.x1*BLOCK_SIZE + DRAW_OFFSET_X;
+            dest.y = ((cursor.y1-1)*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
+            SDL_BlitSurface(surface_cursor_highlight,NULL,screen,&dest);
+        }
+        if (cursor.y1 < CURSOR_MAX_Y) {
+            dest.x = cursor.x1*BLOCK_SIZE + DRAW_OFFSET_X;
+            dest.y = ((cursor.y1+1)*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
+            SDL_BlitSurface(surface_cursor_highlight,NULL,screen,&dest);
+        }
+    }
+
+    if (!(cursor.x1 == cursor.x2 && cursor.y1 == cursor.y2)) {
+        dest.x = cursor.x2*BLOCK_SIZE + DRAW_OFFSET_X;
+        dest.y = (cursor.y2*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
+        SDL_BlitSurface(surface_cursor,NULL,screen,&dest);
+    }
 }
 
 void drawBlocks() {
@@ -126,11 +156,8 @@ void drawInfo() {
     if (game_over || game_over_timer > 0) sprintf(text,"Score: %-10d  Game Over!",score);
     else {
         if (paused) sprintf(text,"Score: %-10d  *Paused*",score);
-#ifdef __JEWELS__
-        else sprintf(text, "Score: %-10d", score);
-#else
+        else if (game_mode == GAME_MODE_JEWELS) sprintf(text, "Score: %-10d", score);
         else sprintf(text,"Score: %-10d  Speed: %d",score,speed);
-#endif
     }
 
     text_info = TTF_RenderText_Blended(font,text,color);

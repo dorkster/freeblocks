@@ -27,52 +27,40 @@
 #define BLOCK_SIZE 32
 #endif
 
-#ifdef __JEWELS__
-#define ROWS 8
-#define COLS 8
-#define START_ROWS ROWS
-#define DISABLED_ROWS 0
-#define CURSOR_MAX_X (COLS-1)
-#define CURSOR_MIN_Y 0
-#define BLOCK_MOVE_SPEED BLOCK_SIZE / 4
-#else
-#define ROWS 15
-#define COLS 20
-#define START_ROWS 4
-#define DISABLED_ROWS 1
-#define CURSOR_MAX_X (COLS-2)
-#define CURSOR_MIN_Y 1
-#define BLOCK_MOVE_SPEED BLOCK_SIZE / 2
-#endif
-
-#define DRAW_OFFSET_X ((SCREEN_WIDTH - COLS*BLOCK_SIZE) / 2)
-#define DRAW_OFFSET_Y ((SCREEN_HEIGHT - ROWS*BLOCK_SIZE) / 2)
 #define CLEAR_TIME 4 / (60/FPS)
 #define SPEED_FACTOR 32 / BLOCK_SIZE
 #define BUMP_TIME (60 / (60/FPS)) * SPEED_FACTOR
 #define SPEED_TIME 1800 / (60/FPS)
 #define MAX_SPEED 25
-#define CURSOR_MAX_Y (ROWS-1-DISABLED_ROWS)
 
 const int POINTS_PER_BLOCK;
 const int POINTS_PER_BUMP;
 const int POINTS_PER_COMBO_BLOCK;
 
+int ROWS;
+int COLS;
+int START_ROWS;
+int DISABLED_ROWS;
+int CURSOR_MAX_X;
+int CURSOR_MIN_Y;
+int CURSOR_MAX_Y;
+int BLOCK_MOVE_SPEED;
+int DRAW_OFFSET_X;
+int DRAW_OFFSET_Y;
+
 typedef struct Block{
     int x,y;
     int dest_x, dest_y;
-#ifdef __JEWELS__
-    int return_row, return_col;
-#endif
     bool alive;
     int color;
     bool matched;
     int clear_timer;
     int frame;
     bool moving;
+    int return_row, return_col;
 }Block;
 
-Block blocks[ROWS][COLS];
+Block **blocks;
 bool animating;
 int bump_timer;
 int bump_pixels;
@@ -80,11 +68,14 @@ int speed;
 int speed_init;
 int speed_timer;
 int game_over_timer;
+bool jewels_cursor_select;
 
 void blockSet(int i, int j, bool alive, int color);
 void blockClear(int i, int j);
 void blockSwitch(int i, int j, int k, int l, bool animate);
 bool blockCompare(int i, int j, int k, int l);
+void blockSetDefaults();
+void blockCleanup();
 void blockInitAll();
 
 void blockLogic();
@@ -95,6 +86,6 @@ void blockMatch();
 bool blockAddLayer();
 bool blockHasSwitchMatch();
 bool blockHasGaps();
-void blockSwitchCursor(ActionMove dir);
+void blockSwitchCursor();
 
 #endif

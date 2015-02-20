@@ -19,46 +19,42 @@
 #include "block.h"
 #include "sys.h"
 
-Block blocks[ROWS][COLS];
 const int POINTS_PER_BLOCK = 10;
 const int POINTS_PER_BUMP = 5;
 const int POINTS_PER_COMBO_BLOCK = 15;
 
 int speed_init = 1;
+Block **blocks = NULL;
 
 void blockSet(int i, int j, bool alive, int color) {
     blocks[i][j].x = j*BLOCK_SIZE;
     blocks[i][j].y = i*BLOCK_SIZE;
     blocks[i][j].dest_x = j*BLOCK_SIZE;
     blocks[i][j].dest_y = i*BLOCK_SIZE;
-#ifdef __JEWELS__
-    blocks[i][j].return_row = -1;
-    blocks[i][j].return_col = -1;
-#endif
     blocks[i][j].alive = alive;
     blocks[i][j].color = color;
     blocks[i][j].matched = false;
     blocks[i][j].clear_timer = 0;
     blocks[i][j].frame = -1;
     blocks[i][j].moving = false;
+    blocks[i][j].return_row = -1;
+    blocks[i][j].return_col = -1;
 }
 
 void blockClear(int i, int j) {
-#ifdef __JEWELS__
-    blocks[i][j].return_row = -1;
-    blocks[i][j].return_col = -1;
-#endif
     blocks[i][j].alive = false;
     blocks[i][j].color = 1;
     blocks[i][j].matched = false;
     blocks[i][j].clear_timer = 0;
     blocks[i][j].frame = -1;
     blocks[i][j].moving = false;
+    blocks[i][j].return_row = -1;
+    blocks[i][j].return_col = -1;
 }
 
 void blockSwitch(int i, int j, int k, int l, bool animate) {
-    if (blocks[i][j].matched || blocks[k][l].matched) return;
     if (i < 0 || i >= ROWS || j < 0 || j >= COLS || k < 0 || k >= ROWS || l < 0 || l >= COLS) return;
+    if (blocks[i][j].matched || blocks[k][l].matched) return;
 
     int b1_color = blocks[i][j].color;
     int b1_alive = blocks[i][j].alive;
@@ -154,7 +150,6 @@ bool blockAnimate() {
 }
 
 void blockReturn() {
-#ifdef __JEWELS__
     int i,j;
 
     for (i=0;i<ROWS;i++) {
@@ -168,7 +163,6 @@ void blockReturn() {
             }
         }
     }
-#endif
 }
 
 void blockAddLayerRandom(int i) {
@@ -200,8 +194,52 @@ bool blockHasMatches() {
 	return false;
 }
 
+void blockSetDefaults() {
+    blockCleanup();
+
+    if (game_mode == GAME_MODE_JEWELS) {
+        ROWS = 8;
+        COLS = 8;
+        START_ROWS = ROWS;
+        DISABLED_ROWS = 0;
+        CURSOR_MAX_X = COLS-1;
+        CURSOR_MIN_Y = 0;
+        BLOCK_MOVE_SPEED = BLOCK_SIZE / 4;
+    }
+    else {
+        ROWS = 15;
+        COLS = 20;
+        START_ROWS = 4;
+        DISABLED_ROWS = 1;
+        CURSOR_MAX_X = COLS-2;
+        CURSOR_MIN_Y = 1;
+        BLOCK_MOVE_SPEED = BLOCK_SIZE / 2;
+    }
+
+    DRAW_OFFSET_X = (SCREEN_WIDTH - COLS * BLOCK_SIZE) / 2;
+    DRAW_OFFSET_Y = (SCREEN_HEIGHT - ROWS * BLOCK_SIZE) / 2;
+    CURSOR_MAX_Y = ROWS-1-DISABLED_ROWS;
+
+    blocks = malloc(sizeof(Block*)*ROWS);
+    for (int i=0; i<ROWS; i++) {
+        blocks[i] = malloc(sizeof(Block)*COLS);
+    }
+}
+
+void blockCleanup() {
+    if (blocks != NULL) {
+        for (int i=0; i<ROWS; i++) {
+            free(blocks[i]);
+        }
+        free(blocks);
+        blocks = NULL;
+    }
+}
+
 void blockInitAll() {
     int i,j;
+
+    blockSetDefaults();
 
     animating = false;
     bump_timer = 0;
@@ -209,6 +247,7 @@ void blockInitAll() {
     speed = speed_init;
     speed_timer = SPEED_TIME;
     game_over_timer = 0;
+    jewels_cursor_select = false;
 
     for(i=0;i<ROWS;i++) {
         for(j=0;j<COLS;j++) {
@@ -216,19 +255,20 @@ void blockInitAll() {
         }
     }
 
-#ifndef __JEWELS__
-    for(i=ROWS-START_ROWS;i<ROWS;i++) {
-        blockAddLayerRandom(i);
-    }
-#else
-    do {
-        for(i=ROWS-START_ROWS;i<ROWS;i++) {
-            for(j=0;j<COLS;j++) {
-                blockSet(i,j,true,rand() % 6);
+    if (game_mode == GAME_MODE_JEWELS) {
+        do {
+            for(i=ROWS-START_ROWS;i<ROWS;i++) {
+                for(j=0;j<COLS;j++) {
+                    blockSet(i,j,true,rand() % 6);
+                }
             }
+        } while (blockHasMatches());
+    }
+    else {
+        for(i=ROWS-START_ROWS;i<ROWS;i++) {
+            blockAddLayerRandom(i);
         }
-    } while (blockHasMatches());
-#endif
+    }
 }
 
 void blockLogic() {
@@ -239,18 +279,18 @@ void blockLogic() {
 
     blockMatch();
 
-#ifndef __JEWELS__
-    blockRise();
-#else
-    blockReturn();
-    blockAddFromTop();
-#endif
+    if (game_mode == GAME_MODE_JEWELS) {
+        blockReturn();
+        blockAddFromTop();
+    }
+    else {
+        blockRise();
+    }
 
     blockGravity();
 
-#ifdef __JEWELS__
-    if (!blockHasGaps() && !blockHasSwitchMatch()) game_over_timer = FPS * 2;
-#endif
+    if (game_mode == GAME_MODE_JEWELS && !blockHasGaps() && !blockHasSwitchMatch())
+        game_over_timer = FPS * 2;
 }
 
 void blockRise() {
@@ -369,7 +409,8 @@ bool blockAddLayer() {
         }
     }
 
-    if (cursor_y > CURSOR_MIN_Y) cursor_y--;
+    if (cursor.y1 > CURSOR_MIN_Y) cursor.y1--;
+    cursor.y2 = cursor.y1;
 
     for (j=0;j<COLS;j++) {
         for (i=1;i<ROWS;i++) {
@@ -389,7 +430,7 @@ bool blockHasSwitchMatch() {
     // check if no moves will result in any matches
     // do this by performing every possible switch and checking for matches
     int i,j;
-    bool has_switch_match;
+    bool has_switch_match = false;
 
     for (j=0;j<COLS;j++) {
         for (i=0;i<ROWS;i++) {
@@ -415,23 +456,27 @@ bool blockHasGaps() {
     return false;
 }
 
-void blockSwitchCursor(ActionMove dir) {
-    int dx,dy;
-    switch (dir) {
-        case ACTION_LEFT: dx = -1; dy = 0; break;
-        case ACTION_RIGHT: dx = 1; dy = 0; break;
-        case ACTION_UP: dx = 0; dy = -1; break;
-        case ACTION_DOWN: dx = 0; dy = 1; break;
-        default: return;
+void blockSwitchCursor() {
+    if (game_mode == GAME_MODE_JEWELS) {
+        if (!jewels_cursor_select) {
+            jewels_cursor_select = true;
+            cursor.x2 = cursor.x1;
+            cursor.y2 = cursor.y1;
+            return;
+        }
+        else {
+            jewels_cursor_select = false;
+        }
     }
-    if (cursor_x+dx < 0 || cursor_x+dx >= COLS || cursor_y+dy < 0 || cursor_y+dy >= ROWS) return;
-    Block *other = &blocks[cursor_y+dy][cursor_x+dx];
+
     // don't allow switching blocks that are already moving
-    if (blocks[cursor_y][cursor_x].moving == false && other->moving == false) {
-        blockSwitch(cursor_y, cursor_x, cursor_y+dy, cursor_x+dx, true);
-#ifdef __JEWELS__
-        blocks[cursor_y][cursor_x].return_row = cursor_y+dy;
-        blocks[cursor_y][cursor_x].return_col = cursor_x+dx;
-#endif
+    if (blocks[cursor.y1][cursor.x1].moving == false && blocks[cursor.y2][cursor.x2].moving == false) {
+        blockSwitch(cursor.y1, cursor.x1, cursor.y2, cursor.x2, true);
+        if (game_mode == GAME_MODE_JEWELS) {
+            blocks[cursor.y1][cursor.x1].return_row = cursor.y2;
+            blocks[cursor.y1][cursor.x1].return_col = cursor.x2;
+            cursor.x2 = cursor.x1;
+            cursor.y2 = cursor.y1;
+        }
     }
 }
