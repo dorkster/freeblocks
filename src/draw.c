@@ -126,7 +126,11 @@ void drawInfo() {
     if (game_over || game_over_timer > 0) sprintf(text,"Score: %-10d  Game Over!",score);
     else {
         if (paused) sprintf(text,"Score: %-10d  *Paused*",score);
+#ifdef __JEWELS__
+        else sprintf(text, "Score: %-10d", score);
+#else
         else sprintf(text,"Score: %-10d  Speed: %d",score,speed);
+#endif
     }
 
     text_info = TTF_RenderText_Blended(font,text,color);
