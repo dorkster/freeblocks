@@ -117,7 +117,11 @@ bool action_bump;
 bool action_pause;
 bool action_exit;
 
-char* config_folder;
+Dork_String path_dir_config;
+Dork_String path_file_config;
+Dork_String path_file_highscores;
+Dork_String path_file_highscores_jewels;
+
 int option_joystick;
 int option_sound;
 int option_music;
@@ -140,7 +144,7 @@ bool sysLoadSound(Mix_Chunk** dest, const char* path);
 bool sysLoadFiles();
 void sysCleanup();
 void sysInput();
-void sysConfigSetFolder();
+void sysConfigSetPaths();
 void sysConfigLoad();
 void sysConfigSave();
 void sysConfigApply();

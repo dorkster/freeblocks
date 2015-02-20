@@ -82,7 +82,6 @@ bool action_bump = false;
 bool action_pause = false;
 bool action_exit = false;
 
-char* config_folder = NULL;
 int option_joystick = -1;
 int option_sound = 8;
 int option_music = 8;
@@ -106,7 +105,7 @@ bool sysInit() {
     
     SDL_WM_SetCaption("FreeBlocks v0.4",NULL);
 
-    sysConfigSetFolder();
+    sysConfigSetPaths();
     sysConfigLoad();
 
     sysHighScoresClear();
@@ -236,7 +235,11 @@ bool sysLoadFiles() {
 
 void sysCleanup() {
     sysConfigSave();
-    if (config_folder) free(config_folder);
+
+    Dork_StringClear(&path_dir_config);
+    Dork_StringClear(&path_file_config);
+    Dork_StringClear(&path_file_highscores);
+    Dork_StringClear(&path_file_highscores_jewels);
 
     Mix_HaltMusic();
 
@@ -346,71 +349,61 @@ void sysInput() {
     }
 }
 
-void sysConfigSetFolder() {
-    char *home = getenv(HOME_DIR_ENV);
+void sysConfigSetPaths() {
+    Dork_StringInit(&path_dir_config);
+    Dork_StringAppend(&path_dir_config, getenv(HOME_DIR_ENV));
+    Dork_StringAppend(&path_dir_config, "/.freeblocks");
 
-    config_folder = malloc(strlen(home)+strlen("/.freeblocks")+1);
-    sprintf(config_folder,"%s/.freeblocks",home);
+    Dork_StringInit(&path_file_config);
+    Dork_StringAppend(&path_file_config, Dork_StringGetData(&path_dir_config));
+    Dork_StringAppend(&path_file_config, "/config");
+
+    Dork_StringInit(&path_file_highscores);
+    Dork_StringAppend(&path_file_highscores, Dork_StringGetData(&path_dir_config));
+    Dork_StringAppend(&path_file_highscores, "/highscores");
+
+    Dork_StringInit(&path_file_highscores_jewels);
+    Dork_StringAppend(&path_file_highscores_jewels, Dork_StringGetData(&path_dir_config));
+    Dork_StringAppend(&path_file_highscores_jewels, "/highscores_jewels");
 }
 
 void sysConfigLoad() {
-    if (!config_folder) return;
-
-    FILE *config_file;
     char buffer[BUFSIZ];
-    char *key;
-    char *temp;
+    char *key = NULL;
+    char *temp = NULL;
 
-    mkdir(config_folder, MKDIR_MODE);
-    char *config_path = malloc(strlen(config_folder)+strlen("/config")+1);
+    mkdir(Dork_StringGetData(&path_dir_config), MKDIR_MODE);
 
-    if (config_path) {
-        sprintf(config_path,"%s/config",config_folder);
-        config_file = fopen(config_path,"r+");
-
-        if (config_file) {
-            while (fgets(buffer,BUFSIZ,config_file)) {
-                temp = buffer;
-                if (temp[0] == '#') continue;
-                key = strtok(temp,"=");
-                if (strcmp(key,"joystick") == 0) option_joystick = atoi(strtok(NULL,"\n"));
-                if (strcmp(key,"sound") == 0) option_sound = atoi(strtok(NULL,"\n"));
-                if (strcmp(key,"music") == 0) option_music = atoi(strtok(NULL,"\n"));
-                if (strcmp(key,"fullscreen") == 0) option_fullscreen = atoi(strtok(NULL,"\n"));
-            }
-            fclose(config_file);
-            sysConfigApply();
-        } else {
-            printf ("Error: Couldn't load config file. Creating new config...\n");
-            sysConfigSave();
+    FILE *config_file = fopen(Dork_StringGetData(&path_file_config),"r+");
+    if (config_file) {
+        while (fgets(buffer,BUFSIZ,config_file)) {
+            temp = buffer;
+            if (temp[0] == '#') continue;
+            key = strtok(temp,"=");
+            if (strcmp(key,"joystick") == 0) option_joystick = atoi(strtok(NULL,"\n"));
+            if (strcmp(key,"sound") == 0) option_sound = atoi(strtok(NULL,"\n"));
+            if (strcmp(key,"music") == 0) option_music = atoi(strtok(NULL,"\n"));
+            if (strcmp(key,"fullscreen") == 0) option_fullscreen = atoi(strtok(NULL,"\n"));
         }
-
-        free(config_path);
+        fclose(config_file);
+        sysConfigApply();
+    } else {
+        printf ("Error: Couldn't load config file. Creating new config...\n");
+        sysConfigSave();
     }
 }
 
 void sysConfigSave() {
-    if (!config_folder) return;
+    mkdir(Dork_StringGetData(&path_dir_config), MKDIR_MODE);
 
-    FILE *config_file;
-
-    mkdir(config_folder, MKDIR_MODE);
-    char *config_path = malloc(strlen(config_folder)+strlen("/config")+1);
-
-    if (config_path) {
-        sprintf(config_path,"%s/config",config_folder);
-        config_file = fopen(config_path,"w+");
-
-        if (config_file) {
-            fprintf(config_file,"joystick=%d\n",option_joystick);
-            fprintf(config_file,"sound=%d\n",option_sound);
-            fprintf(config_file,"music=%d\n",option_music);
-            fprintf(config_file,"fullscreen=%d\n",option_fullscreen);
-            fclose(config_file);
-        } else printf("Error: Couldn't write to config file.\n");
-
-        free(config_path);
-    }
+    FILE *config_file = fopen(Dork_StringGetData(&path_file_config),"w+");
+    if (config_file) {
+        fprintf(config_file,"joystick=%d\n",option_joystick);
+        fprintf(config_file,"sound=%d\n",option_sound);
+        fprintf(config_file,"music=%d\n",option_music);
+        fprintf(config_file,"fullscreen=%d\n",option_fullscreen);
+        fclose(config_file);
+    } else printf("Error: Couldn't write to config file.\n");
 
     sysConfigApply();
 }
@@ -435,59 +428,49 @@ void sysConfigApply() {
 }
 
 void sysHighScoresLoad() {
-    if (!config_folder) return;
-
-    FILE *file;
+    FILE *file = NULL;
     char buffer[BUFSIZ];
     char *temp;
     int i = 0;
 
-    mkdir(config_folder, MKDIR_MODE);
-    char *path = malloc(strlen(config_folder)+strlen("/highscores")+1);
+    mkdir(Dork_StringGetData(&path_dir_config), MKDIR_MODE);
 
-    if (path) {
-        sprintf(path,"%s/highscores",config_folder);
-        file = fopen(path,"r+");
+    if (game_mode == GAME_MODE_JEWELS)
+        file = fopen(Dork_StringGetData(&path_file_highscores_jewels),"r+");
+    else
+        file = fopen(Dork_StringGetData(&path_file_highscores),"r+");
 
-        if (file) {
-            while (fgets(buffer,BUFSIZ,file)) {
-                temp = buffer;
-                if (i < 10) high_scores[i] = atoi(strtok(temp,"\n"));
-                else break;
-                i++;
-            }
-            fclose(file);
-        } else {
-            printf ("Error: Couldn't load high scores.\n");
-            sysHighScoresSave();
+    if (file) {
+        while (fgets(buffer,BUFSIZ,file)) {
+            temp = buffer;
+            if (i < 10) high_scores[i] = atoi(strtok(temp,"\n"));
+            else break;
+            i++;
         }
-
-        free(path);
+        fclose(file);
+    } else {
+        printf ("Error: Couldn't load high scores.\n");
+        sysHighScoresSave();
     }
 }
 
 void sysHighScoresSave() {
-    if (!config_folder) return;
-
-    FILE *file;
+    FILE *file = NULL;
     int i = 0;
 
-    mkdir(config_folder, MKDIR_MODE);
-    char *path = malloc(strlen(config_folder)+strlen("/highscores")+1);
+    mkdir(Dork_StringGetData(&path_dir_config), MKDIR_MODE);
 
-    if (path) {
-        sprintf(path,"%s/highscores",config_folder);
-        file = fopen(path,"w+");
+    if (game_mode == GAME_MODE_JEWELS)
+        file = fopen(Dork_StringGetData(&path_file_highscores_jewels),"w+");
+    else
+        file = fopen(Dork_StringGetData(&path_file_highscores),"w+");
 
-        if (file) {
-            for (i=0;i<10;i++) {
-                fprintf(file,"%d\n",high_scores[i]);
-            }
-            fclose(file);
-        } else printf("Error: Couldn't save high scores.\n");
-
-        free(path);
-    }
+    if (file) {
+        for (i=0;i<10;i++) {
+            fprintf(file,"%d\n",high_scores[i]);
+        }
+        fclose(file);
+    } else printf("Error: Couldn't save high scores.\n");
 }
 
 void sysHighScoresClear() {
