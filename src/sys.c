@@ -55,6 +55,7 @@ SDL_Surface* surface_background = NULL;
 SDL_Surface* surface_title = NULL;
 SDL_Surface* surface_highscores = NULL;
 Mix_Music* music = NULL;
+Mix_Music* music_jewels = NULL;
 Mix_Chunk* sound_menu = NULL;
 Mix_Chunk* sound_switch = NULL;
 Mix_Chunk* sound_match = NULL;
@@ -220,6 +221,7 @@ bool sysLoadFiles() {
 
     // background music
     if (!sysLoadMusic(&music, "/sounds/music.ogg")) return false;
+    if (!sysLoadMusic(&music_jewels, "/sounds/music_jewels.ogg")) return false;
 
     // sound effects
     if (!sysLoadSound(&sound_menu, "/sounds/menu.wav")) return false;
@@ -249,6 +251,7 @@ void sysCleanup() {
     SDL_FreeSurface(surface_title);
     SDL_FreeSurface(surface_highscores);
     Mix_FreeMusic(music);
+    Mix_FreeMusic(music_jewels);
     Mix_FreeChunk(sound_menu);
     Mix_FreeChunk(sound_switch);
     Mix_FreeChunk(sound_match);

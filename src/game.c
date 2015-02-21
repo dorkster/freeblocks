@@ -105,7 +105,11 @@ void gameInit() {
 
 
     Mix_VolumeMusic(option_music*16);
-    if (!game_over) Mix_PlayMusic(music,-1);
+    if (!game_over)
+        if (game_mode == GAME_MODE_JEWELS)
+            Mix_PlayMusic(music_jewels,-1);
+        else
+            Mix_PlayMusic(music,-1);
 
     game_over = false;
 }

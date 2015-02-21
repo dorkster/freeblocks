@@ -165,6 +165,7 @@ SDL_Surface* surface_highscores;
 
 // Music and Sounds
 Mix_Music* music;
+Mix_Music* music_jewels;
 Mix_Chunk* sound_menu;
 Mix_Chunk* sound_switch;
 Mix_Chunk* sound_match;
