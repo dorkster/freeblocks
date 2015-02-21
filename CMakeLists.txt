@@ -4,6 +4,11 @@ cmake_minimum_required (VERSION 2.6)
 Set (PACKAGE "FREEBLOCKS")
 Set (VERSION "0.4")
 
+option(HALF_GFX "Use 320x240 graphics" Off)
+if (HALF_GFX)
+    add_definitions(-DHALF_GFX)
+endif()
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 if(CMAKE_CROSSCOMPILING)
