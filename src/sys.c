@@ -68,11 +68,7 @@ bool game_over = false;
 bool paused = false;
 bool quit = false;
 
-#ifdef __JEWELS__
-int game_mode = GAME_MODE_JEWELS;
-#else
 int game_mode = GAME_MODE_DEFAULT;
-#endif
 
 int action_cooldown = 0;
 ActionMove action_move = ACTION_NONE;

@@ -110,6 +110,20 @@ void menuItemSetOptionText(int i, int opt, const char* text) {
         menuItemUpdate(i);
 }
 
+void menuItemSetEnabled(int i, bool enable) {
+    if (i < 0 || i >= menu_size)
+        return;
+
+    menu_items[i]->enabled = enable;
+}
+
+bool menuItemIsEnabled(int i) {
+    if (i < 0 || i >= menu_size)
+        return false;
+
+    return menu_items[i]->enabled;
+}
+
 void menuInit() {
     menu_items = NULL;
     menu_size = 0;
@@ -135,6 +149,7 @@ void menuAdd(const char *item, unsigned int val_min, unsigned int val_max) {
     menu_items[menu_size]->val = 0;
     menu_items[menu_size]->val_min = 0;
     menu_items[menu_size]->val_max = 0;
+    menu_items[menu_size]->enabled = true;
 
     if (val_max < val_min)
         val_max = val_min;
@@ -189,7 +204,7 @@ void menuClear() {
 
 int menuLogic() {
     if (menu_size > 0) {
-        if (action_switch && menu_items[menu_option]->val_max == 0) {
+        if (action_switch && menu_items[menu_option]->enabled && menu_items[menu_option]->val_max == 0) {
             action_switch = false;
             Mix_PlayChannel(-1,sound_menu,0);
             return menu_option;
@@ -201,12 +216,12 @@ int menuLogic() {
             menu_option++;
             action_cooldown = ACTION_COOLDOWN;
             Mix_PlayChannel(-1,sound_switch,0);
-        } else if (action_move == ACTION_LEFT && action_cooldown == 0) {
+        } else if (action_move == ACTION_LEFT && action_cooldown == 0 && menu_items[menu_option]->enabled) {
             if (menuItemDecreaseVal(menu_option)) {
                 Mix_PlayChannel(-1,sound_switch,0);
             }
             action_cooldown = ACTION_COOLDOWN;
-        } else if (action_move == ACTION_RIGHT && action_cooldown == 0) {
+        } else if (action_move == ACTION_RIGHT && action_cooldown == 0 && menu_items[menu_option]->enabled) {
             if (menuItemIncreaseVal(menu_option)) {
                 Mix_PlayChannel(-1,sound_switch,0);
             }

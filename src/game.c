@@ -33,16 +33,23 @@ void gameTitle() {
     Mix_FadeOutMusic(2000);
 
     menuAdd("Play Game", 0, 0);
+    menuAdd("Game Type", GAME_MODE_DEFAULT, GAME_MODE_JEWELS);
     menuAdd("Speed Level", 1, MAX_SPEED);
     menuAdd("High Scores", 0, 0);
     menuAdd("Options", 0, 0);
     menuAdd("Quit", 0, 0);
+
+    menuItemSetOptionText(1, GAME_MODE_DEFAULT, "Normal");
+    menuItemSetOptionText(1, GAME_MODE_JEWELS, "Jewels");
+    menuItemSetVal(1, game_mode);
 }
 
 void gameHighScores() {
     title_screen = false;
     high_scores_screen = true;
     options_screen = -1;
+
+    sysHighScoresLoad();
 
     menuAdd("Return to title screen", 0, 0);
 }
@@ -118,16 +125,25 @@ void gameLogic() {
             menu_choice = menuLogic();
         }
 
+        // get the "Game Type" value
+        game_mode = menuItemGetVal(1);
+
+        if (game_mode == GAME_MODE_JEWELS)
+            menuItemSetEnabled(2, false);
+        else
+            menuItemSetEnabled(2, true);
+
         if (menu_choice > -1) {
             // get the "Speed Level" value
-            speed_init = menuItemGetVal(1);
+            speed_init = menuItemGetVal(2);
 
             menuClear();
             if (menu_choice == 0) gameInit();
-            // menu_choice == 1 speed selection
-            else if (menu_choice == 2) gameHighScores();
-            else if (menu_choice == 3) gameOptions();
-            else if (menu_choice == 4) quit = true;
+            // menu_choice == 1 game type selection
+            // menu_choice == 2 speed selection
+            else if (menu_choice == 3) gameHighScores();
+            else if (menu_choice == 4) gameOptions();
+            else if (menu_choice == 5) quit = true;
         }
         return;
     }

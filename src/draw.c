@@ -45,6 +45,7 @@ void drawEverything() {
 void drawMenu(int offset) {
     SDL_Surface *text;
     SDL_Color color = {217,217,217,255};
+    SDL_Color color_disabled = {127,127,127,255};
     SDL_Rect dest;
     int i;
 
@@ -54,7 +55,11 @@ void drawMenu(int offset) {
         if (i == menu_option) SDL_BlitSurface(surface_bar,NULL,screen,&dest);
         else SDL_BlitSurface(surface_bar_inactive,NULL,screen,&dest);
 
-        text = TTF_RenderText_Blended(font, menuItemGetText(i), color);
+        if (menuItemIsEnabled(i))
+            text = TTF_RenderText_Blended(font, menuItemGetText(i), color);
+        else
+            text = TTF_RenderText_Blended(font, menuItemGetText(i), color_disabled);
+
         if (text) {
             dest.x = SCREEN_WIDTH/2 - text->w/2;
             dest.y = SCREEN_HEIGHT - ((menu_size-i-1) * surface_bar->h) - surface_bar->h - offset;
@@ -178,7 +183,7 @@ void drawTitle() {
 
     // title logo
     dest.x = 0;
-    dest.y = SCREEN_HEIGHT/2 - surface_title->h/2 - surface_bar->h*2;
+    dest.y = 0;
     SDL_BlitSurface(surface_title,NULL,screen,&dest);
 
     // menu

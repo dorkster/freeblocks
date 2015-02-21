@@ -4,11 +4,6 @@ cmake_minimum_required (VERSION 2.6)
 Set (PACKAGE "FREEBLOCKS")
 Set (VERSION "0.4")
 
-option(JEWELS "Use the alternative Jewels game mode" OFF)
-if (JEWELS)
-    add_definitions(-D__JEWELS__)
-endif()
-
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 if(CMAKE_CROSSCOMPILING)
