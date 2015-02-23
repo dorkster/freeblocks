@@ -160,6 +160,7 @@ SDL_Surface* surface_cursor_highlight;
 SDL_Surface* surface_bar;
 SDL_Surface* surface_bar_inactive;
 SDL_Surface* surface_background;
+SDL_Surface* surface_background_jewels;
 SDL_Surface* surface_title;
 SDL_Surface* surface_highscores;
 

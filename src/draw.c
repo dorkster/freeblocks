@@ -27,7 +27,10 @@ void drawEverything() {
     // Fill the screen with black
     SDL_FillRect(screen,NULL, 0x000000);
 
-    SDL_BlitSurface(surface_background,NULL,screen,NULL);
+    if (game_mode == GAME_MODE_JEWELS)
+        SDL_BlitSurface(surface_background_jewels,NULL,screen,NULL);
+    else
+        SDL_BlitSurface(surface_background,NULL,screen,NULL);
 
     if (title_screen) {
         drawTitle();
