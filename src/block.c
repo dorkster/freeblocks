@@ -26,6 +26,10 @@ const int POINTS_PER_COMBO_BLOCK = 15;
 int speed_init = 1;
 Block **blocks = NULL;
 
+int blockRand(void) {
+    return rand() % NUM_BLOCKS;
+}
+
 void blockSet(int i, int j, bool alive, int color) {
     blocks[i][j].x = j*BLOCK_SIZE;
     blocks[i][j].y = i*BLOCK_SIZE;
@@ -169,9 +173,9 @@ void blockAddLayerRandom(int i) {
     int j;
     int last_color = -1;
     for(j=0;j<COLS;j++) {
-        int new_color = rand() % 6;
+        int new_color = blockRand();
         while (new_color == last_color || (i > 0 && new_color == blocks[i-1][j].color)) {
-            new_color = rand() % 6;
+            new_color = blockRand();
         }
         last_color = new_color;
         blockSet(i,j,true,new_color);
@@ -200,6 +204,7 @@ void blockSetDefaults() {
     if (game_mode == GAME_MODE_JEWELS) {
         ROWS = 8;
         COLS = 8;
+        NUM_BLOCKS = 7;
         START_ROWS = ROWS;
         DISABLED_ROWS = 0;
         CURSOR_MAX_X = COLS-1;
@@ -209,6 +214,7 @@ void blockSetDefaults() {
     else {
         ROWS = 15;
         COLS = 20;
+        NUM_BLOCKS = 6;
         START_ROWS = 4;
         DISABLED_ROWS = 1;
         CURSOR_MAX_X = COLS-2;
@@ -259,7 +265,7 @@ void blockInitAll() {
         do {
             for(i=ROWS-START_ROWS;i<ROWS;i++) {
                 for(j=0;j<COLS;j++) {
-                    blockSet(i,j,true,rand() % 6);
+                    blockSet(i,j,true,blockRand());
                 }
             }
         } while (blockHasMatches());
@@ -314,7 +320,7 @@ void blockRise() {
 void blockAddFromTop() {
     for(int j=0;j<COLS;j++)
         if (!blocks[0][j].alive)
-            blockSet(0,j,true,rand() % 6);
+            blockSet(0,j,true,blockRand());
 }
 
 void blockGravity() {
