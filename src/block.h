@@ -39,6 +39,7 @@ const int POINTS_PER_COMBO_BLOCK;
 
 int ROWS;
 int COLS;
+int NUM_BLOCKS;
 int START_ROWS;
 int DISABLED_ROWS;
 int CURSOR_MAX_X;
