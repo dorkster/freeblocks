@@ -12,7 +12,14 @@ FreeBlocks is Copyright (c) 2012-2015 Justin Jacobs
 FreeBlocks' source code is released under the GNU GPL v3. Later versions are permitted.
 
 The block graphics are modified versions of those by Kenney.nl, licensed under CC-BY 3.0.
+
+The space background is modified from the following artists and under the following licenses:
+
+- http://opengameart.org/content/spaaaaaaace-scene by Kris Lachowski (CC-BY 3.0)
+- http://opengameart.org/content/ui-pack by Kenney.nl (CC0)
+
 The included Alegreya font is licensed under the SIL Open Font License, Version 1.1.
+
 This project contains music created by the following artists and under the following licenses:
 
 - David McKee (ViRiX) (http://soundcloud.com/virix) (CC-BY 3.0)

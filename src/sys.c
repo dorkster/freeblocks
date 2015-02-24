@@ -52,6 +52,7 @@ SDL_Surface* surface_cursor_single = NULL;
 SDL_Surface* surface_bar = NULL;
 SDL_Surface* surface_bar_inactive = NULL;
 SDL_Surface* surface_background = NULL;
+SDL_Surface* surface_background_jewels = NULL;
 SDL_Surface* surface_title = NULL;
 SDL_Surface* surface_highscores = NULL;
 Mix_Music* music = NULL;
@@ -216,6 +217,7 @@ bool sysLoadFiles() {
     if (!sysLoadImage(&surface_bar, "bar.png")) return false;
     if (!sysLoadImage(&surface_bar_inactive, "bar_inactive.png")) return false;
     if (!sysLoadImage(&surface_background, "background.png")) return false;
+    if (!sysLoadImage(&surface_background_jewels, "background_jewels.png")) return false;
     if (!sysLoadImage(&surface_title, "title.png")) return false;
     if (!sysLoadImage(&surface_highscores, "highscores.png")) return false;
 
@@ -248,6 +250,7 @@ void sysCleanup() {
     SDL_FreeSurface(surface_cursor_highlight);
     SDL_FreeSurface(surface_bar);
     SDL_FreeSurface(surface_background);
+    SDL_FreeSurface(surface_background_jewels);
     SDL_FreeSurface(surface_title);
     SDL_FreeSurface(surface_highscores);
     Mix_FreeMusic(music);
