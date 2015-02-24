@@ -170,6 +170,7 @@ Mix_Music* music_jewels;
 Mix_Chunk* sound_menu;
 Mix_Chunk* sound_switch;
 Mix_Chunk* sound_match;
+Mix_Chunk* sound_drop;
 
 // Joystick
 SDL_Joystick* joy;

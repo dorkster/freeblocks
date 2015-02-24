@@ -59,6 +59,7 @@ typedef struct Block{
     int frame;
     bool moving;
     int return_row, return_col;
+    bool sound_after_move;
 }Block;
 
 Block **blocks;
@@ -73,7 +74,7 @@ bool jewels_cursor_select;
 
 void blockSet(int i, int j, bool alive, int color);
 void blockClear(int i, int j);
-void blockSwitch(int i, int j, int k, int l, bool animate);
+void blockSwitch(int i, int j, int k, int l, bool animate, bool sound_after_move);
 bool blockCompare(int i, int j, int k, int l);
 void blockSetDefaults();
 void blockCleanup();

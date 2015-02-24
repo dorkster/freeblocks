@@ -60,6 +60,7 @@ Mix_Music* music_jewels = NULL;
 Mix_Chunk* sound_menu = NULL;
 Mix_Chunk* sound_switch = NULL;
 Mix_Chunk* sound_match = NULL;
+Mix_Chunk* sound_drop = NULL;
 SDL_Joystick* joy = NULL;
 
 int score = 0;
@@ -229,6 +230,7 @@ bool sysLoadFiles() {
     if (!sysLoadSound(&sound_menu, "/sounds/menu.wav")) return false;
     if (!sysLoadSound(&sound_switch, "/sounds/switch.wav")) return false;
     if (!sysLoadSound(&sound_match, "/sounds/match.wav")) return false;
+    if (!sysLoadSound(&sound_drop, "/sounds/drop.wav")) return false;
 
     return true;
 }
@@ -258,6 +260,7 @@ void sysCleanup() {
     Mix_FreeChunk(sound_menu);
     Mix_FreeChunk(sound_switch);
     Mix_FreeChunk(sound_match);
+    Mix_FreeChunk(sound_drop);
     SDL_Quit();
 }
 
