@@ -43,6 +43,7 @@ void blockSet(int i, int j, bool alive, int color) {
     blocks[i][j].moving = false;
     blocks[i][j].return_row = -1;
     blocks[i][j].return_col = -1;
+    blocks[i][j].sound_after_move = false;
 }
 
 void blockClear(int i, int j) {
@@ -54,9 +55,10 @@ void blockClear(int i, int j) {
     blocks[i][j].moving = false;
     blocks[i][j].return_row = -1;
     blocks[i][j].return_col = -1;
+    blocks[i][j].sound_after_move = false;
 }
 
-void blockSwitch(int i, int j, int k, int l, bool animate) {
+void blockSwitch(int i, int j, int k, int l, bool animate, bool sound_after_move) {
     if (i < 0 || i >= ROWS || j < 0 || j >= COLS || k < 0 || k >= ROWS || l < 0 || l >= COLS) return;
     if (blocks[i][j].matched || blocks[k][l].matched) return;
 
@@ -73,8 +75,10 @@ void blockSwitch(int i, int j, int k, int l, bool animate) {
     if (animate) {
         blocks[i][j].x = blocks[k][l].dest_x;
         blocks[i][j].y = blocks[k][l].dest_y;
+        blocks[i][j].sound_after_move = sound_after_move;
         blocks[k][l].x = blocks[i][j].dest_x;
         blocks[k][l].y = blocks[i][j].dest_y;
+        blocks[k][l].sound_after_move = sound_after_move;
     }
 }
 
@@ -111,9 +115,11 @@ int blockMatchVertical(int i, int j) {
 bool blockAnimate() {
     int i,j;
     bool anim = false;
+    bool drop_sound = false;
 
     for (i=0;i<ROWS;i++) {
         for (j=0;j<COLS;j++) {
+            bool was_moving = blocks[i][j].moving;
             blocks[i][j].moving = false;
 
             if (blocks[i][j].matched && blocks[i][j].frame < 8) {
@@ -147,8 +153,16 @@ bool blockAnimate() {
                 blocks[i][j].moving = true;
                 anim = true;
             }
+
+            // play sound after block has finished moving
+            if (was_moving && !blocks[i][j].moving && blocks[i][j].alive && blocks[i][j].sound_after_move) {
+                drop_sound = true;
+                blocks[i][j].sound_after_move = false;
+            }
         }
     }
+
+    if (drop_sound) Mix_PlayChannel(-1, sound_drop, 0);
 
     return anim;
 }
@@ -161,7 +175,7 @@ void blockReturn() {
             // If we attempted to switch this block but
             // there is no match, move it back
             if (blocks[i][j].dest_x == blocks[i][j].x && blocks[i][j].dest_y == blocks[i][j].y && !blocks[i][j].matched && !blocks[i][j].moving && blocks[i][j].return_row != -1) {
-                blockSwitch(i, j, blocks[i][j].return_row, blocks[i][j].return_col, true);
+                blockSwitch(i, j, blocks[i][j].return_row, blocks[i][j].return_col, true, false);
                 blocks[i][j].return_row = -1;
                 blocks[i][j].return_col = -1;
             }
@@ -344,7 +358,7 @@ void blockGravity() {
         if (gap_size > 0) {
             for (i=first_empty-gap_size;i>=0;i--) {
                 if (blocks[i][j].alive) {
-                    blockSwitch(i,j,i+gap_size,j, true);
+                    blockSwitch(i,j,i+gap_size,j, true, true);
                 }
             }
         }
@@ -420,7 +434,7 @@ bool blockAddLayer() {
 
     for (j=0;j<COLS;j++) {
         for (i=1;i<ROWS;i++) {
-            blockSwitch(i,j,i-1,j, false);
+            blockSwitch(i,j,i-1,j, false, false);
         }
     }
 
@@ -440,12 +454,12 @@ bool blockHasSwitchMatch() {
 
     for (j=0;j<COLS;j++) {
         for (i=0;i<ROWS;i++) {
-            blockSwitch(i,j,i+1,j,false);
+            blockSwitch(i,j,i+1,j,false,false);
             has_switch_match = has_switch_match || blockHasMatches();
-            blockSwitch(i,j,i+1,j,false);
-            blockSwitch(i,j,i,j+1,false);
+            blockSwitch(i,j,i+1,j,false,false);
+            blockSwitch(i,j,i,j+1,false,false);
             has_switch_match = has_switch_match || blockHasMatches();
-            blockSwitch(i,j,i,j+1,false);
+            blockSwitch(i,j,i,j+1,false,false);
             if (has_switch_match) return true;
         }
         if (has_switch_match) return true;
@@ -477,7 +491,7 @@ void blockSwitchCursor() {
 
     // don't allow switching blocks that are already moving
     if (blocks[cursor.y1][cursor.x1].moving == false && blocks[cursor.y2][cursor.x2].moving == false) {
-        blockSwitch(cursor.y1, cursor.x1, cursor.y2, cursor.x2, true);
+        blockSwitch(cursor.y1, cursor.x1, cursor.y2, cursor.x2, true, false);
         if (game_mode == GAME_MODE_JEWELS) {
             blocks[cursor.y1][cursor.x1].return_row = cursor.y2;
             blocks[cursor.y1][cursor.x1].return_col = cursor.x2;
