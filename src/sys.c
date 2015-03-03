@@ -455,6 +455,9 @@ void sysHighScoresLoad() {
         fclose(file);
     } else {
         printf ("Error: Couldn't load high scores.\n");
+        for (int j=0; j<10; j++) {
+            high_scores[j] = 0;
+        }
         sysHighScoresSave();
     }
 }

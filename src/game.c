@@ -98,11 +98,12 @@ void gameInit() {
     cursor_moving = false;
     cursor_timer = -1;
 
+    sysHighScoresLoad();
+
     blockInitAll();
     cursor.x1 = (COLS/2)-1;
     cursor.y1 = ROWS-START_ROWS;
     if (cursor.y1 > CURSOR_MAX_Y) cursor.y1 = CURSOR_MAX_Y;
-
 
     Mix_VolumeMusic(option_music*16);
     if (!game_over) {
