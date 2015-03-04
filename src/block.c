@@ -209,13 +209,18 @@ bool blockHasMatches() {
             }
         }
     }
-	return false;
+    return false;
 }
 
 void blockSetDefaults() {
     blockCleanup();
 
     if (game_mode == GAME_MODE_JEWELS) {
+#ifdef HALF_GFX
+        BLOCK_SIZE = 26;
+#else
+        BLOCK_SIZE = 32;
+#endif
         ROWS = 8;
         COLS = 8;
         NUM_BLOCKS = 7;
@@ -223,9 +228,15 @@ void blockSetDefaults() {
         DISABLED_ROWS = 0;
         CURSOR_MAX_X = COLS-1;
         CURSOR_MIN_Y = 0;
-        BLOCK_MOVE_SPEED = BLOCK_SIZE / 4;
+        BLOCK_MOVE_SPEED = BLOCK_SIZE / 2;
+        surface_blocks = surface_blocks_jewels;
     }
     else {
+#ifdef HALF_GFX
+        BLOCK_SIZE = 16;
+#else
+        BLOCK_SIZE = 32;
+#endif
         ROWS = 15;
         COLS = 20;
         NUM_BLOCKS = 6;
@@ -234,6 +245,7 @@ void blockSetDefaults() {
         CURSOR_MAX_X = COLS-2;
         CURSOR_MIN_Y = 1;
         BLOCK_MOVE_SPEED = BLOCK_SIZE / 2;
+        surface_blocks = surface_blocks_normal;
     }
 
     DRAW_OFFSET_X = (SCREEN_WIDTH - COLS * BLOCK_SIZE) / 2;

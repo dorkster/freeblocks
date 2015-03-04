@@ -80,35 +80,35 @@ void drawCursor() {
     dest.x = cursor.x1*BLOCK_SIZE + DRAW_OFFSET_X;
     dest.y = (cursor.y1*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
 
-    SDL_BlitSurface(surface_cursor,NULL,screen,&dest);
+    SDL_BlitSurface(surface_blocks.cursor,NULL,screen,&dest);
 
     if (game_mode == GAME_MODE_JEWELS && jewels_cursor_select) {
         if (cursor.x1 > 0) {
             dest.x = (cursor.x1-1)*BLOCK_SIZE + DRAW_OFFSET_X;
             dest.y = (cursor.y1*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
-            SDL_BlitSurface(surface_cursor_highlight,NULL,screen,&dest);
+            SDL_BlitSurface(surface_blocks.cursor_highlight,NULL,screen,&dest);
         }
         if (cursor.x1 < CURSOR_MAX_X) {
             dest.x = (cursor.x1+1)*BLOCK_SIZE + DRAW_OFFSET_X;
             dest.y = (cursor.y1*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
-            SDL_BlitSurface(surface_cursor_highlight,NULL,screen,&dest);
+            SDL_BlitSurface(surface_blocks.cursor_highlight,NULL,screen,&dest);
         }
         if (cursor.y1 > CURSOR_MIN_Y) {
             dest.x = cursor.x1*BLOCK_SIZE + DRAW_OFFSET_X;
             dest.y = ((cursor.y1-1)*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
-            SDL_BlitSurface(surface_cursor_highlight,NULL,screen,&dest);
+            SDL_BlitSurface(surface_blocks.cursor_highlight,NULL,screen,&dest);
         }
         if (cursor.y1 < CURSOR_MAX_Y) {
             dest.x = cursor.x1*BLOCK_SIZE + DRAW_OFFSET_X;
             dest.y = ((cursor.y1+1)*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
-            SDL_BlitSurface(surface_cursor_highlight,NULL,screen,&dest);
+            SDL_BlitSurface(surface_blocks.cursor_highlight,NULL,screen,&dest);
         }
     }
 
     if (!(cursor.x1 == cursor.x2 && cursor.y1 == cursor.y2)) {
         dest.x = cursor.x2*BLOCK_SIZE + DRAW_OFFSET_X;
         dest.y = (cursor.y2*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
-        SDL_BlitSurface(surface_cursor,NULL,screen,&dest);
+        SDL_BlitSurface(surface_blocks.cursor,NULL,screen,&dest);
     }
 }
 
@@ -132,7 +132,7 @@ void drawBlocks() {
 
                     src.w = src.h = BLOCK_SIZE;
 
-                    SDL_BlitSurface(surface_clear,&src,screen,&dest);
+                    SDL_BlitSurface(surface_blocks.clear,&src,screen,&dest);
                 } else {
                     src.x = blocks[i][j].color * BLOCK_SIZE;
 
@@ -141,7 +141,7 @@ void drawBlocks() {
 
                     src.w = src.h = BLOCK_SIZE;
 
-                    SDL_BlitSurface(surface_blocks,&src,screen,&dest);
+                    SDL_BlitSurface(surface_blocks.blocks,&src,screen,&dest);
                 }
             }
         }
