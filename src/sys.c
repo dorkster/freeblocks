@@ -45,10 +45,9 @@
 
 SDL_Surface* screen = NULL;
 TTF_Font* font = NULL;
-SDL_Surface* surface_blocks = NULL;
-SDL_Surface* surface_clear = NULL;
-SDL_Surface* surface_cursor = NULL;
-SDL_Surface* surface_cursor_single = NULL;
+struct BlockSurfaces surface_blocks = { NULL, NULL, NULL, NULL };
+struct BlockSurfaces surface_blocks_normal = { NULL, NULL, NULL, NULL };
+struct BlockSurfaces surface_blocks_jewels = { NULL, NULL, NULL, NULL };
 SDL_Surface* surface_bar = NULL;
 SDL_Surface* surface_bar_inactive = NULL;
 SDL_Surface* surface_background = NULL;
@@ -211,10 +210,13 @@ bool sysLoadFiles() {
     if (!sysLoadFont(&font, "/fonts/Alegreya-Regular.ttf", FONT_SIZE)) return false;
 
     // graphics
-    if (!sysLoadImage(&surface_blocks, "blocks.png")) return false;
-    if (!sysLoadImage(&surface_clear, "clear.png")) return false;
-    if (!sysLoadImage(&surface_cursor, "cursor.png")) return false;
-    if (!sysLoadImage(&surface_cursor_highlight, "cursor_highlight.png")) return false;
+#define LOAD_BLOCKS(_surfaces, _prefix)\
+    if (!sysLoadImage(&_surfaces.blocks, _prefix "blocks.png")) return false;\
+    if (!sysLoadImage(&_surfaces.clear, _prefix "clear.png")) return false;\
+    if (!sysLoadImage(&_surfaces.cursor, _prefix "cursor.png")) return false;\
+    if (!sysLoadImage(&_surfaces.cursor_highlight, _prefix "cursor_highlight.png")) return false;
+    LOAD_BLOCKS(surface_blocks_normal, BLOCK_GFX_PREFIX_NORMAL)
+    LOAD_BLOCKS(surface_blocks_jewels, BLOCK_GFX_PREFIX_JEWELS)
     if (!sysLoadImage(&surface_bar, "bar.png")) return false;
     if (!sysLoadImage(&surface_bar_inactive, "bar_inactive.png")) return false;
     if (!sysLoadImage(&surface_background, "background.png")) return false;
@@ -235,6 +237,13 @@ bool sysLoadFiles() {
     return true;
 }
 
+void sysCleanupBlocks(struct BlockSurfaces *surfaces) {
+    SDL_FreeSurface(surfaces->blocks);
+    SDL_FreeSurface(surfaces->clear);
+    SDL_FreeSurface(surfaces->cursor);
+    SDL_FreeSurface(surfaces->cursor_highlight);
+}
+
 void sysCleanup() {
     sysConfigSave();
 
@@ -246,10 +255,8 @@ void sysCleanup() {
     Mix_HaltMusic();
 
     TTF_CloseFont(font);
-    SDL_FreeSurface(surface_blocks);
-    SDL_FreeSurface(surface_clear);
-    SDL_FreeSurface(surface_cursor);
-    SDL_FreeSurface(surface_cursor_highlight);
+    sysCleanupBlocks(&surface_blocks_normal);
+    sysCleanupBlocks(&surface_blocks_jewels);
     SDL_FreeSurface(surface_bar);
     SDL_FreeSurface(surface_background);
     SDL_FreeSurface(surface_background_jewels);

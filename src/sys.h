@@ -41,11 +41,15 @@ typedef enum { false = 0, true = 1 } bool;
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
 #define GFX_PREFIX "/graphics/320x240/"
+#define BLOCK_GFX_PREFIX_NORMAL "blocks_16/"
+#define BLOCK_GFX_PREFIX_JEWELS "blocks_26/"
 #define FONT_SIZE 12
 #else
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
 #define GFX_PREFIX "/graphics/"
+#define BLOCK_GFX_PREFIX_NORMAL "blocks_32/"
+#define BLOCK_GFX_PREFIX_JEWELS "blocks_32/"
 #define FONT_SIZE 24
 #endif
 
@@ -153,10 +157,15 @@ void sysHighScoresSave();
 void sysHighScoresClear();
 
 // Images
-SDL_Surface* surface_blocks;
-SDL_Surface* surface_clear;
-SDL_Surface* surface_cursor;
-SDL_Surface* surface_cursor_highlight;
+struct BlockSurfaces {
+    SDL_Surface* blocks;
+    SDL_Surface* clear;
+    SDL_Surface* cursor;
+    SDL_Surface* cursor_highlight;
+};
+struct BlockSurfaces surface_blocks;
+struct BlockSurfaces surface_blocks_normal;
+struct BlockSurfaces surface_blocks_jewels;
 SDL_Surface* surface_bar;
 SDL_Surface* surface_bar_inactive;
 SDL_Surface* surface_background;

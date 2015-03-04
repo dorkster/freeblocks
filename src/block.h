@@ -21,12 +21,6 @@
 
 #include "sys.h"
 
-#ifdef HALF_GFX
-#define BLOCK_SIZE 16
-#else
-#define BLOCK_SIZE 32
-#endif
-
 #define CLEAR_TIME 4 / (60/FPS)
 #define SPEED_FACTOR 32 / BLOCK_SIZE
 #define BUMP_TIME (60 / (60/FPS)) * SPEED_FACTOR
@@ -37,6 +31,7 @@ const int POINTS_PER_BLOCK;
 const int POINTS_PER_BUMP;
 const int POINTS_PER_COMBO_BLOCK;
 
+int BLOCK_SIZE;
 int ROWS;
 int COLS;
 int NUM_BLOCKS;
