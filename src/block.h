@@ -22,9 +22,9 @@
 #include "sys.h"
 
 #ifdef HALF_GFX
-#define BLOCK_SIZE 16
+#define BLOCK_SIZE 24
 #else
-#define BLOCK_SIZE 32
+#define BLOCK_SIZE 48
 #endif
 
 #define CLEAR_TIME 4 / (60/FPS)

@@ -226,8 +226,8 @@ void blockSetDefaults() {
         BLOCK_MOVE_SPEED = BLOCK_SIZE / 4;
     }
     else {
-        ROWS = 15;
-        COLS = 20;
+        ROWS = 9;
+        COLS = 13;
         NUM_BLOCKS = 6;
         START_ROWS = 4;
         DISABLED_ROWS = 1;
