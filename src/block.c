@@ -226,7 +226,7 @@ void blockSetDefaults() {
         BLOCK_MOVE_SPEED = BLOCK_SIZE / 4;
     }
     else {
-        ROWS = 9;
+        ROWS = 10;
         COLS = 13;
         NUM_BLOCKS = 6;
         START_ROWS = 4;
@@ -239,6 +239,11 @@ void blockSetDefaults() {
     DRAW_OFFSET_X = (SCREEN_WIDTH - COLS * BLOCK_SIZE) / 2;
     DRAW_OFFSET_Y = (SCREEN_HEIGHT - ROWS * BLOCK_SIZE) / 2;
     CURSOR_MAX_Y = ROWS-1-DISABLED_ROWS;
+
+    // We need to change our vertical offset if the block size != status bar size
+    if (game_mode == GAME_MODE_DEFAULT) {
+        DRAW_OFFSET_Y += BLOCK_SIZE-(surface_bar->h);
+    }
 
     blocks = malloc(sizeof(Block*)*ROWS);
     for (int i=0; i<ROWS; i++) {
