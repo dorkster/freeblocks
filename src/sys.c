@@ -30,14 +30,10 @@
 #include "sys.h"
 
 #ifdef __GCW0__
-#define KEY_SWITCH SDLK_LCTRL
-#define KEY_BUMP SDLK_LALT
 #define KEY_PAUSE SDLK_RETURN
 #define KEY_EXIT SDLK_ESCAPE
 #define SDL_FLAGS (SDL_HWSURFACE|SDL_TRIPLEBUF)
 #else
-#define KEY_SWITCH 'z'
-#define KEY_BUMP 'x'
 #define KEY_PAUSE SDLK_ESCAPE
 #define KEY_EXIT SDLK_ESCAPE
 #define SDL_FLAGS (SDL_HWSURFACE)
@@ -84,6 +80,13 @@ bool action_exit = false;
 int option_joystick = -1;
 int option_sound = 8;
 int option_music = 8;
+#ifdef __GCW0__
+SDLKey option_key_switch = SDLK_LCTRL;
+SDLKey option_key_bump = SDLK_LALT;
+#else
+SDLKey option_key_switch = SDLK_z;
+SDLKey option_key_bump = SDLK_x;
+#endif
 
 #ifdef __GCW0__
 int option_fullscreen = 1;
@@ -275,9 +278,9 @@ void sysInput() {
                 action_move = ACTION_UP;
             if(event.key.keysym.sym == SDLK_DOWN)
                 action_move = ACTION_DOWN;
-            if(event.key.keysym.sym == KEY_SWITCH)
+            if(event.key.keysym.sym == option_key_switch)
                 action_switch = true;
-            if(event.key.keysym.sym == KEY_BUMP)
+            if(event.key.keysym.sym == option_key_bump)
                 action_bump = true;
             if(event.key.keysym.sym == KEY_PAUSE)
                 action_pause = true;
@@ -293,9 +296,9 @@ void sysInput() {
                 action_move = ACTION_NONE;
                 action_last_move = ACTION_NONE;
             }
-			if(event.key.keysym.sym == KEY_SWITCH)
+            if(event.key.keysym.sym == option_key_switch)
                 action_switch = false;
-            if(event.key.keysym.sym == KEY_BUMP)
+            if(event.key.keysym.sym == option_key_bump)
                 action_bump = false;
             if(event.key.keysym.sym == KEY_PAUSE)
                 action_pause = false;
@@ -389,6 +392,8 @@ void sysConfigLoad() {
             if (strcmp(key,"sound") == 0) option_sound = atoi(strtok(NULL,"\n"));
             if (strcmp(key,"music") == 0) option_music = atoi(strtok(NULL,"\n"));
             if (strcmp(key,"fullscreen") == 0) option_fullscreen = atoi(strtok(NULL,"\n"));
+            if (strcmp(key,"key_bump") == 0) option_key_bump = (SDLKey)atoi(strtok(NULL,"\n"));
+            if (strcmp(key,"key_switch") == 0) option_key_switch = (SDLKey)atoi(strtok(NULL,"\n"));
         }
         fclose(config_file);
         sysConfigApply();
@@ -407,6 +412,8 @@ void sysConfigSave() {
         fprintf(config_file,"sound=%d\n",option_sound);
         fprintf(config_file,"music=%d\n",option_music);
         fprintf(config_file,"fullscreen=%d\n",option_fullscreen);
+        fprintf(config_file,"key_bump=%d\n",(int)option_key_bump);
+        fprintf(config_file,"key_switch=%d\n",(int)option_key_switch);
         fclose(config_file);
     } else printf("Error: Couldn't write to config file.\n");
 
