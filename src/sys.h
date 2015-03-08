@@ -126,6 +126,8 @@ int option_joystick;
 int option_sound;
 int option_music;
 int option_fullscreen;
+SDLKey option_key_switch;
+SDLKey option_key_bump;
 
 SDL_Event event;
 
