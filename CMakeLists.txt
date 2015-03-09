@@ -2,7 +2,7 @@ Project (freeblocks)
 cmake_minimum_required (VERSION 2.6)
 
 Set (PACKAGE "FREEBLOCKS")
-Set (VERSION "0.4")
+Set (VERSION "0.5")
 
 option(HALF_GFX "Use 320x240 graphics" Off)
 if (HALF_GFX)
