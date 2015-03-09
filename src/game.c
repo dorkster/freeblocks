@@ -27,6 +27,7 @@ void gameTitle() {
     title_screen = true;
     high_scores_screen = false;
     options_screen = -1;
+    rebind_index = -1;
 
     game_over = false;
     score = 0;
@@ -60,7 +61,8 @@ void gameOptions() {
     options_screen = OPTIONS_MAIN;
 
     // 0 joystick
-    menuAdd("Joystick", 0, SDL_NumJoysticks());
+    menuAdd("Controls", 0, SDL_NumJoysticks());
+    menuItemEnableAction(0);
     menuItemSetVal(0, option_joystick+1);
     menuItemSetOptionText(0, 0, "(no joystick)");
     int i;
@@ -90,6 +92,49 @@ void gameOptions() {
 
     menuAdd("Cancel", 0, 0);
     menuAdd("Save settings", 0, 0);
+}
+
+void gameOptionsControls() {
+    options_screen = OPTIONS_CONTROLS;
+
+    if (option_joystick == -1) {
+        for (int i=0; i<9; i++) {
+            Dork_String label;
+            Dork_StringInit(&label);
+            Dork_StringAppend(&label, key_desc[i]);
+            Dork_StringAppend(&label, ": ");
+            Dork_StringAppend(&label, SDL_GetKeyName(option_key[i]));
+            menuAdd(Dork_StringGetData(&label), 0, 0);
+            Dork_StringClear(&label);
+        }
+    }
+    else if (option_joystick > -1) {
+        for (int i=0; i<5; i++) {
+            Dork_String label;
+            Dork_StringInit(&label);
+            Dork_StringAppend(&label, key_desc[i]);
+            Dork_StringAppend(&label, ": Button ");
+            Dork_StringAppendNumber(&label, option_joy_button[i]);
+            menuAdd(Dork_StringGetData(&label), 0, 0);
+            Dork_StringClear(&label);
+        }
+    }
+
+    menuAdd("Return to options menu", 0, 0);
+}
+
+void gameOptionsRebind() {
+    options_screen = OPTIONS_REBIND;
+
+    last_key = SDLK_UNKNOWN;
+    last_joy_button = -1;
+
+    Dork_String label;
+    Dork_StringInit(&label);
+    Dork_StringAppend(&label, "Press a key to use for: ");
+    Dork_StringAppend(&label, key_desc[rebind_index]);
+    menuAdd(Dork_StringGetData(&label), 0, 0);
+    Dork_StringClear(&label);
 }
 
 void gameInit() {
@@ -172,7 +217,7 @@ void gameLogic() {
     }
 
     // handle options screen menu
-    if (options_screen > -1) {
+    if (options_screen == OPTIONS_MAIN) {
         if (action_bump) {
             action_bump = false;
             menu_choice = menu_size-2; // exit without saving changes
@@ -184,7 +229,14 @@ void gameLogic() {
         if (menu_choice > -1) {
             if (menu_choice == menu_size-2) {
                 menuClear();
+                sysConfigLoad();
                 gameTitle();
+            }
+            else if (menu_choice == 0) {
+                // edit controls
+                option_joystick = (int)menuItemGetVal(0)-1;
+                menuClear();
+                gameOptionsControls();
             }
             else if (menu_choice == menu_size-1) {
                 option_joystick = (int)menuItemGetVal(0)-1;
@@ -199,6 +251,45 @@ void gameLogic() {
                 sysConfigSave();
                 gameTitle();
             }
+        }
+        return;
+    }
+    else if (options_screen == OPTIONS_CONTROLS) {
+        if (action_bump) {
+            action_bump = false;
+            menu_choice = menu_size-1; // exit without saving changes
+        }
+        else {
+            menu_choice = menuLogic();
+        }
+
+        if (menu_choice > -1) {
+            if (menu_choice == menu_size-1) {
+                menuClear();
+                gameOptions();
+            }
+            else {
+                rebind_index = menu_choice;
+                menuClear();
+                gameOptionsRebind();
+            }
+        }
+        return;
+    }
+    else if (options_screen == OPTIONS_REBIND) {
+        if (option_joystick == -1 && last_key != SDLK_UNKNOWN) {
+            option_key[rebind_index] = last_key;
+            rebind_index = -1;
+            menuClear();
+            sysInputReset();
+            gameOptionsControls();
+        }
+        else if (option_joystick > -1 && last_joy_button != -1) {
+            option_joy_button[rebind_index] = last_joy_button;
+            rebind_index = -1;
+            menuClear();
+            sysInputReset();
+            gameOptionsControls();
         }
         return;
     }

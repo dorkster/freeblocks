@@ -124,6 +124,13 @@ bool menuItemIsEnabled(int i) {
     return menu_items[i]->enabled;
 }
 
+void menuItemEnableAction(int i) {
+    if (i < 0 || i >= menu_size)
+        return;
+
+    menu_items[i]->has_action = true;
+}
+
 void menuInit() {
     menu_items = NULL;
     menu_size = 0;
@@ -150,6 +157,7 @@ void menuAdd(const char *item, unsigned int val_min, unsigned int val_max) {
     menu_items[menu_size]->val_min = 0;
     menu_items[menu_size]->val_max = 0;
     menu_items[menu_size]->enabled = true;
+    menu_items[menu_size]->has_action = true;
 
     if (val_max < val_min)
         val_max = val_min;
@@ -161,6 +169,7 @@ void menuAdd(const char *item, unsigned int val_min, unsigned int val_max) {
 
     // create default options if this is a "spinner" menu item
     if (val_max > 0) {
+        menu_items[menu_size]->has_action = false;
         menu_items[menu_size]->options = malloc(sizeof(Dork_String)*(val_max+1));
         unsigned int i;
         for (i=val_min; i<=val_max; i++) {
@@ -204,7 +213,7 @@ void menuClear() {
 
 int menuLogic() {
     if (menu_size > 0) {
-        if ((action_switch || action_accept) && menu_items[menu_option]->enabled && menu_items[menu_option]->val_max == 0) {
+        if ((action_switch || action_accept) && menu_items[menu_option]->enabled && menu_items[menu_option]->has_action) {
             action_switch = false;
             action_accept = false;
             Mix_PlayChannel(-1,sound_menu,0);

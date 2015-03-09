@@ -35,6 +35,18 @@
 #define SDL_FLAGS (SDL_HWSURFACE)
 #endif
 
+const char* const key_desc[] = {
+    "Switch blocks",
+    "Raise blocks",
+    "Accept",
+    "Pause",
+    "Exit",
+    "Left",
+    "Right",
+    "Up",
+    "Down"
+};
+
 SDL_Surface* screen = NULL;
 TTF_Font* font = NULL;
 SDL_Surface* surface_blocks = NULL;
@@ -83,6 +95,9 @@ int option_fullscreen = 1;
 #else
 int option_fullscreen = 0;
 #endif
+
+SDLKey last_key = SDLK_UNKNOWN;
+int last_joy_button = -1;
 
 bool sysInit() {
     if(SDL_Init(SDL_INIT_EVERYTHING) == -1) return false;
@@ -288,6 +303,8 @@ void sysCleanup() {
 void sysInput() {
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_KEYDOWN) {
+            last_key = event.key.keysym.sym;
+
             if (event.key.keysym.sym == option_key[KEY_LEFT])
                 action_move = ACTION_LEFT;
             if (event.key.keysym.sym == option_key[KEY_RIGHT])
@@ -330,6 +347,8 @@ void sysInput() {
 
         else if (option_joystick > -1 && event.type == SDL_JOYBUTTONDOWN) {
             if (event.jbutton.which == option_joystick) {
+                last_joy_button = event.jbutton.button;
+
                 if (event.jbutton.button == option_joy_button[KEY_SWITCH])
                     action_switch = true;
                 if (event.jbutton.button == option_joy_button[KEY_BUMP])
@@ -385,6 +404,15 @@ void sysInput() {
             action_move = ACTION_NONE;
         }
     }
+}
+
+void sysInputReset() {
+    action_move = ACTION_NONE;
+    action_switch = false;
+    action_bump = false;
+    action_accept = false;
+    action_pause = false;
+    action_exit = false;
 }
 
 void sysConfigSetPaths() {

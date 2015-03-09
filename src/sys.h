@@ -54,6 +54,8 @@ typedef enum { false = 0, true = 1 } bool;
 #define ACTION_COOLDOWN 10 / (60/FPS)
 
 #define OPTIONS_MAIN 0
+#define OPTIONS_CONTROLS 1
+#define OPTIONS_REBIND 2
 
 #ifndef PKGDATADIR
 #define PKGDATADIR "./res"
@@ -94,6 +96,8 @@ enum KEYBINDS {
     KEY_UP = 7,
     KEY_DOWN = 8
 };
+
+extern const char* const key_desc[];
 
 SDL_Surface* screen;
 TTF_Font* font;
@@ -142,6 +146,9 @@ int option_joy_button[5];
 int option_joy_axis_x;
 int option_joy_axis_y;
 
+SDLKey last_key;
+int last_joy_button;
+
 SDL_Event event;
 
 // Timers
@@ -159,6 +166,7 @@ bool sysLoadSound(Mix_Chunk** dest, const char* path);
 bool sysLoadFiles();
 void sysCleanup();
 void sysInput();
+void sysInputReset();
 void sysConfigSetPaths();
 void sysConfigLoad();
 void sysConfigSave();

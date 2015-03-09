@@ -23,10 +23,13 @@
 
 bool cursor_moving;
 int cursor_timer;
+int rebind_index;
 
 void gameTitle();
 void gameHighScores();
 void gameOptions();
+void gameOptionsControls();
+void gameOptionsRebind();
 void gameInit();
 void gameLogic();
 void gameMove();

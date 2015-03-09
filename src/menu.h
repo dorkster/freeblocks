@@ -34,6 +34,7 @@ typedef struct {
     unsigned int val_max;
 
     bool enabled;
+    bool has_action;
 }MenuItem;
 
 MenuItem** menu_items;
@@ -49,6 +50,7 @@ void menuItemSetVal(int i, unsigned int val);
 void menuItemSetOptionText(int i, int opt, const char* text);
 void menuItemSetEnabled(int i, bool enable);
 bool menuItemIsEnabled(int i);
+void menuItemEnableAction(int i);
 
 void menuInit();
 void menuAdd(const char *item, unsigned int val_min, unsigned int val_max);
