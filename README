@@ -42,11 +42,19 @@ To compile FreeBlocks, simply run `cmake . && make` in the base directory.
 
 ## Controls
 
-* Arrow keys / Joystick D-pad = Move cursor
-* Z / Joystick Button 0 = Switch blocks / Confirm menu selection
-* X / Joystick Button 1 = Manually bump up the stack / Go to previous menu
-* ESC / Joystick Button 9 = Pause the game / Exit the game when on the title screen
-* Return / Joystick Button 9 = Confirm menu selection
+* Arrow keys = Move cursor
+* Left Control = Switch blocks / Confirm menu selection
+* Left Alt = Manually bump up the stack / Go to previous menu
+* ESC = Pause the game / Exit the game when on the title screen
+* Return = Confirm menu selection
+
+## Controls (joystick)
+
+* Primary directional input (stick or D-pad depending on device) = Move cursor
+* Button 0 = Switch blocks / Confirm menu selection
+* Button 1 = Manually bump up the stack / Go to previous menu
+* Button 9 = Pause the game / Confirm menu selection
+* Button 8 = Exit the game when on the title screen
 
 ## Controls (GCW-Zero)
 
