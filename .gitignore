@@ -23,3 +23,6 @@ CMakeScripts/
 Debug/
 freeblocks.build/
 *.xcodeproj
+
+# GCW-Zero
+pkg/gcw_build/

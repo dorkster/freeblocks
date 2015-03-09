@@ -12,13 +12,18 @@ else
   datadir=$1
 fi
 
-cd ${datadir}
-cmake -DCMAKE_TOOLCHAIN_FILE="/opt/gcw0-toolchain/usr/share/buildroot/toolchainfile.cmake" .
+# to prevent interfering with an existing desktop build, build in a separate directory
+mkdir -p "${datadir}/pkg/gcw_build"
+cd "${datadir}/pkg/gcw_build"
+# this is important, otherwise the existing CMakeCache will be used (and overwritten)
+touch CMakeCache.txt
+
+cmake -DCMAKE_TOOLCHAIN_FILE="/opt/gcw0-toolchain/usr/share/buildroot/toolchainfile.cmake" ../../
 make clean
 make
 cd -
 
-bin="${datadir}/freeblocks"
+bin="${datadir}/pkg/gcw_build/freeblocks"
 
 data="${datadir}/res"
 
