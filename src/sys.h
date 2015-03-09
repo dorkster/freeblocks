@@ -83,6 +83,18 @@ typedef enum { false = 0, true = 1 } bool;
 #define stat _stat
 #endif
 
+enum KEYBINDS {
+    KEY_SWITCH = 0,
+    KEY_BUMP = 1,
+    KEY_ACCEPT = 2,
+    KEY_PAUSE = 3,
+    KEY_EXIT = 4,
+    KEY_LEFT = 5,
+    KEY_RIGHT = 6,
+    KEY_UP = 7,
+    KEY_DOWN = 8
+};
+
 SDL_Surface* screen;
 TTF_Font* font;
 
@@ -124,8 +136,11 @@ int option_joystick;
 int option_sound;
 int option_music;
 int option_fullscreen;
-SDLKey option_key_switch;
-SDLKey option_key_bump;
+
+SDLKey option_key[9];
+int option_joy_button[5];
+int option_joy_axis_x;
+int option_joy_axis_y;
 
 SDL_Event event;
 

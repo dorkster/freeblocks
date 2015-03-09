@@ -29,14 +29,9 @@
 
 #include "sys.h"
 
-#define KEY_ACCEPT SDLK_RETURN
-#define KEY_EXIT SDLK_ESCAPE
-
 #ifdef __GCW0__
-#define KEY_PAUSE SDLK_RETURN
 #define SDL_FLAGS (SDL_HWSURFACE|SDL_TRIPLEBUF)
 #else
-#define KEY_PAUSE SDLK_ESCAPE
 #define SDL_FLAGS (SDL_HWSURFACE)
 #endif
 
@@ -82,13 +77,6 @@ bool action_exit = false;
 int option_joystick = -1;
 int option_sound = 8;
 int option_music = 8;
-#ifdef __GCW0__
-SDLKey option_key_switch = SDLK_LCTRL;
-SDLKey option_key_bump = SDLK_LALT;
-#else
-SDLKey option_key_switch = SDLK_z;
-SDLKey option_key_bump = SDLK_x;
-#endif
 
 #ifdef __GCW0__
 int option_fullscreen = 1;
@@ -109,9 +97,37 @@ bool sysInit() {
     
     SDL_WM_SetCaption("FreeBlocks v0.4",NULL);
 
+    // set up the default controls
+    option_key[KEY_SWITCH] = SDLK_LCTRL;
+    option_key[KEY_BUMP] = SDLK_LALT;
+    option_key[KEY_ACCEPT] = SDLK_RETURN;
+    option_key[KEY_EXIT] = SDLK_ESCAPE;
+
+    option_key[KEY_LEFT] = SDLK_LEFT;
+    option_key[KEY_RIGHT] = SDLK_RIGHT;
+    option_key[KEY_UP] = SDLK_UP;
+    option_key[KEY_DOWN] = SDLK_DOWN;
+
+#ifdef __GCW0__
+    option_key[KEY_PAUSE] = SDLK_RETURN;
+#else
+    option_key[KEY_PAUSE] = SDLK_ESCAPE;
+#endif
+
+    option_joy_button[KEY_SWITCH] = 0;
+    option_joy_button[KEY_BUMP] = 1;
+    option_joy_button[KEY_ACCEPT] = 9;
+    option_joy_button[KEY_PAUSE] = 9;
+    option_joy_button[KEY_EXIT] = 8;
+
+    option_joy_axis_x = 0;
+    option_joy_axis_y = 1;
+
+    // load config
     sysConfigSetPaths();
     sysConfigLoad();
 
+    //load high scores
     sysHighScoresClear();
     sysHighScoresLoad();
 
@@ -270,75 +286,79 @@ void sysCleanup() {
 }
 
 void sysInput() {
-    while(SDL_PollEvent(&event)) {
-        if(event.type == SDL_KEYDOWN) {
-            if(event.key.keysym.sym == SDLK_LEFT)
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_KEYDOWN) {
+            if (event.key.keysym.sym == option_key[KEY_LEFT])
                 action_move = ACTION_LEFT;
-            if(event.key.keysym.sym == SDLK_RIGHT)
+            if (event.key.keysym.sym == option_key[KEY_RIGHT])
                 action_move = ACTION_RIGHT;
-            if(event.key.keysym.sym == SDLK_UP)
+            if (event.key.keysym.sym == option_key[KEY_UP])
                 action_move = ACTION_UP;
-            if(event.key.keysym.sym == SDLK_DOWN)
+            if (event.key.keysym.sym == option_key[KEY_DOWN])
                 action_move = ACTION_DOWN;
-            if(event.key.keysym.sym == option_key_switch)
+            if (event.key.keysym.sym == option_key[KEY_SWITCH])
                 action_switch = true;
-            if(event.key.keysym.sym == option_key_bump)
+            if (event.key.keysym.sym == option_key[KEY_BUMP])
                 action_bump = true;
-            if(event.key.keysym.sym == KEY_ACCEPT)
+            if (event.key.keysym.sym == option_key[KEY_ACCEPT])
                 action_accept = true;
-            if(event.key.keysym.sym == KEY_PAUSE)
+            if (event.key.keysym.sym == option_key[KEY_PAUSE])
                 action_pause = true;
-            if(event.key.keysym.sym == KEY_EXIT)
+            if (event.key.keysym.sym == option_key[KEY_EXIT])
                 action_exit = true;
         }
 
-        else if(event.type == SDL_KEYUP) {
-            if((event.key.keysym.sym == SDLK_LEFT && action_move == ACTION_LEFT) ||
-               (event.key.keysym.sym == SDLK_RIGHT && action_move == ACTION_RIGHT) ||
-               (event.key.keysym.sym == SDLK_UP && action_move == ACTION_UP) ||
-               (event.key.keysym.sym == SDLK_DOWN && action_move == ACTION_DOWN)) {
+        else if (event.type == SDL_KEYUP) {
+            if ((event.key.keysym.sym == option_key[KEY_LEFT] && action_move == ACTION_LEFT) ||
+               (event.key.keysym.sym == option_key[KEY_RIGHT] && action_move == ACTION_RIGHT) ||
+               (event.key.keysym.sym == option_key[KEY_UP] && action_move == ACTION_UP) ||
+               (event.key.keysym.sym == option_key[KEY_DOWN] && action_move == ACTION_DOWN)) {
                 action_move = ACTION_NONE;
                 action_last_move = ACTION_NONE;
             }
-            if(event.key.keysym.sym == option_key_switch)
+            if (event.key.keysym.sym == option_key[KEY_SWITCH])
                 action_switch = false;
-            if(event.key.keysym.sym == option_key_bump)
+            if (event.key.keysym.sym == option_key[KEY_BUMP])
                 action_bump = false;
-            if(event.key.keysym.sym == KEY_ACCEPT)
+            if (event.key.keysym.sym == option_key[KEY_ACCEPT])
                 action_accept = false;
-            if(event.key.keysym.sym == KEY_PAUSE)
+            if (event.key.keysym.sym == option_key[KEY_PAUSE])
                 action_pause = false;
-            if(event.key.keysym.sym == KEY_EXIT)
+            if (event.key.keysym.sym == option_key[KEY_EXIT])
                 action_exit = false;
         }
 
-        else if(event.type == SDL_JOYBUTTONDOWN) {
-            if(event.jbutton.which == 0) {
-                if (event.jbutton.button == 0)
+        else if (option_joystick > -1 && event.type == SDL_JOYBUTTONDOWN) {
+            if (event.jbutton.which == option_joystick) {
+                if (event.jbutton.button == option_joy_button[KEY_SWITCH])
                     action_switch = true;
-                if (event.jbutton.button == 1)
+                if (event.jbutton.button == option_joy_button[KEY_BUMP])
                     action_bump = true;
-                if (event.jbutton.button == 9) {
+                if (event.jbutton.button == option_joy_button[KEY_ACCEPT])
                     action_accept = true;
+                if (event.jbutton.button == option_joy_button[KEY_PAUSE])
                     action_pause = true;
-                }
+                if (event.jbutton.button == option_joy_button[KEY_EXIT])
+                    action_exit = true;
             }
         }
 
-        else if(event.type == SDL_JOYBUTTONUP) {
-            if(event.jbutton.which == 0) {
-                if (event.jbutton.button == 0)
+        else if (option_joystick > -1 && event.type == SDL_JOYBUTTONUP) {
+            if (event.jbutton.which == option_joystick) {
+                if (event.jbutton.button == option_joy_button[KEY_SWITCH])
                     action_switch = false;
-                if (event.jbutton.button == 1)
+                if (event.jbutton.button == option_joy_button[KEY_BUMP])
                     action_bump = false;
-                if (event.jbutton.button == 9) {
+                if (event.jbutton.button == option_joy_button[KEY_ACCEPT])
                     action_accept = false;
+                if (event.jbutton.button == option_joy_button[KEY_PAUSE])
                     action_pause = false;
-                }
+                if (event.jbutton.button == option_joy_button[KEY_EXIT])
+                    action_exit = false;
             }
         }
 
-        else if(event.type == SDL_QUIT) {
+        else if (event.type == SDL_QUIT) {
             quit = true;
         }
     }
@@ -399,11 +419,28 @@ void sysConfigLoad() {
             if (temp[0] == '#') continue;
             key = strtok(temp,"=");
             if (strcmp(key,"joystick") == 0) option_joystick = atoi(strtok(NULL,"\n"));
-            if (strcmp(key,"sound") == 0) option_sound = atoi(strtok(NULL,"\n"));
-            if (strcmp(key,"music") == 0) option_music = atoi(strtok(NULL,"\n"));
-            if (strcmp(key,"fullscreen") == 0) option_fullscreen = atoi(strtok(NULL,"\n"));
-            if (strcmp(key,"key_bump") == 0) option_key_bump = (SDLKey)atoi(strtok(NULL,"\n"));
-            if (strcmp(key,"key_switch") == 0) option_key_switch = (SDLKey)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"sound") == 0) option_sound = atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"music") == 0) option_music = atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"fullscreen") == 0) option_fullscreen = atoi(strtok(NULL,"\n"));
+
+            else if (strcmp(key,"key_switch") == 0) option_key[KEY_SWITCH] = (SDLKey)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"key_bump") == 0) option_key[KEY_BUMP] = (SDLKey)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"key_accept") == 0) option_key[KEY_ACCEPT] = (SDLKey)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"key_pause") == 0) option_key[KEY_PAUSE] = (SDLKey)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"key_exit") == 0) option_key[KEY_EXIT] = (SDLKey)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"key_left") == 0) option_key[KEY_LEFT] = (SDLKey)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"key_right") == 0) option_key[KEY_RIGHT] = (SDLKey)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"key_up") == 0) option_key[KEY_UP] = (SDLKey)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"key_down") == 0) option_key[KEY_DOWN] = (SDLKey)atoi(strtok(NULL,"\n"));
+
+            else if (strcmp(key,"joy_switch") == 0) option_joy_button[KEY_SWITCH] = (SDLKey)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"joy_bump") == 0) option_joy_button[KEY_BUMP] = (SDLKey)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"joy_accept") == 0) option_joy_button[KEY_ACCEPT] = (SDLKey)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"joy_pause") == 0) option_joy_button[KEY_PAUSE] = (SDLKey)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"joy_exit") == 0) option_joy_button[KEY_EXIT] = (SDLKey)atoi(strtok(NULL,"\n"));
+
+            else if (strcmp(key,"joy_axis_x") == 0) option_joy_axis_x = (SDLKey)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"joy_axis_y") == 0) option_joy_axis_y = (SDLKey)atoi(strtok(NULL,"\n"));
         }
         fclose(config_file);
         sysConfigApply();
@@ -422,8 +459,27 @@ void sysConfigSave() {
         fprintf(config_file,"sound=%d\n",option_sound);
         fprintf(config_file,"music=%d\n",option_music);
         fprintf(config_file,"fullscreen=%d\n",option_fullscreen);
-        fprintf(config_file,"key_bump=%d\n",(int)option_key_bump);
-        fprintf(config_file,"key_switch=%d\n",(int)option_key_switch);
+
+        fprintf(config_file,"\n# keyboard/GCW-Zero bindings\n");
+        fprintf(config_file,"key_switch=%d\n",(int)option_key[KEY_SWITCH]);
+        fprintf(config_file,"key_bump=%d\n",(int)option_key[KEY_BUMP]);
+        fprintf(config_file,"key_accept=%d\n",(int)option_key[KEY_ACCEPT]);
+        fprintf(config_file,"key_pause=%d\n",(int)option_key[KEY_PAUSE]);
+        fprintf(config_file,"key_exit=%d\n",(int)option_key[KEY_EXIT]);
+        fprintf(config_file,"key_left=%d\n",(int)option_key[KEY_LEFT]);
+        fprintf(config_file,"key_right=%d\n",(int)option_key[KEY_RIGHT]);
+        fprintf(config_file,"key_up=%d\n",(int)option_key[KEY_UP]);
+        fprintf(config_file,"key_down=%d\n",(int)option_key[KEY_DOWN]);
+
+        fprintf(config_file,"\n# joystick bindings\n");
+        fprintf(config_file,"joy_switch=%d\n",(int)option_joy_button[KEY_SWITCH]);
+        fprintf(config_file,"joy_bump=%d\n",(int)option_joy_button[KEY_BUMP]);
+        fprintf(config_file,"joy_accept=%d\n",(int)option_joy_button[KEY_ACCEPT]);
+        fprintf(config_file,"joy_pause=%d\n",(int)option_joy_button[KEY_PAUSE]);
+        fprintf(config_file,"joy_exit=%d\n",(int)option_joy_button[KEY_EXIT]);
+        fprintf(config_file,"joy_axis_x=%d\n",option_joy_axis_x);
+        fprintf(config_file,"joy_axis_y=%d\n",option_joy_axis_y);
+
         fclose(config_file);
     } else printf("Error: Couldn't write to config file.\n");
 
