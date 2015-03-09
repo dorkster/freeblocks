@@ -228,7 +228,7 @@ void blockSetDefaults() {
     else {
         ROWS = 10;
         COLS = 13;
-        NUM_BLOCKS = 6;
+        NUM_BLOCKS = 7;
         START_ROWS = 4;
         DISABLED_ROWS = 1;
         CURSOR_MAX_X = COLS-2;
