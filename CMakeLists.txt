@@ -126,7 +126,7 @@ EndIf (NOT SDLMAIN_LIBRARY)
 Target_Link_Libraries (freeblocks ${CMAKE_LD_FLAGS} ${SDL_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLTTF_LIBRARY} ${SDLMAIN_LIBRARY} ${EXTRA_LIBRARIES})
 
 # installing to the proper places
-install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/freeblocks DESTINATION ${BINDIR})
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/res" DESTINATION ${DATADIR})
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/pkg/default.gcw0.desktop" DESTINATION ${APPDIR} RENAME freeblocks.desktop)
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/pkg/freeblocks.png" DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/32x32/apps)
+install(TARGETS freeblocks DESTINATION ${BINDIR})
+install(DIRECTORY res DESTINATION ${DATADIR})
+install(FILES pkg/default.gcw0.desktop DESTINATION ${APPDIR} RENAME freeblocks.desktop)
+install(FILES pkg/freeblocks.png DESTINATION share/icons/hicolor/32x32/apps)
