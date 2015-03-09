@@ -204,8 +204,9 @@ void menuClear() {
 
 int menuLogic() {
     if (menu_size > 0) {
-        if (action_switch && menu_items[menu_option]->enabled && menu_items[menu_option]->val_max == 0) {
+        if ((action_switch || action_accept) && menu_items[menu_option]->enabled && menu_items[menu_option]->val_max == 0) {
             action_switch = false;
+            action_accept = false;
             Mix_PlayChannel(-1,sound_menu,0);
             return menu_option;
         } else if (action_move == ACTION_UP && action_cooldown == 0 && menu_option > 0) {

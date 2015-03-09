@@ -54,9 +54,6 @@ typedef enum { false = 0, true = 1 } bool;
 #define ACTION_COOLDOWN 10 / (60/FPS)
 
 #define OPTIONS_MAIN 0
-#define OPTIONS_JOYSTICK 1
-#define OPTIONS_SOUND 2
-#define OPTIONS_MUSIC 3
 
 #ifndef PKGDATADIR
 #define PKGDATADIR "./res"
@@ -114,6 +111,7 @@ ActionMove action_move;
 ActionMove action_last_move;
 ActionMove action_switch;
 bool action_bump;
+bool action_accept;
 bool action_pause;
 bool action_exit;
 

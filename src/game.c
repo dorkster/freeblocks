@@ -411,6 +411,7 @@ void gamePause() {
             cursor_timer = -1;
         }
 
+        action_accept = false;
         action_pause = false;
     }
 }

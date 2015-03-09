@@ -29,13 +29,14 @@
 
 #include "sys.h"
 
+#define KEY_ACCEPT SDLK_RETURN
+#define KEY_EXIT SDLK_ESCAPE
+
 #ifdef __GCW0__
 #define KEY_PAUSE SDLK_RETURN
-#define KEY_EXIT SDLK_ESCAPE
 #define SDL_FLAGS (SDL_HWSURFACE|SDL_TRIPLEBUF)
 #else
 #define KEY_PAUSE SDLK_ESCAPE
-#define KEY_EXIT SDLK_ESCAPE
 #define SDL_FLAGS (SDL_HWSURFACE)
 #endif
 
@@ -74,6 +75,7 @@ ActionMove action_move = ACTION_NONE;
 ActionMove action_last_move = ACTION_NONE;
 ActionMove action_switch = ACTION_NONE;
 bool action_bump = false;
+bool action_accept = false;
 bool action_pause = false;
 bool action_exit = false;
 
@@ -282,6 +284,8 @@ void sysInput() {
                 action_switch = true;
             if(event.key.keysym.sym == option_key_bump)
                 action_bump = true;
+            if(event.key.keysym.sym == KEY_ACCEPT)
+                action_accept = true;
             if(event.key.keysym.sym == KEY_PAUSE)
                 action_pause = true;
             if(event.key.keysym.sym == KEY_EXIT)
@@ -300,6 +304,8 @@ void sysInput() {
                 action_switch = false;
             if(event.key.keysym.sym == option_key_bump)
                 action_bump = false;
+            if(event.key.keysym.sym == KEY_ACCEPT)
+                action_accept = false;
             if(event.key.keysym.sym == KEY_PAUSE)
                 action_pause = false;
             if(event.key.keysym.sym == KEY_EXIT)
@@ -312,8 +318,10 @@ void sysInput() {
                     action_switch = true;
                 if (event.jbutton.button == 1)
                     action_bump = true;
-                if (event.jbutton.button == 9)
+                if (event.jbutton.button == 9) {
+                    action_accept = true;
                     action_pause = true;
+                }
             }
         }
 
@@ -323,8 +331,10 @@ void sysInput() {
                     action_switch = false;
                 if (event.jbutton.button == 1)
                     action_bump = false;
-                if (event.jbutton.button == 9)
+                if (event.jbutton.button == 9) {
+                    action_accept = false;
                     action_pause = false;
+                }
             }
         }
 
