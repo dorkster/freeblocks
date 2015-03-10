@@ -45,19 +45,22 @@ int DISABLED_ROWS;
 int CURSOR_MAX_X;
 int CURSOR_MIN_Y;
 int CURSOR_MAX_Y;
-int BLOCK_MOVE_SPEED;
+int BLOCK_MOVE_FRAMES;
 int DRAW_OFFSET_X;
 int DRAW_OFFSET_Y;
 
 typedef struct Block{
     int x,y;
-    int dest_x, dest_y;
+    int start_col, start_row;
+    int dest_col, dest_row;
     bool alive;
     int color;
     bool matched;
     int clear_timer;
     int frame;
     bool moving;
+    int move_counter;
+    int move_counter_max;
     int return_row, return_col;
     bool sound_after_move;
 }Block;

@@ -33,14 +33,18 @@ int blockRand(void) {
 void blockSet(int i, int j, bool alive, int color) {
     blocks[i][j].x = j*BLOCK_SIZE;
     blocks[i][j].y = i*BLOCK_SIZE;
-    blocks[i][j].dest_x = j*BLOCK_SIZE;
-    blocks[i][j].dest_y = i*BLOCK_SIZE;
+    blocks[i][j].start_col = j;
+    blocks[i][j].start_row = i;
+    blocks[i][j].dest_col = j;
+    blocks[i][j].dest_row = i;
     blocks[i][j].alive = alive;
     blocks[i][j].color = color;
     blocks[i][j].matched = false;
     blocks[i][j].clear_timer = 0;
     blocks[i][j].frame = -1;
     blocks[i][j].moving = false;
+    blocks[i][j].move_counter = 0;
+    blocks[i][j].move_counter_max = 1;
     blocks[i][j].return_row = -1;
     blocks[i][j].return_col = -1;
     blocks[i][j].sound_after_move = false;
@@ -53,6 +57,8 @@ void blockClear(int i, int j) {
     blocks[i][j].clear_timer = 0;
     blocks[i][j].frame = -1;
     blocks[i][j].moving = false;
+    blocks[i][j].move_counter = 0;
+    blocks[i][j].move_counter_max = 1;
     blocks[i][j].return_row = -1;
     blocks[i][j].return_col = -1;
     blocks[i][j].sound_after_move = false;
@@ -73,12 +79,18 @@ void blockSwitch(int i, int j, int k, int l, bool animate, bool sound_after_move
     blocks[k][l].alive = b1_alive;
 
     if (animate) {
-        blocks[i][j].x = blocks[k][l].dest_x;
-        blocks[i][j].y = blocks[k][l].dest_y;
+        blocks[i][j].start_col = blocks[k][l].dest_col;
+        blocks[i][j].start_row = blocks[k][l].dest_row;
+        blocks[i][j].x = blocks[k][l].dest_col*BLOCK_SIZE;
+        blocks[i][j].y = blocks[k][l].dest_row*BLOCK_SIZE;
         blocks[i][j].sound_after_move = sound_after_move;
-        blocks[k][l].x = blocks[i][j].dest_x;
-        blocks[k][l].y = blocks[i][j].dest_y;
+        blocks[i][j].move_counter = blocks[i][j].move_counter_max = BLOCK_MOVE_FRAMES*(abs(i-k)+abs(j-l));
+        blocks[k][l].start_col = blocks[i][j].dest_col;
+        blocks[k][l].start_row = blocks[i][j].dest_row;
+        blocks[k][l].x = blocks[i][j].dest_col*BLOCK_SIZE;
+        blocks[k][l].y = blocks[i][j].dest_row*BLOCK_SIZE;
         blocks[k][l].sound_after_move = sound_after_move;
+        blocks[k][l].move_counter = blocks[k][l].move_counter_max = BLOCK_MOVE_FRAMES*(abs(i-k)+abs(j-l));
     }
 }
 
@@ -112,6 +124,12 @@ int blockMatchVertical(int i, int j) {
     return match_count;
 }
 
+int interpolateBlock(int start, int end, int counter, int counter_max) {
+    // linear
+    float value = (float)(counter_max - counter + 1) / counter_max;
+    return (int)((start + ((end - start) * value))*BLOCK_SIZE);
+}
+
 bool blockAnimate() {
     int i,j;
     bool anim = false;
@@ -132,24 +150,10 @@ bool blockAnimate() {
             }
 
             // move blocks
-            if (blocks[i][j].dest_x < blocks[i][j].x) {
-                blocks[i][j].x -= BLOCK_MOVE_SPEED;
-                blocks[i][j].moving = true;
-                anim = true;
-            }
-            else if (blocks[i][j].dest_x > blocks[i][j].x) {
-                blocks[i][j].x += BLOCK_MOVE_SPEED;
-                blocks[i][j].moving = true;
-                anim = true;
-            }
-
-            if (blocks[i][j].dest_y < blocks[i][j].y) {
-                blocks[i][j].y -= BLOCK_MOVE_SPEED;
-                blocks[i][j].moving = true;
-                anim = true;
-            }
-            else if (blocks[i][j].dest_y > blocks[i][j].y) {
-                blocks[i][j].y += BLOCK_MOVE_SPEED;
+            if (blocks[i][j].move_counter > 0) {
+                blocks[i][j].x = interpolateBlock(blocks[i][j].start_col, blocks[i][j].dest_col, blocks[i][j].move_counter, blocks[i][j].move_counter_max);
+                blocks[i][j].y = interpolateBlock(blocks[i][j].start_row, blocks[i][j].dest_row, blocks[i][j].move_counter, blocks[i][j].move_counter_max);
+                blocks[i][j].move_counter--;
                 blocks[i][j].moving = true;
                 anim = true;
             }
@@ -174,7 +178,7 @@ void blockReturn() {
         for (j=0;j<COLS;j++) {
             // If we attempted to switch this block but
             // there is no match, move it back
-            if (blocks[i][j].dest_x == blocks[i][j].x && blocks[i][j].dest_y == blocks[i][j].y && !blocks[i][j].matched && !blocks[i][j].moving && blocks[i][j].return_row != -1) {
+            if (blocks[i][j].move_counter == 0 && !blocks[i][j].matched && !blocks[i][j].moving && blocks[i][j].return_row != -1) {
                 blockSwitch(i, j, blocks[i][j].return_row, blocks[i][j].return_col, true, false);
                 blocks[i][j].return_row = -1;
                 blocks[i][j].return_col = -1;
@@ -223,7 +227,7 @@ void blockSetDefaults() {
         DISABLED_ROWS = 0;
         CURSOR_MAX_X = COLS-1;
         CURSOR_MIN_Y = 0;
-        BLOCK_MOVE_SPEED = BLOCK_SIZE / 4;
+        BLOCK_MOVE_FRAMES = 4;
     }
     else {
         ROWS = 10;
@@ -233,7 +237,7 @@ void blockSetDefaults() {
         DISABLED_ROWS = 1;
         CURSOR_MAX_X = COLS-2;
         CURSOR_MIN_Y = 1;
-        BLOCK_MOVE_SPEED = BLOCK_SIZE / 2;
+        BLOCK_MOVE_FRAMES = 2;
     }
 
     DRAW_OFFSET_X = (SCREEN_WIDTH - COLS * BLOCK_SIZE) / 2;
