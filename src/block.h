@@ -60,6 +60,7 @@ typedef struct Block{
     int frame;
     bool moving;
     int move_counter;
+    int move_counter_max;
     int return_row, return_col;
     bool sound_after_move;
 }Block;

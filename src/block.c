@@ -44,6 +44,7 @@ void blockSet(int i, int j, bool alive, int color) {
     blocks[i][j].frame = -1;
     blocks[i][j].moving = false;
     blocks[i][j].move_counter = 0;
+    blocks[i][j].move_counter_max = 1;
     blocks[i][j].return_row = -1;
     blocks[i][j].return_col = -1;
     blocks[i][j].sound_after_move = false;
@@ -57,6 +58,7 @@ void blockClear(int i, int j) {
     blocks[i][j].frame = -1;
     blocks[i][j].moving = false;
     blocks[i][j].move_counter = 0;
+    blocks[i][j].move_counter_max = 1;
     blocks[i][j].return_row = -1;
     blocks[i][j].return_col = -1;
     blocks[i][j].sound_after_move = false;
@@ -82,13 +84,13 @@ void blockSwitch(int i, int j, int k, int l, bool animate, bool sound_after_move
         blocks[i][j].x = blocks[k][l].dest_col*BLOCK_SIZE;
         blocks[i][j].y = blocks[k][l].dest_row*BLOCK_SIZE;
         blocks[i][j].sound_after_move = sound_after_move;
-        blocks[i][j].move_counter = BLOCK_MOVE_FRAMES;
+        blocks[i][j].move_counter = blocks[i][j].move_counter_max = BLOCK_MOVE_FRAMES*(abs(i-k)+abs(j-l));
         blocks[k][l].start_col = blocks[i][j].dest_col;
         blocks[k][l].start_row = blocks[i][j].dest_row;
         blocks[k][l].x = blocks[i][j].dest_col*BLOCK_SIZE;
         blocks[k][l].y = blocks[i][j].dest_row*BLOCK_SIZE;
         blocks[k][l].sound_after_move = sound_after_move;
-        blocks[k][l].move_counter = BLOCK_MOVE_FRAMES;
+        blocks[k][l].move_counter = blocks[k][l].move_counter_max = BLOCK_MOVE_FRAMES*(abs(i-k)+abs(j-l));
     }
 }
 
@@ -122,9 +124,9 @@ int blockMatchVertical(int i, int j) {
     return match_count;
 }
 
-int interpolateBlock(int start, int end, int counter) {
+int interpolateBlock(int start, int end, int counter, int counter_max) {
     // linear
-    float value = (float)(BLOCK_MOVE_FRAMES - counter + 1) / BLOCK_MOVE_FRAMES;
+    float value = (float)(counter_max - counter + 1) / counter_max;
     return (int)((start + ((end - start) * value))*BLOCK_SIZE);
 }
 
@@ -149,8 +151,8 @@ bool blockAnimate() {
 
             // move blocks
             if (blocks[i][j].move_counter > 0) {
-                blocks[i][j].x = interpolateBlock(blocks[i][j].start_col, blocks[i][j].dest_col, blocks[i][j].move_counter);
-                blocks[i][j].y = interpolateBlock(blocks[i][j].start_row, blocks[i][j].dest_row, blocks[i][j].move_counter);
+                blocks[i][j].x = interpolateBlock(blocks[i][j].start_col, blocks[i][j].dest_col, blocks[i][j].move_counter, blocks[i][j].move_counter_max);
+                blocks[i][j].y = interpolateBlock(blocks[i][j].start_row, blocks[i][j].dest_row, blocks[i][j].move_counter, blocks[i][j].move_counter_max);
                 blocks[i][j].move_counter--;
                 blocks[i][j].moving = true;
                 anim = true;
