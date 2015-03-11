@@ -49,7 +49,7 @@ typedef enum { false = 0, true = 1 } bool;
 #define FONT_SIZE 24
 #endif
 
-#define FPS 30
+#define FPS 60
 #define JOY_DEADZONE 100
 #define ACTION_COOLDOWN 10 / (60/FPS)
 

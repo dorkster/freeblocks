@@ -20,7 +20,7 @@ endif()
 
 # Default definitions
 if(MSVC)
-    add_definitions(-Wall -W4 -wd"4996")
+    add_definitions(-Wall -W4 -wd"4996" -D_USE_MATH_DEFINES)
 else()
     add_definitions(-Wall -Wextra -Wunused -Wshadow -Wunreachable-code -std=c99)
     add_definitions(-fno-math-errno -fno-exceptions)
@@ -95,6 +95,7 @@ Set (FREEBLOCKS_SOURCES
     ./src/dork/dork_string.c
     ./src/block.c
     ./src/draw.c
+    ./src/easing.c
     ./src/game.c
     ./src/menu.c
     ./src/sys.c
@@ -105,6 +106,7 @@ Set (FREEBLOCKS_HEADERS
     ./src/dork/dork_string.h
     ./src/block.h
     ./src/draw.h
+    ./src/easing.h
     ./src/game.h
     ./src/menu.h
     ./src/sys.h

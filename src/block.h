@@ -19,6 +19,7 @@
 #ifndef BLOCK_H
 #define BLOCK_H
 
+#include "easing.h"
 #include "sys.h"
 
 #ifdef HALF_GFX
@@ -61,6 +62,7 @@ typedef struct Block{
     bool moving;
     int move_counter;
     int move_counter_max;
+    AHEasingFunction ease_func;
     int return_row, return_col;
     bool sound_after_move;
 }Block;
