@@ -15,6 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include <math.h>
 
 #include "block.h"
 #include "sys.h"
@@ -45,6 +46,7 @@ void blockSet(int i, int j, bool alive, int color) {
     blocks[i][j].moving = false;
     blocks[i][j].move_counter = 0;
     blocks[i][j].move_counter_max = 1;
+    blocks[i][j].ease_func = NULL;
     blocks[i][j].return_row = -1;
     blocks[i][j].return_col = -1;
     blocks[i][j].sound_after_move = false;
@@ -59,12 +61,13 @@ void blockClear(int i, int j) {
     blocks[i][j].moving = false;
     blocks[i][j].move_counter = 0;
     blocks[i][j].move_counter_max = 1;
+    blocks[i][j].ease_func = NULL;
     blocks[i][j].return_row = -1;
     blocks[i][j].return_col = -1;
     blocks[i][j].sound_after_move = false;
 }
 
-void blockSwitch(int i, int j, int k, int l, bool animate, bool sound_after_move) {
+void blockSwitch(int i, int j, int k, int l, bool animate, bool sound_after_move, AHEasingFunction ease_func) {
     if (i < 0 || i >= ROWS || j < 0 || j >= COLS || k < 0 || k >= ROWS || l < 0 || l >= COLS) return;
     if (blocks[i][j].matched || blocks[k][l].matched) return;
 
@@ -85,11 +88,13 @@ void blockSwitch(int i, int j, int k, int l, bool animate, bool sound_after_move
         blocks[i][j].y = blocks[k][l].dest_row*BLOCK_SIZE;
         blocks[i][j].sound_after_move = sound_after_move;
         blocks[i][j].move_counter = blocks[i][j].move_counter_max = BLOCK_MOVE_FRAMES*(abs(i-k)+abs(j-l));
+        blocks[i][j].ease_func = ease_func;
         blocks[k][l].start_col = blocks[i][j].dest_col;
         blocks[k][l].start_row = blocks[i][j].dest_row;
         blocks[k][l].x = blocks[i][j].dest_col*BLOCK_SIZE;
         blocks[k][l].y = blocks[i][j].dest_row*BLOCK_SIZE;
-        blocks[k][l].sound_after_move = sound_after_move;
+        blocks[k][l].sound_after_move = sound_after_move;;
+        blocks[k][l].ease_func = ease_func;
         blocks[k][l].move_counter = blocks[k][l].move_counter_max = BLOCK_MOVE_FRAMES*(abs(i-k)+abs(j-l));
     }
 }
@@ -124,9 +129,8 @@ int blockMatchVertical(int i, int j) {
     return match_count;
 }
 
-int interpolateBlock(int start, int end, int counter, int counter_max) {
-    // linear
-    float value = (float)(counter_max - counter + 1) / counter_max;
+int interpolateBlock(int start, int end, int counter, int counter_max, AHEasingFunction ease_func) {
+    float value = ease_func((float)(counter_max - counter + 1) / counter_max);
     return (int)((start + ((end - start) * value))*BLOCK_SIZE);
 }
 
@@ -151,8 +155,8 @@ bool blockAnimate() {
 
             // move blocks
             if (blocks[i][j].move_counter > 0) {
-                blocks[i][j].x = interpolateBlock(blocks[i][j].start_col, blocks[i][j].dest_col, blocks[i][j].move_counter, blocks[i][j].move_counter_max);
-                blocks[i][j].y = interpolateBlock(blocks[i][j].start_row, blocks[i][j].dest_row, blocks[i][j].move_counter, blocks[i][j].move_counter_max);
+                blocks[i][j].x = interpolateBlock(blocks[i][j].start_col, blocks[i][j].dest_col, blocks[i][j].move_counter, blocks[i][j].move_counter_max, blocks[i][j].ease_func);
+                blocks[i][j].y = interpolateBlock(blocks[i][j].start_row, blocks[i][j].dest_row, blocks[i][j].move_counter, blocks[i][j].move_counter_max, blocks[i][j].ease_func);
                 blocks[i][j].move_counter--;
                 blocks[i][j].moving = true;
                 anim = true;
@@ -179,7 +183,7 @@ void blockReturn() {
             // If we attempted to switch this block but
             // there is no match, move it back
             if (blocks[i][j].move_counter == 0 && !blocks[i][j].matched && !blocks[i][j].moving && blocks[i][j].return_row != -1) {
-                blockSwitch(i, j, blocks[i][j].return_row, blocks[i][j].return_col, true, false);
+                blockSwitch(i, j, blocks[i][j].return_row, blocks[i][j].return_col, true, false, SineEaseInOut);
                 blocks[i][j].return_row = -1;
                 blocks[i][j].return_col = -1;
             }
@@ -227,7 +231,7 @@ void blockSetDefaults() {
         DISABLED_ROWS = 0;
         CURSOR_MAX_X = COLS-1;
         CURSOR_MIN_Y = 0;
-        BLOCK_MOVE_FRAMES = 4;
+        BLOCK_MOVE_FRAMES = 8;
     }
     else {
         ROWS = 10;
@@ -237,7 +241,7 @@ void blockSetDefaults() {
         DISABLED_ROWS = 1;
         CURSOR_MAX_X = COLS-2;
         CURSOR_MIN_Y = 1;
-        BLOCK_MOVE_FRAMES = 2;
+        BLOCK_MOVE_FRAMES = 4;
     }
 
     DRAW_OFFSET_X = (SCREEN_WIDTH - COLS * BLOCK_SIZE) / 2;
@@ -367,7 +371,7 @@ void blockGravity() {
         if (gap_size > 0) {
             for (i=first_empty-gap_size;i>=0;i--) {
                 if (blocks[i][j].alive) {
-                    blockSwitch(i,j,i+gap_size,j, true, true);
+                    blockSwitch(i,j,i+gap_size,j, true, true, SineEaseIn);
                 }
             }
         }
@@ -443,7 +447,7 @@ bool blockAddLayer() {
 
     for (j=0;j<COLS;j++) {
         for (i=1;i<ROWS;i++) {
-            blockSwitch(i,j,i-1,j, false, false);
+            blockSwitch(i,j,i-1,j, false, false, LinearInterpolation);
         }
     }
 
@@ -463,12 +467,12 @@ bool blockHasSwitchMatch() {
 
     for (j=0;j<COLS;j++) {
         for (i=0;i<ROWS;i++) {
-            blockSwitch(i,j,i+1,j,false,false);
+            blockSwitch(i,j,i+1,j,false,false,LinearInterpolation);
             has_switch_match = has_switch_match || blockHasMatches();
-            blockSwitch(i,j,i+1,j,false,false);
-            blockSwitch(i,j,i,j+1,false,false);
+            blockSwitch(i,j,i+1,j,false,false,LinearInterpolation);
+            blockSwitch(i,j,i,j+1,false,false,LinearInterpolation);
             has_switch_match = has_switch_match || blockHasMatches();
-            blockSwitch(i,j,i,j+1,false,false);
+            blockSwitch(i,j,i,j+1,false,false,LinearInterpolation);
             if (has_switch_match) return true;
         }
         if (has_switch_match) return true;
@@ -500,7 +504,7 @@ void blockSwitchCursor() {
 
     // don't allow switching blocks that are already moving
     if (blocks[cursor.y1][cursor.x1].moving == false && blocks[cursor.y2][cursor.x2].moving == false) {
-        blockSwitch(cursor.y1, cursor.x1, cursor.y2, cursor.x2, true, false);
+        blockSwitch(cursor.y1, cursor.x1, cursor.y2, cursor.x2, true, false, SineEaseOut);
         if (game_mode == GAME_MODE_JEWELS) {
             blocks[cursor.y1][cursor.x1].return_row = cursor.y2;
             blocks[cursor.y1][cursor.x1].return_col = cursor.x2;
