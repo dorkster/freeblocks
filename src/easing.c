@@ -13,6 +13,15 @@
 #include <math.h>
 #include "easing.h"
 
+// C99 does not define these, so define them here
+#ifndef M_PI
+#define M_PI 3.14159265358979323846264338327
+#endif
+
+#ifndef M_PI_2
+#define M_PI_2 M_PI/2
+#endif
+
 // Modeled after the line y = x
 AHFloat LinearInterpolation(AHFloat p)
 {
