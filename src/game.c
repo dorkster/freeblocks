@@ -434,7 +434,7 @@ void gameMove() {
         Mix_PlayChannel(-1,sound_switch,0);
 
         if (cursor_timer == -1)
-            cursor_timer = FPS/5;
+            cursor_timer = FPS/(FPS/5);
 
         if (cursor_timer > 0)
             cursor_timer--;
