@@ -688,10 +688,14 @@ void sysHighScoresLoad() {
 
     mkdir(Dork_StringGetData(&path_dir_config), MKDIR_MODE);
 
-    if (game_mode == GAME_MODE_JEWELS)
-        file = fopen(Dork_StringGetData(&path_file_highscores_jewels),"r+");
-    else
+    switch (game_mode) {
+    case GAME_MODE_DEFAULT:
         file = fopen(Dork_StringGetData(&path_file_highscores),"r+");
+        break;
+    case GAME_MODE_JEWELS:
+        file = fopen(Dork_StringGetData(&path_file_highscores_jewels),"r+");
+        break;
+    }
 
     if (file) {
         while (fgets(buffer,BUFSIZ,file)) {
@@ -716,10 +720,14 @@ void sysHighScoresSave() {
 
     mkdir(Dork_StringGetData(&path_dir_config), MKDIR_MODE);
 
-    if (game_mode == GAME_MODE_JEWELS)
-        file = fopen(Dork_StringGetData(&path_file_highscores_jewels),"w+");
-    else
+    switch (game_mode) {
+    case GAME_MODE_DEFAULT:
         file = fopen(Dork_StringGetData(&path_file_highscores),"w+");
+        break;
+    case GAME_MODE_JEWELS:
+        file = fopen(Dork_StringGetData(&path_file_highscores_jewels),"w+");
+        break;
+    }
 
     if (file) {
         for (i=0;i<10;i++) {

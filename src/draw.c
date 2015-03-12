@@ -27,10 +27,14 @@ void drawEverything() {
     // Fill the screen with black
     SDL_RenderClear(renderer);
 
-    if (game_mode == GAME_MODE_JEWELS)
-        sysRenderImage(surface_background_jewels, NULL, NULL);
-    else
-        sysRenderImage(surface_background, NULL, NULL);
+    switch (game_mode) {
+    case GAME_MODE_JEWELS:
+        SDL_BlitSurface(surface_background_jewels,NULL,screen,NULL);
+        break;
+    default:
+        SDL_BlitSurface(surface_background,NULL,screen,NULL);
+        break;
+    }
 
     if (title_screen) {
         drawTitle();
@@ -173,8 +177,16 @@ void drawInfo() {
     if (game_over || game_over_timer > 0) sprintf(text,"Score: %-10d  Game Over!",score);
     else {
         if (paused) sprintf(text,"Score: %-10d  *Paused*",score);
-        else if (game_mode == GAME_MODE_JEWELS) sprintf(text, "Score: %-10d", score);
-        else sprintf(text,"Score: %-10d  Speed: %d",score,speed);
+        else {
+            switch (game_mode) {
+            case GAME_MODE_JEWELS:
+                sprintf(text, "Score: %-10d", score);
+                break;
+            default:
+                sprintf(text,"Score: %-10d  Speed: %d",score,speed);
+                break;
+            }
+        }
     }
 
     text_info = createText(text, &color);

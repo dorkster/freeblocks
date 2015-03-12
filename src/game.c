@@ -34,7 +34,7 @@ void gameTitle() {
     Mix_FadeOutMusic(2000);
 
     menuAdd("Play Game", 0, 0);
-    menuAdd("Game Type", GAME_MODE_DEFAULT, GAME_MODE_JEWELS);
+    menuAdd("Game Type", GAME_MODE_DEFAULT, GAME_MODE_DROP);
     menuAdd("Speed Level", 1, MAX_SPEED);
     menuAdd("High Scores", 0, 0);
     menuAdd("Options", 0, 0);
@@ -42,6 +42,7 @@ void gameTitle() {
 
     menuItemSetOptionText(1, GAME_MODE_DEFAULT, "Normal");
     menuItemSetOptionText(1, GAME_MODE_JEWELS, "Jewels");
+    menuItemSetOptionText(1, GAME_MODE_DROP, "Drop");
     menuItemSetVal(1, game_mode);
 }
 
@@ -168,10 +169,14 @@ void gameInit() {
 
     Mix_VolumeMusic(option_music*16);
     if (!game_over) {
-        if (game_mode == GAME_MODE_JEWELS)
+        switch (game_mode) {
+        case GAME_MODE_JEWELS:
             Mix_PlayMusic(music_jewels,-1);
-        else
+            break;
+        default:
             Mix_PlayMusic(music,-1);
+            break;
+        }
     }
 
     game_over = false;
@@ -199,10 +204,14 @@ void gameLogic() {
         // get the "Game Type" value
         game_mode = menuItemGetVal(1);
 
-        if (game_mode == GAME_MODE_JEWELS)
+        switch (game_mode) {
+        case GAME_MODE_JEWELS:
             menuItemSetEnabled(2, false);
-        else
+            break;
+        default:
             menuItemSetEnabled(2, true);
+            break;
+        }
 
         if (menu_choice > -1) {
             // get the "Speed Level" value
@@ -453,7 +462,14 @@ void gameMove() {
             break;
         }
 
-        cursor.x2 = (game_mode == GAME_MODE_JEWELS) ? cursor.x1 : cursor.x1+1;
+        switch (game_mode) {
+        case GAME_MODE_DEFAULT:
+            cursor.x2 = cursor.x1 + 1;
+            break;
+        default:
+            cursor.x2 = cursor.x1;
+            break;
+        }
         cursor.y2 = cursor.y1;
     }
 
@@ -553,12 +569,14 @@ void gameSwitch() {
 
 void gameBump() {
     if (action_bump) {
-        if (game_mode == GAME_MODE_JEWELS) {
-            jewels_cursor_select = false;
-        }
-        else {
+        switch (game_mode) {
+        case GAME_MODE_DEFAULT:
             if (blockAddLayer())
                 score += POINTS_PER_BUMP;
+            break;
+        case GAME_MODE_JEWELS:
+            jewels_cursor_select = false;
+            break;
         }
         action_bump = false;
     }
