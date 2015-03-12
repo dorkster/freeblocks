@@ -223,7 +223,8 @@ bool blockHasMatches() {
 void blockSetDefaults() {
     blockCleanup();
 
-    if (game_mode == GAME_MODE_JEWELS) {
+    switch (game_mode) {
+    case GAME_MODE_JEWELS:
         ROWS = 8;
         COLS = 8;
         NUM_BLOCKS = 7;
@@ -232,8 +233,18 @@ void blockSetDefaults() {
         CURSOR_MAX_X = COLS-1;
         CURSOR_MIN_Y = 0;
         BLOCK_MOVE_FRAMES = 8;
-    }
-    else {
+        break;
+    case GAME_MODE_DROP:
+        ROWS = 10;
+        COLS = 13;
+        NUM_BLOCKS = 4;
+        START_ROWS = 4;
+        DISABLED_ROWS = 1;
+        CURSOR_MAX_X = COLS-2;
+        CURSOR_MIN_Y = 1;
+        BLOCK_MOVE_FRAMES = 4;
+        break;
+    default:
         ROWS = 10;
         COLS = 13;
         NUM_BLOCKS = 7;
@@ -242,6 +253,7 @@ void blockSetDefaults() {
         CURSOR_MAX_X = COLS-2;
         CURSOR_MIN_Y = 1;
         BLOCK_MOVE_FRAMES = 4;
+        break;
     }
 
     DRAW_OFFSET_X = (SCREEN_WIDTH - COLS * BLOCK_SIZE) / 2;
@@ -288,7 +300,8 @@ void blockInitAll() {
         }
     }
 
-    if (game_mode == GAME_MODE_JEWELS) {
+    switch (game_mode) {
+    case GAME_MODE_JEWELS:
         do {
             for(i=ROWS-START_ROWS;i<ROWS;i++) {
                 for(j=0;j<COLS;j++) {
@@ -296,11 +309,19 @@ void blockInitAll() {
                 }
             }
         } while (blockHasMatches());
-    }
-    else {
+        break;
+    case GAME_MODE_DROP:
+        for(i=ROWS-START_ROWS;i<ROWS;i++) {
+            for(j=0;j<COLS;j++) {
+                blockSet(i,j,true,blockRand());
+            }
+        }
+        break;
+    default:
         for(i=ROWS-START_ROWS;i<ROWS;i++) {
             blockAddLayerRandom(i);
         }
+        break;
     }
 }
 
@@ -312,12 +333,14 @@ void blockLogic() {
 
     blockMatch();
 
-    if (game_mode == GAME_MODE_JEWELS) {
+    switch (game_mode) {
+    case GAME_MODE_JEWELS:
         blockReturn();
         blockAddFromTop();
-    }
-    else {
+        break;
+    default:
         blockRise();
+        break;
     }
 
     blockGravity();

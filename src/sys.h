@@ -29,6 +29,7 @@ typedef enum { false = 0, true = 1 } bool;
 
 #define GAME_MODE_DEFAULT 0
 #define GAME_MODE_JEWELS 1
+#define GAME_MODE_DROP 2
 
 #ifdef __GCW0__
 #define HALF_GFX
