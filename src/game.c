@@ -466,6 +466,16 @@ void gameMove() {
         case GAME_MODE_DEFAULT:
             cursor.x2 = cursor.x1 + 1;
             break;
+        case GAME_MODE_DROP:
+            // always set cursor to top block in column
+            for (int i=ROWS-1;i>=0;i--) {
+                if (!blocks[i][cursor.x1].alive) {
+                    cursor.y1 = min(max(i + 1, 0), ROWS - 1);
+                    break;
+                }
+            }
+            cursor.x2 = cursor.x1;
+            break;
         default:
             cursor.x2 = cursor.x1;
             break;
