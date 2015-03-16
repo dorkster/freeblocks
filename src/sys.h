@@ -86,6 +86,13 @@ typedef enum { false = 0, true = 1 } bool;
 #define stat _stat
 #endif
 
+#ifndef min
+#define min(a, b) (((a)<(b))?(a):(b))
+#endif
+#ifndef max
+#define max(a,b) (((a)>(b))?(a):(b))
+#endif
+
 enum KEYBINDS {
     KEY_SWITCH = 0,
     KEY_BUMP = 1,
