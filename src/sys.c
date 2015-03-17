@@ -85,6 +85,7 @@ bool action_bump = false;
 bool action_accept = false;
 bool action_pause = false;
 bool action_exit = false;
+bool action_click = false;
 
 int option_joystick = -1;
 int option_sound = 8;
@@ -98,6 +99,9 @@ int option_fullscreen = 0;
 
 SDL_Keycode last_key = SDLK_UNKNOWN;
 int last_joy_button = -1;
+
+int mouse_x = 0;
+int mouse_y = 0;
 
 bool sysInit() {
     if(SDL_Init(SDL_INIT_EVERYTHING) == -1) return false;
@@ -337,7 +341,23 @@ void sysCleanup() {
 
 void sysInput() {
     while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_KEYDOWN) {
+        if (event.type == SDL_MOUSEMOTION) {
+            mouse_x = event.motion.x;
+            mouse_y = event.motion.y;
+        }
+        else if (event.type == SDL_MOUSEBUTTONDOWN) {
+            mouse_x = event.motion.x;
+            mouse_y = event.motion.y;
+            if (event.button.button == SDL_BUTTON_LEFT)
+                action_click = true;
+        }
+        else if (event.type == SDL_MOUSEBUTTONUP) {
+            mouse_x = event.motion.x;
+            mouse_y = event.motion.y;
+            if (event.button.button == SDL_BUTTON_LEFT)
+                action_click = false;
+        }
+        else if (event.type == SDL_KEYDOWN) {
             last_key = event.key.keysym.sym;
 
             if (event.key.keysym.sym == option_key[KEY_LEFT])
@@ -359,7 +379,6 @@ void sysInput() {
             if (event.key.keysym.sym == option_key[KEY_EXIT])
                 action_exit = true;
         }
-
         else if (event.type == SDL_KEYUP) {
             if ((event.key.keysym.sym == option_key[KEY_LEFT] && action_move == ACTION_LEFT) ||
                (event.key.keysym.sym == option_key[KEY_RIGHT] && action_move == ACTION_RIGHT) ||
@@ -379,7 +398,6 @@ void sysInput() {
             if (event.key.keysym.sym == option_key[KEY_EXIT])
                 action_exit = false;
         }
-
         else if (option_joystick > -1 && event.type == SDL_JOYBUTTONDOWN) {
             if (event.jbutton.which == option_joystick) {
                 last_joy_button = event.jbutton.button;
@@ -396,7 +414,6 @@ void sysInput() {
                     action_exit = true;
             }
         }
-
         else if (option_joystick > -1 && event.type == SDL_JOYBUTTONUP) {
             if (event.jbutton.which == option_joystick) {
                 if (event.jbutton.button == option_joy_button[KEY_SWITCH])
@@ -411,13 +428,12 @@ void sysInput() {
                     action_exit = false;
             }
         }
-
         else if (event.type == SDL_QUIT) {
             quit = true;
         }
     }
 
-    if (joy && event.type != SDL_KEYDOWN && event.type != SDL_KEYUP) {
+    if (joy && event.type == SDL_JOYAXISMOTION) {
         int joy_x = SDL_JoystickGetAxis(joy, 0);
         int joy_y = SDL_JoystickGetAxis(joy, 1);
 

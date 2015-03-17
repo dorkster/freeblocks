@@ -213,7 +213,34 @@ void menuClear() {
 
 int menuLogic() {
     if (menu_size > 0) {
-        if ((action_switch || action_accept) && menu_items[menu_option]->enabled && menu_items[menu_option]->has_action) {
+        bool click_decrease = false;
+        bool click_increase = false;
+        bool click_accept = false;
+
+        if (action_click) {
+            int menu_top = SCREEN_HEIGHT - (menu_size * surface_bar->h);
+            if (paused)
+                menu_top -= surface_bar->h;
+
+            for (int i=0; i<menu_size; i++) {
+                int menu_pos = menu_top + (i*surface_bar->h);
+                if (mouse_y >= menu_pos && mouse_y < menu_pos + surface_bar->h) {
+                    if (menu_option == i) {
+                        if (mouse_x <= surface_bar->w/3)
+                            click_decrease = true;
+                        else if (mouse_x > (surface_bar->w/3) * 2)
+                            click_increase = true;
+                        else
+                            click_accept = true;
+                    }
+                    menu_option = i;
+                    break;
+                }
+            }
+            action_click = false;
+        }
+
+        if ((action_switch || action_accept || click_accept) && menu_items[menu_option]->enabled && menu_items[menu_option]->has_action) {
             action_switch = false;
             action_accept = false;
             Mix_PlayChannel(-1,sound_menu,0);
@@ -226,12 +253,12 @@ int menuLogic() {
             menu_option++;
             action_cooldown = ACTION_COOLDOWN;
             Mix_PlayChannel(-1,sound_switch,0);
-        } else if (action_move == ACTION_LEFT && action_cooldown == 0 && menu_items[menu_option]->enabled) {
+        } else if ((action_move == ACTION_LEFT || click_decrease) && action_cooldown == 0 && menu_items[menu_option]->enabled) {
             if (menuItemDecreaseVal(menu_option)) {
                 Mix_PlayChannel(-1,sound_switch,0);
             }
             action_cooldown = ACTION_COOLDOWN;
-        } else if (action_move == ACTION_RIGHT && action_cooldown == 0 && menu_items[menu_option]->enabled) {
+        } else if ((action_move == ACTION_RIGHT || click_increase) && action_cooldown == 0 && menu_items[menu_option]->enabled) {
             if (menuItemIncreaseVal(menu_option)) {
                 Mix_PlayChannel(-1,sound_switch,0);
             }

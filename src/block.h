@@ -94,5 +94,6 @@ bool blockAddLayer();
 bool blockHasSwitchMatch();
 bool blockHasGaps();
 void blockSwitchCursor();
+void blockGetAtMouse(int* block_x, int* block_y);
 
 #endif
