@@ -153,10 +153,6 @@ bool sysInit() {
     sysConfigLoad();
     sysConfigApply();
 
-    //load high scores
-    sysHighScoresClear();
-    sysHighScoresLoad();
-
     return true;
 }
 
@@ -531,6 +527,10 @@ void sysConfigSetPaths() {
     Dork_StringInit(&path_file_highscores_jewels);
     Dork_StringAppend(&path_file_highscores_jewels, Dork_StringGetData(&path_dir_config));
     Dork_StringAppend(&path_file_highscores_jewels, "/highscores_jewels");
+
+    Dork_StringInit(&path_file_highscores_drop);
+    Dork_StringAppend(&path_file_highscores_drop, Dork_StringGetData(&path_dir_config));
+    Dork_StringAppend(&path_file_highscores_drop, "/highscores_drop");
 }
 
 void sysConfigLoad() {
@@ -688,14 +688,7 @@ void sysHighScoresLoad() {
 
     mkdir(Dork_StringGetData(&path_dir_config), MKDIR_MODE);
 
-    switch (game_mode) {
-    case GAME_MODE_DEFAULT:
-        file = fopen(Dork_StringGetData(&path_file_highscores),"r+");
-        break;
-    case GAME_MODE_JEWELS:
-        file = fopen(Dork_StringGetData(&path_file_highscores_jewels),"r+");
-        break;
-    }
+    file = fopen(Dork_StringGetData(game_mode->highscores),"r+");
 
     if (file) {
         while (fgets(buffer,BUFSIZ,file)) {
@@ -720,14 +713,7 @@ void sysHighScoresSave() {
 
     mkdir(Dork_StringGetData(&path_dir_config), MKDIR_MODE);
 
-    switch (game_mode) {
-    case GAME_MODE_DEFAULT:
-        file = fopen(Dork_StringGetData(&path_file_highscores),"w+");
-        break;
-    case GAME_MODE_JEWELS:
-        file = fopen(Dork_StringGetData(&path_file_highscores_jewels),"w+");
-        break;
-    }
+    file = fopen(Dork_StringGetData(game_mode->highscores),"w+");
 
     if (file) {
         for (i=0;i<10;i++) {

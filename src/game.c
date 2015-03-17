@@ -20,6 +20,7 @@
 
 #include "block.h"
 #include "game.h"
+#include "game_mode.h"
 #include "menu.h"
 #include "sys.h"
 
@@ -43,7 +44,7 @@ void gameTitle() {
     menuItemSetOptionText(1, GAME_MODE_DEFAULT, "Normal");
     menuItemSetOptionText(1, GAME_MODE_JEWELS, "Jewels");
     menuItemSetOptionText(1, GAME_MODE_DROP, "Drop");
-    menuItemSetVal(1, game_mode);
+    menuItemSetVal(1, GAME_MODE_DEFAULT);
 }
 
 void gameHighScores() {
@@ -169,14 +170,7 @@ void gameInit() {
 
     Mix_VolumeMusic(option_music*16);
     if (!game_over) {
-        switch (game_mode) {
-        case GAME_MODE_JEWELS:
-            Mix_PlayMusic(music_jewels,-1);
-            break;
-        default:
-            Mix_PlayMusic(music,-1);
-            break;
-        }
+        Mix_PlayMusic(game_mode->music,-1);
     }
 
     game_over = false;
@@ -202,16 +196,13 @@ void gameLogic() {
         }
 
         // get the "Game Type" value
-        game_mode = menuItemGetVal(1);
-
-        switch (game_mode) {
-        case GAME_MODE_JEWELS:
-            menuItemSetEnabled(2, false);
-            break;
-        default:
-            menuItemSetEnabled(2, true);
-            break;
+        switch (menuItemGetVal(1)) {
+        case GAME_MODE_DEFAULT: game_mode = &game_mode_default; break;
+        case GAME_MODE_JEWELS: game_mode = &game_mode_jewels; break;
+        case GAME_MODE_DROP: game_mode = &game_mode_drop; break;
         }
+
+        menuItemSetEnabled(2, game_mode->speed);
 
         if (menu_choice > -1) {
             // get the "Speed Level" value
@@ -394,7 +385,7 @@ void gameMove() {
     if (action_move != action_last_move) cursor_timer = -1;
     if (action_move == action_last_move && action_cooldown > 0) return;
 
-    if (game_mode == GAME_MODE_JEWELS && jewels_cursor_select) {
+    if (game_mode == &game_mode_jewels && jewels_cursor_select) {
         switch (action_move) {
         case ACTION_LEFT:
             if (cursor.x1 > 0) {
@@ -462,25 +453,7 @@ void gameMove() {
             break;
         }
 
-        switch (game_mode) {
-        case GAME_MODE_DEFAULT:
-            cursor.x2 = cursor.x1 + 1;
-            break;
-        case GAME_MODE_DROP:
-            // always set cursor to top block in column
-            for (int i=ROWS-1;i>=0;i--) {
-                if (!blocks[i][cursor.x1].alive) {
-                    cursor.y1 = min(max(i + 1, 0), ROWS - 1);
-                    break;
-                }
-            }
-            cursor.x2 = cursor.x1;
-            break;
-        default:
-            cursor.x2 = cursor.x1;
-            break;
-        }
-        cursor.y2 = cursor.y1;
+        game_mode->setCursor(&cursor);
     }
 
     if (cursor_moving) {
@@ -579,15 +552,7 @@ void gameSwitch() {
 
 void gameBump() {
     if (action_bump) {
-        switch (game_mode) {
-        case GAME_MODE_DEFAULT:
-            if (blockAddLayer())
-                score += POINTS_PER_BUMP;
-            break;
-        case GAME_MODE_JEWELS:
-            jewels_cursor_select = false;
-            break;
-        }
+        game_mode->bump();
         action_bump = false;
     }
     else if (action_click) {

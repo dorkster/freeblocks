@@ -37,6 +37,7 @@ int main(int argc, char *argv[]) {
     if(!sysInit()) return 1;
     if(!sysLoadFiles()) return 1;
 
+    gameModeInit();
     menuInit();
     gameTitle();
 

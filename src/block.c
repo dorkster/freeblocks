@@ -18,6 +18,7 @@
 #include <math.h>
 
 #include "block.h"
+#include "game_mode.h"
 #include "sys.h"
 
 const int POINTS_PER_BLOCK = 10;
@@ -223,47 +224,14 @@ bool blockHasMatches() {
 void blockSetDefaults() {
     blockCleanup();
 
-    switch (game_mode) {
-    case GAME_MODE_JEWELS:
-        ROWS = 8;
-        COLS = 8;
-        NUM_BLOCKS = 7;
-        START_ROWS = ROWS;
-        DISABLED_ROWS = 0;
-        CURSOR_MAX_X = COLS-1;
-        CURSOR_MIN_Y = 0;
-        BLOCK_MOVE_FRAMES = 8;
-        break;
-    case GAME_MODE_DROP:
-        ROWS = 10;
-        COLS = 13;
-        NUM_BLOCKS = 4;
-        START_ROWS = 4;
-        DISABLED_ROWS = 1;
-        CURSOR_MAX_X = COLS-2;
-        CURSOR_MIN_Y = 1;
-        BLOCK_MOVE_FRAMES = 4;
-        break;
-    default:
-        ROWS = 10;
-        COLS = 13;
-        NUM_BLOCKS = 7;
-        START_ROWS = 4;
-        DISABLED_ROWS = 1;
-        CURSOR_MAX_X = COLS-2;
-        CURSOR_MIN_Y = 1;
-        BLOCK_MOVE_FRAMES = 4;
-        break;
-    }
+    game_mode->setDefaults();
 
     DRAW_OFFSET_X = (SCREEN_WIDTH - COLS * BLOCK_SIZE) / 2;
     DRAW_OFFSET_Y = (SCREEN_HEIGHT - ROWS * BLOCK_SIZE) / 2;
     CURSOR_MAX_Y = ROWS-1-DISABLED_ROWS;
 
     // We need to change our vertical offset if the block size != status bar size
-    if (game_mode == GAME_MODE_DEFAULT) {
-        DRAW_OFFSET_Y += BLOCK_SIZE-(surface_bar->h);
-    }
+    DRAW_OFFSET_Y += game_mode->drawOffsetExtraY;
 
     blocks = malloc(sizeof(Block*)*ROWS);
     for (int i=0; i<ROWS; i++) {
@@ -300,29 +268,7 @@ void blockInitAll() {
         }
     }
 
-    switch (game_mode) {
-    case GAME_MODE_JEWELS:
-        do {
-            for(i=ROWS-START_ROWS;i<ROWS;i++) {
-                for(j=0;j<COLS;j++) {
-                    blockSet(i,j,true,blockRand());
-                }
-            }
-        } while (blockHasMatches());
-        break;
-    case GAME_MODE_DROP:
-        for(i=ROWS-START_ROWS;i<ROWS;i++) {
-            for(j=0;j<COLS;j++) {
-                blockSet(i,j,true,blockRand());
-            }
-        }
-        break;
-    default:
-        for(i=ROWS-START_ROWS;i<ROWS;i++) {
-            blockAddLayerRandom(i);
-        }
-        break;
-    }
+    game_mode->initAll();
 }
 
 void blockLogic() {
@@ -331,22 +277,7 @@ void blockLogic() {
     if (animating)
         return;
 
-    blockMatch();
-
-    switch (game_mode) {
-    case GAME_MODE_JEWELS:
-        blockReturn();
-        blockAddFromTop();
-        break;
-    default:
-        blockRise();
-        break;
-    }
-
-    blockGravity();
-
-    if (game_mode == GAME_MODE_JEWELS && !blockHasGaps() && !blockHasSwitchMatch())
-        game_over_timer = FPS * 2;
+    game_mode->blockLogic();
 }
 
 void blockRise() {
@@ -513,7 +444,7 @@ bool blockHasGaps() {
 }
 
 void blockSwitchCursor() {
-    if (game_mode == GAME_MODE_JEWELS) {
+    if (game_mode == &game_mode_jewels) {
         if (!jewels_cursor_select) {
             jewels_cursor_select = true;
             cursor.x2 = cursor.x1;
@@ -528,7 +459,7 @@ void blockSwitchCursor() {
     // don't allow switching blocks that are already moving
     if (blocks[cursor.y1][cursor.x1].moving == false && blocks[cursor.y2][cursor.x2].moving == false) {
         blockSwitch(cursor.y1, cursor.x1, cursor.y2, cursor.x2, true, false, SineEaseOut);
-        if (game_mode == GAME_MODE_JEWELS) {
+        if (game_mode == &game_mode_jewels) {
             blocks[cursor.y1][cursor.x1].return_row = cursor.y2;
             blocks[cursor.y1][cursor.x1].return_col = cursor.x2;
             cursor.x2 = cursor.x1;
