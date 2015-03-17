@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
         drawEverything();
 
         // Update the screen
-        if(SDL_Flip(screen) == -1) return 1;
+        SDL_RenderPresent(renderer);
         
         // Limit the frame rate
         endTimer = SDL_GetTicks();

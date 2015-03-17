@@ -67,7 +67,7 @@ void gameOptions() {
     menuItemSetOptionText(0, 0, "(no joystick)");
     int i;
     for (i=0; i < SDL_NumJoysticks(); i++) {
-        menuItemSetOptionText(0, i+1, SDL_JoystickName(i));
+        menuItemSetOptionText(0, i+1, SDL_JoystickNameForIndex(i));
     }
 
     // 1 sound level

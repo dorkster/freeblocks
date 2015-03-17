@@ -29,11 +29,10 @@
 
 #include "sys.h"
 
-#ifdef __GCW0__
-#define SDL_FLAGS (SDL_HWSURFACE|SDL_TRIPLEBUF)
-#else
-#define SDL_FLAGS (SDL_HWSURFACE)
-#endif
+#define RENDERER_FLAGS (SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC)
+
+#define VERSION "0.5"
+#define WINDOW_TITLE "FreeBlocks v" VERSION
 
 const char* const key_desc[] = {
     "Switch blocks",
@@ -47,18 +46,19 @@ const char* const key_desc[] = {
     "Down"
 };
 
-SDL_Surface* screen = NULL;
+SDL_Window* window = NULL;
+SDL_Renderer* renderer = NULL;
 TTF_Font* font = NULL;
-SDL_Surface* surface_blocks = NULL;
-SDL_Surface* surface_clear = NULL;
-SDL_Surface* surface_cursor = NULL;
-SDL_Surface* surface_cursor_single = NULL;
-SDL_Surface* surface_bar = NULL;
-SDL_Surface* surface_bar_inactive = NULL;
-SDL_Surface* surface_background = NULL;
-SDL_Surface* surface_background_jewels = NULL;
-SDL_Surface* surface_title = NULL;
-SDL_Surface* surface_highscores = NULL;
+Image* surface_blocks = NULL;
+Image* surface_clear = NULL;
+Image* surface_cursor = NULL;
+Image* surface_cursor_single = NULL;
+Image* surface_bar = NULL;
+Image* surface_bar_inactive = NULL;
+Image* surface_background = NULL;
+Image* surface_background_jewels = NULL;
+Image* surface_title = NULL;
+Image* surface_highscores = NULL;
 Mix_Music* music = NULL;
 Mix_Music* music_jewels = NULL;
 Mix_Chunk* sound_menu = NULL;
@@ -96,21 +96,15 @@ int option_fullscreen = 1;
 int option_fullscreen = 0;
 #endif
 
-SDLKey last_key = SDLK_UNKNOWN;
+SDL_Keycode last_key = SDLK_UNKNOWN;
 int last_joy_button = -1;
 
 bool sysInit() {
     if(SDL_Init(SDL_INIT_EVERYTHING) == -1) return false;
-   
-    screen = SDL_SetVideoMode(SCREEN_WIDTH,SCREEN_HEIGHT,SCREEN_BPP,SDL_FLAGS);
-
-    if(screen == NULL) return false;
-    
     if(TTF_Init() == -1) return false;
-
     if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) == -1 ) return false;
     
-    SDL_WM_SetCaption("FreeBlocks v0.5",NULL);
+    // SDL_WM_SetCaption("FreeBlocks v0.5",NULL);
 
     // set up the default controls
     option_key[KEY_SWITCH] = SDLK_LCTRL;
@@ -141,6 +135,7 @@ bool sysInit() {
     // load config
     sysConfigSetPaths();
     sysConfigLoad();
+    sysConfigApply();
 
     //load high scores
     sysHighScoresClear();
@@ -180,23 +175,56 @@ char* sysGetFilePath(Dork_String *dest, const char* path, bool is_gfx) {
     return NULL;
 }
 
-bool sysLoadImage(SDL_Surface** dest, const char* path) {
+bool sysLoadImage(Image** dest, const char* path) {
     Dork_String temp;
     Dork_StringInit(&temp);
 
-    *dest = IMG_Load(sysGetFilePath(&temp, path, true));
-    if (*dest == NULL) {
-        Dork_StringClear(&temp);
+    SDL_Surface* surface = IMG_Load(sysGetFilePath(&temp, path, true));
+    Dork_StringClear(&temp);
+
+    if (surface == NULL) {
         return false;
     }
     else {
-        SDL_Surface *cleanup = *dest;
-        *dest = SDL_DisplayFormatAlpha(cleanup);
-        SDL_FreeSurface(cleanup);
+        *dest = malloc(sizeof(Image));
+        if (*dest == NULL)
+            return false;
+
+        (*dest)->w = 0;
+        (*dest)->h = 0;
+        (*dest)->texture = NULL;
+
+        (*dest)->texture = SDL_CreateTextureFromSurface(renderer, surface);
+        SDL_FreeSurface(surface);
+        SDL_QueryTexture((*dest)->texture, NULL, NULL, &((*dest)->w), &((*dest)->h));
     }
 
-    Dork_StringClear(&temp);
     return true;
+}
+
+void sysDestroyImage(Image** dest) {
+    if (*dest != NULL) {
+        SDL_DestroyTexture((*dest)->texture);
+        free(*dest);
+        *dest = NULL;
+    }
+}
+
+void sysRenderImage(Image* img, SDL_Rect* src, SDL_Rect* dest) {
+    if (!img) return;
+
+    if (dest) {
+        if (src) {
+            dest->w = src->w;
+            dest->h = src->h;
+        }
+        else {
+            dest->w = img->w;
+            dest->h = img->h;
+        }
+    }
+
+    SDL_RenderCopy(renderer, img->texture, src, dest);
 }
 
 bool sysLoadFont(TTF_Font** dest, const char* path, int font_size) {
@@ -282,21 +310,28 @@ void sysCleanup() {
     Mix_HaltMusic();
 
     TTF_CloseFont(font);
-    SDL_FreeSurface(surface_blocks);
-    SDL_FreeSurface(surface_clear);
-    SDL_FreeSurface(surface_cursor);
-    SDL_FreeSurface(surface_cursor_highlight);
-    SDL_FreeSurface(surface_bar);
-    SDL_FreeSurface(surface_background);
-    SDL_FreeSurface(surface_background_jewels);
-    SDL_FreeSurface(surface_title);
-    SDL_FreeSurface(surface_highscores);
+
+    sysDestroyImage(&surface_blocks);
+    sysDestroyImage(&surface_clear);
+    sysDestroyImage(&surface_cursor);
+    sysDestroyImage(&surface_cursor_highlight);
+    sysDestroyImage(&surface_bar);
+    sysDestroyImage(&surface_background);
+    sysDestroyImage(&surface_background_jewels);
+    sysDestroyImage(&surface_title);
+    sysDestroyImage(&surface_highscores);
+
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+
     Mix_FreeMusic(music);
     Mix_FreeMusic(music_jewels);
+
     Mix_FreeChunk(sound_menu);
     Mix_FreeChunk(sound_switch);
     Mix_FreeChunk(sound_match);
     Mix_FreeChunk(sound_drop);
+
     SDL_Quit();
 }
 
@@ -437,6 +472,7 @@ void sysConfigLoad() {
     char buffer[BUFSIZ];
     char *key = NULL;
     char *temp = NULL;
+    bool version_match = false;
 
     mkdir(Dork_StringGetData(&path_dir_config), MKDIR_MODE);
 
@@ -446,34 +482,50 @@ void sysConfigLoad() {
             temp = buffer;
             if (temp[0] == '#') continue;
             key = strtok(temp,"=");
+
+            // check to see if this config matches our program version
+            if (strcmp(key,"version") == 0) {
+                if (strcmp(strtok(NULL, "\n"), VERSION) == 0)
+                    version_match = true;
+            }
+
+            if (!version_match)
+                continue;
+
             if (strcmp(key,"joystick") == 0) option_joystick = atoi(strtok(NULL,"\n"));
             else if (strcmp(key,"sound") == 0) option_sound = atoi(strtok(NULL,"\n"));
             else if (strcmp(key,"music") == 0) option_music = atoi(strtok(NULL,"\n"));
             else if (strcmp(key,"fullscreen") == 0) option_fullscreen = atoi(strtok(NULL,"\n"));
 
-            else if (strcmp(key,"key_switch") == 0) option_key[KEY_SWITCH] = (SDLKey)atoi(strtok(NULL,"\n"));
-            else if (strcmp(key,"key_bump") == 0) option_key[KEY_BUMP] = (SDLKey)atoi(strtok(NULL,"\n"));
-            else if (strcmp(key,"key_accept") == 0) option_key[KEY_ACCEPT] = (SDLKey)atoi(strtok(NULL,"\n"));
-            else if (strcmp(key,"key_pause") == 0) option_key[KEY_PAUSE] = (SDLKey)atoi(strtok(NULL,"\n"));
-            else if (strcmp(key,"key_exit") == 0) option_key[KEY_EXIT] = (SDLKey)atoi(strtok(NULL,"\n"));
-            else if (strcmp(key,"key_left") == 0) option_key[KEY_LEFT] = (SDLKey)atoi(strtok(NULL,"\n"));
-            else if (strcmp(key,"key_right") == 0) option_key[KEY_RIGHT] = (SDLKey)atoi(strtok(NULL,"\n"));
-            else if (strcmp(key,"key_up") == 0) option_key[KEY_UP] = (SDLKey)atoi(strtok(NULL,"\n"));
-            else if (strcmp(key,"key_down") == 0) option_key[KEY_DOWN] = (SDLKey)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"key_switch") == 0) option_key[KEY_SWITCH] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"key_bump") == 0) option_key[KEY_BUMP] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"key_accept") == 0) option_key[KEY_ACCEPT] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"key_pause") == 0) option_key[KEY_PAUSE] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"key_exit") == 0) option_key[KEY_EXIT] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"key_left") == 0) option_key[KEY_LEFT] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"key_right") == 0) option_key[KEY_RIGHT] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"key_up") == 0) option_key[KEY_UP] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"key_down") == 0) option_key[KEY_DOWN] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
 
-            else if (strcmp(key,"joy_switch") == 0) option_joy_button[KEY_SWITCH] = (SDLKey)atoi(strtok(NULL,"\n"));
-            else if (strcmp(key,"joy_bump") == 0) option_joy_button[KEY_BUMP] = (SDLKey)atoi(strtok(NULL,"\n"));
-            else if (strcmp(key,"joy_accept") == 0) option_joy_button[KEY_ACCEPT] = (SDLKey)atoi(strtok(NULL,"\n"));
-            else if (strcmp(key,"joy_pause") == 0) option_joy_button[KEY_PAUSE] = (SDLKey)atoi(strtok(NULL,"\n"));
-            else if (strcmp(key,"joy_exit") == 0) option_joy_button[KEY_EXIT] = (SDLKey)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"joy_switch") == 0) option_joy_button[KEY_SWITCH] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"joy_bump") == 0) option_joy_button[KEY_BUMP] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"joy_accept") == 0) option_joy_button[KEY_ACCEPT] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"joy_pause") == 0) option_joy_button[KEY_PAUSE] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"joy_exit") == 0) option_joy_button[KEY_EXIT] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
 
-            else if (strcmp(key,"joy_axis_x") == 0) option_joy_axis_x = (SDLKey)atoi(strtok(NULL,"\n"));
-            else if (strcmp(key,"joy_axis_y") == 0) option_joy_axis_y = (SDLKey)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"joy_axis_x") == 0) option_joy_axis_x = (SDL_Keycode)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"joy_axis_y") == 0) option_joy_axis_y = (SDL_Keycode)atoi(strtok(NULL,"\n"));
         }
         fclose(config_file);
         sysConfigApply();
     } else {
-        printf ("Error: Couldn't load config file. Creating new config...\n");
+        printf("Error: Couldn't load config file. Creating new config...\n");
+        sysConfigSave();
+        return;
+    }
+
+    if (!version_match) {
+        printf("Error: Config file did not match current version. Creating new config...\n");
         sysConfigSave();
     }
 }
@@ -483,6 +535,8 @@ void sysConfigSave() {
 
     FILE *config_file = fopen(Dork_StringGetData(&path_file_config),"w+");
     if (config_file) {
+        fprintf(config_file,"version=%s\n", VERSION);
+
         fprintf(config_file,"joystick=%d\n",option_joystick);
         fprintf(config_file,"sound=%d\n",option_sound);
         fprintf(config_file,"music=%d\n",option_music);
@@ -526,10 +580,29 @@ void sysConfigApply() {
     Mix_VolumeMusic(option_music*16);
 
     if (option_fullscreen == 1) {
-        screen = SDL_SetVideoMode(SCREEN_WIDTH,SCREEN_HEIGHT,SCREEN_BPP,SDL_FLAGS|SDL_FULLSCREEN);
+        if (!window)
+            window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0, 0, SDL_WINDOW_FULLSCREEN_DESKTOP);
+        else
+            SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
     }
-    if (!screen || option_fullscreen != 1) {
-        screen = SDL_SetVideoMode(SCREEN_WIDTH,SCREEN_HEIGHT,SCREEN_BPP,SDL_FLAGS);
+    else {
+        if (!window)
+            window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+        else {
+            SDL_SetWindowFullscreen(window, 0);
+            SDL_SetWindowSize(window, SCREEN_WIDTH, SCREEN_HEIGHT);
+        }
+    }
+
+    if (window && !renderer) {
+        renderer = SDL_CreateRenderer(window, -1, RENDERER_FLAGS);
+    }
+    if (renderer)
+        SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    if (!window || !renderer) {
+        sysCleanup();
+        exit(1);
     }
 }
 

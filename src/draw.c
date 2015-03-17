@@ -25,12 +25,12 @@
 
 void drawEverything() {
     // Fill the screen with black
-    SDL_FillRect(screen,NULL, 0x000000);
+    SDL_RenderClear(renderer);
 
     if (game_mode == GAME_MODE_JEWELS)
-        SDL_BlitSurface(surface_background_jewels,NULL,screen,NULL);
+        sysRenderImage(surface_background_jewels, NULL, NULL);
     else
-        SDL_BlitSurface(surface_background,NULL,screen,NULL);
+        sysRenderImage(surface_background, NULL, NULL);
 
     if (title_screen) {
         drawTitle();
@@ -46,28 +46,28 @@ void drawEverything() {
 }
 
 void drawMenu(int offset) {
-    SDL_Surface *text;
+    Image *text;
     SDL_Color color = {217,217,217,255};
     SDL_Color color_disabled = {127,127,127,255};
     SDL_Rect dest;
-    int i;
 
-    for (i=0;i<menu_size;i++) {
+    for (int i=0;i<menu_size;i++) {
         dest.x = 0;
         dest.y = SCREEN_HEIGHT - ((menu_size-i) * surface_bar->h) - offset;
-        if (i == menu_option) SDL_BlitSurface(surface_bar,NULL,screen,&dest);
-        else SDL_BlitSurface(surface_bar_inactive,NULL,screen,&dest);
+
+        if (i == menu_option) sysRenderImage(surface_bar, NULL, &dest);
+        else sysRenderImage(surface_bar_inactive, NULL, &dest);
 
         if (menuItemIsEnabled(i))
-            text = TTF_RenderText_Blended(font, menuItemGetText(i), color);
+            text = createText(menuItemGetText(i), &color);
         else
-            text = TTF_RenderText_Blended(font, menuItemGetText(i), color_disabled);
+            text = createText(menuItemGetText(i), &color_disabled);
 
         if (text) {
             dest.x = SCREEN_WIDTH/2 - text->w/2;
             dest.y = SCREEN_HEIGHT - ((menu_size-i-1) * surface_bar->h) - surface_bar->h - offset;
-            SDL_BlitSurface(text,NULL,screen,&dest);
-            SDL_FreeSurface(text);
+            sysRenderImage(text, NULL, &dest);
+            sysDestroyImage(&text);
         }
     }
 }
@@ -80,35 +80,35 @@ void drawCursor() {
     dest.x = cursor.x1*BLOCK_SIZE + DRAW_OFFSET_X;
     dest.y = (cursor.y1*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
 
-    SDL_BlitSurface(surface_cursor,NULL,screen,&dest);
+    sysRenderImage(surface_cursor, NULL, &dest);
 
     if (game_mode == GAME_MODE_JEWELS && jewels_cursor_select) {
         if (cursor.x1 > 0) {
             dest.x = (cursor.x1-1)*BLOCK_SIZE + DRAW_OFFSET_X;
             dest.y = (cursor.y1*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
-            SDL_BlitSurface(surface_cursor_highlight,NULL,screen,&dest);
+            sysRenderImage(surface_cursor_highlight, NULL, &dest);
         }
         if (cursor.x1 < CURSOR_MAX_X) {
             dest.x = (cursor.x1+1)*BLOCK_SIZE + DRAW_OFFSET_X;
             dest.y = (cursor.y1*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
-            SDL_BlitSurface(surface_cursor_highlight,NULL,screen,&dest);
+            sysRenderImage(surface_cursor_highlight, NULL, &dest);
         }
         if (cursor.y1 > CURSOR_MIN_Y) {
             dest.x = cursor.x1*BLOCK_SIZE + DRAW_OFFSET_X;
             dest.y = ((cursor.y1-1)*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
-            SDL_BlitSurface(surface_cursor_highlight,NULL,screen,&dest);
+            sysRenderImage(surface_cursor_highlight, NULL, &dest);
         }
         if (cursor.y1 < CURSOR_MAX_Y) {
             dest.x = cursor.x1*BLOCK_SIZE + DRAW_OFFSET_X;
             dest.y = ((cursor.y1+1)*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
-            SDL_BlitSurface(surface_cursor_highlight,NULL,screen,&dest);
+            sysRenderImage(surface_cursor_highlight, NULL, &dest);
         }
     }
 
     if (!(cursor.x1 == cursor.x2 && cursor.y1 == cursor.y2)) {
         dest.x = cursor.x2*BLOCK_SIZE + DRAW_OFFSET_X;
         dest.y = (cursor.y2*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
-        SDL_BlitSurface(surface_cursor,NULL,screen,&dest);
+        sysRenderImage(surface_cursor, NULL, &dest);
     }
 }
 
@@ -132,7 +132,7 @@ void drawBlocks() {
 
                     src.w = src.h = BLOCK_SIZE;
 
-                    SDL_BlitSurface(surface_clear,&src,screen,&dest);
+                    sysRenderImage(surface_clear, &src, &dest);
                 } else {
                     src.x = blocks[i][j].color * BLOCK_SIZE;
 
@@ -141,7 +141,7 @@ void drawBlocks() {
 
                     src.w = src.h = BLOCK_SIZE;
 
-                    SDL_BlitSurface(surface_blocks,&src,screen,&dest);
+                    sysRenderImage(surface_blocks, &src, &dest);
                 }
             }
         }
@@ -149,7 +149,7 @@ void drawBlocks() {
 }
 
 void drawInfo() {
-    SDL_Surface *text_info;
+    Image *text_info;
     char text[256];
     SDL_Color color = {217,217,217,255};
     SDL_Rect dest;
@@ -157,8 +157,8 @@ void drawInfo() {
     // statusbar background
     dest.x = 0;
     dest.y = SCREEN_HEIGHT - surface_bar->h;
-    if (paused || game_over || game_over_timer > 0) SDL_BlitSurface(surface_bar_inactive,NULL,screen,&dest);
-    else SDL_BlitSurface(surface_bar,NULL,screen,&dest);
+    if (paused || game_over || game_over_timer > 0) sysRenderImage(surface_bar_inactive, NULL, &dest);
+    else sysRenderImage(surface_bar, NULL, &dest);
 
     // statusbar text
     if (game_over || game_over_timer > 0) sprintf(text,"Score: %-10d  Game Over!",score);
@@ -168,13 +168,14 @@ void drawInfo() {
         else sprintf(text,"Score: %-10d  Speed: %d",score,speed);
     }
 
-    text_info = TTF_RenderText_Blended(font,text,color);
+    text_info = createText(text, &color);
     if(text_info) {
         dest.x = surface_bar->h / 4;
         dest.y = SCREEN_HEIGHT-surface_bar->h;
 
-        SDL_BlitSurface(text_info,NULL,screen,&dest);
-        SDL_FreeSurface(text_info);
+        sysRenderImage(text_info, NULL, &dest);
+        sysDestroyImage(&text_info);
+        text_info = NULL;
     }
 
     // menu
@@ -187,15 +188,15 @@ void drawTitle() {
     // title logo
     dest.x = 0;
     dest.y = 0;
-    SDL_BlitSurface(surface_title,NULL,screen,&dest);
+    sysRenderImage(surface_title, NULL, &dest);
 
     // menu
     drawMenu(0);
 }
 
 void drawHighScores() {
-    SDL_Surface *text_header;
-    SDL_Surface *text_score[10];
+    Image *text_header;
+    Image *text_score[10];
     char text[256];
     SDL_Color color = {217,217,217,255};
     SDL_Rect dest;
@@ -203,30 +204,32 @@ void drawHighScores() {
     // list background
     dest.x = SCREEN_WIDTH/2 - surface_highscores->w/2;
     dest.y = 0;
-    SDL_BlitSurface(surface_highscores,NULL,screen,&dest);
+    sysRenderImage(surface_highscores, NULL, &dest);
 
     // "High Scores" text
     sprintf(text,"High Scores");
-    text_header = TTF_RenderText_Blended(font,text,color);
+    text_header = createText(text, &color);
     if (text_header) {
         dest.x = SCREEN_WIDTH/2 - text_header->w/2;
         dest.y = surface_bar->h/4;
 
-        SDL_BlitSurface(text_header,NULL,screen,&dest);
-        SDL_FreeSurface(text_header);
+        sysRenderImage(text_header, NULL, &dest);
+        sysDestroyImage(&text_header);
+        text_header = NULL;
     }
 
     // high score list
     for (int i=0; i<10; i++) {
         if (high_scores[i] > 0) sprintf(text,"%d. %d",i+1,high_scores[i]);
         else sprintf(text,"%d.",i+1);
-        text_score[i] = TTF_RenderText_Blended(font,text,color);
+        text_score[i] = createText(text, &color);
         if (text_score[i]) {
             dest.x = surface_highscores->w;
             dest.y = (surface_bar->h*i) + surface_bar->h*2;
 
-            SDL_BlitSurface(text_score[i],NULL,screen,&dest);
-            SDL_FreeSurface(text_score[i]);
+            sysRenderImage(text_score[i], NULL, &dest);
+            sysDestroyImage(&text_score[i]);
+            text_score[i] = NULL;
         }
     }
 
@@ -239,3 +242,27 @@ void drawOptions() {
     drawMenu(0);
 }
 
+Image* createText(const char* text, const SDL_Color* color) {
+    if (!text || !color) return NULL;
+
+    Image* img = malloc(sizeof(Image));
+    if (!img)
+        return NULL;
+    else {
+        img->texture = NULL;
+        img->w = 0;
+        img->h = 0;
+    }
+
+    SDL_Surface *surface = TTF_RenderText_Blended(font, text, *color);
+    if (surface) {
+        img->texture = SDL_CreateTextureFromSurface(renderer, surface);
+        SDL_FreeSurface(surface);
+        SDL_QueryTexture(img->texture, NULL, NULL, &(img->w), &(img->h));
+        return img;
+    }
+    else {
+        sysDestroyImage(&img);
+    }
+    return NULL;
+}
