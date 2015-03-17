@@ -27,6 +27,11 @@
 #include "sys.h"
 
 int main(int argc, char *argv[]) {
+    // no argument parsing
+    // but surpress compiler warnings
+    if (argc) {}
+    if (argv) {}
+
     srand(time(0));
 
     if(!sysInit()) return 1;
