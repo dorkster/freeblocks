@@ -20,6 +20,7 @@
 
 #include "block.h"
 #include "draw.h"
+#include "game_mode.h"
 #include "menu.h"
 #include "sys.h"
 
@@ -27,14 +28,7 @@ void drawEverything() {
     // Fill the screen with black
     SDL_RenderClear(renderer);
 
-    switch (game_mode) {
-    case GAME_MODE_JEWELS:
-        SDL_BlitSurface(surface_background_jewels,NULL,screen,NULL);
-        break;
-    default:
-        SDL_BlitSurface(surface_background,NULL,screen,NULL);
-        break;
-    }
+    SDL_BlitSurface(game_mode->background, NULL, screen, NULL);
 
     if (title_screen) {
         drawTitle();
@@ -95,7 +89,7 @@ void drawCursor() {
 
     sysRenderImage(surface_cursor, NULL, &dest);
 
-    if (game_mode == GAME_MODE_JEWELS && jewels_cursor_select) {
+    if (game_mode == &game_mode_jewels && jewels_cursor_select) {
         if (cursor.x1 > 0) {
             dest.x = (cursor.x1-1)*BLOCK_SIZE + DRAW_OFFSET_X;
             dest.y = (cursor.y1*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
@@ -178,14 +172,7 @@ void drawInfo() {
     else {
         if (paused) sprintf(text,"Score: %-10d  *Paused*",score);
         else {
-            switch (game_mode) {
-            case GAME_MODE_JEWELS:
-                sprintf(text, "Score: %-10d", score);
-                break;
-            default:
-                sprintf(text,"Score: %-10d  Speed: %d",score,speed);
-                break;
-            }
+            game_mode->statusText(text, score, speed);
         }
     }
 

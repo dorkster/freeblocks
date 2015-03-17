@@ -91,6 +91,7 @@ void blockAddFromTop();
 void blockGravity();
 void blockMatch();
 bool blockAddLayer();
+void blockAddLayerRandom(int i);
 bool blockHasSwitchMatch();
 bool blockHasGaps();
 void blockSwitchCursor();

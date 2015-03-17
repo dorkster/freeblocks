@@ -98,6 +98,7 @@ Set (FREEBLOCKS_SOURCES
     ./src/draw.c
     ./src/easing.c
     ./src/game.c
+    ./src/game_mode.c
     ./src/menu.c
     ./src/sys.c
     ./src/main.c
@@ -109,6 +110,7 @@ Set (FREEBLOCKS_HEADERS
     ./src/draw.h
     ./src/easing.h
     ./src/game.h
+    ./src/game_mode.h
     ./src/menu.h
     ./src/sys.h
 )
