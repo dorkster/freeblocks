@@ -597,8 +597,10 @@ void sysConfigApply() {
     if (window && !renderer) {
         renderer = SDL_CreateRenderer(window, -1, RENDERER_FLAGS);
     }
-    if (renderer)
+    if (renderer) {
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
         SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
+    }
 
     if (!window || !renderer) {
         sysCleanup();
