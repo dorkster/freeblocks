@@ -60,6 +60,20 @@ void gameOptions() {
     high_scores_screen = false;
     options_screen = OPTIONS_MAIN;
 
+#ifdef __ANDROID__
+    // 0 sound level
+    menuAdd("Sound", 0, 8);
+    menuItemSetVal(0, option_sound);
+    menuItemSetOptionText(0, 0, "Off");
+    menuItemSetOptionText(0, 8, "Max");
+
+    // 1 music level
+    menuAdd("Music", 0, 8);
+    menuItemSetVal(1, option_music);
+    menuItemSetOptionText(1, 0, "Off");
+    menuItemSetOptionText(1, 8, "Max");
+
+#else
     // 0 joystick
     menuAdd("Controls", 0, SDL_NumJoysticks());
     menuItemEnableAction(0);
@@ -88,7 +102,9 @@ void gameOptions() {
     menuItemSetVal(3, option_fullscreen);
     menuItemSetOptionText(3, 0, "Off");
     menuItemSetOptionText(3, 1, "On");
-#endif
+#endif //__GCW0__
+
+#endif //__ANDROID__
 
     menuAdd("Cancel", 0, 0);
     menuAdd("Save settings", 0, 0);
@@ -232,19 +248,26 @@ void gameLogic() {
                 sysConfigLoad();
                 gameTitle();
             }
+#ifndef __ANDROID__
             else if (menu_choice == 0) {
                 // edit controls
                 option_joystick = (int)menuItemGetVal(0)-1;
                 menuClear();
                 gameOptionsControls();
             }
+#endif
             else if (menu_choice == menu_size-1) {
+#ifdef __ANDROID__
+                option_sound = menuItemGetVal(0);
+                option_music = menuItemGetVal(1);
+#else
                 option_joystick = (int)menuItemGetVal(0)-1;
                 option_sound = menuItemGetVal(1);
                 option_music = menuItemGetVal(2);
 #ifndef __GCW0__
                 option_fullscreen = menuItemGetVal(3);
-#endif
+#endif //__GCW0__
+#endif //__ANDROID__
 
                 menuClear();
                 sysConfigApply();
