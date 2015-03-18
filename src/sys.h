@@ -167,6 +167,7 @@ unsigned int endTimer;
 unsigned int deltaTimer;
 
 // Functions
+void sysInitVars();
 bool sysInit();
 char* sysGetFilePath(Dork_String *dest, const char* path, bool is_gfx);
 bool sysLoadImage(Image** dest, const char* path);

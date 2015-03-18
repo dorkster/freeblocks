@@ -47,69 +47,71 @@ const char* const key_desc[] = {
     "Down"
 };
 
-SDL_Window* window = NULL;
-SDL_Renderer* renderer = NULL;
-TTF_Font* font = NULL;
-Image* surface_blocks = NULL;
-Image* surface_clear = NULL;
-Image* surface_cursor = NULL;
-Image* surface_cursor_single = NULL;
-Image* surface_bar = NULL;
-Image* surface_bar_inactive = NULL;
-Image* surface_background = NULL;
-Image* surface_background_jewels = NULL;
-Image* surface_title = NULL;
-Image* surface_highscores = NULL;
-Mix_Music* music = NULL;
-Mix_Music* music_jewels = NULL;
-Mix_Chunk* sound_menu = NULL;
-Mix_Chunk* sound_switch = NULL;
-Mix_Chunk* sound_match = NULL;
-Mix_Chunk* sound_drop = NULL;
-SDL_Joystick* joy = NULL;
+void sysInitVars() {
+    window = NULL;
+    renderer = NULL;
+    font = NULL;
+    surface_blocks = NULL;
+    surface_clear = NULL;
+    surface_cursor = NULL;
+    surface_cursor_highlight = NULL;
+    surface_bar = NULL;
+    surface_bar_inactive = NULL;
+    surface_background = NULL;
+    surface_background_jewels = NULL;
+    surface_title = NULL;
+    surface_highscores = NULL;
+    music = NULL;
+    music_jewels = NULL;
+    sound_menu = NULL;
+    sound_switch = NULL;
+    sound_match = NULL;
+    sound_drop = NULL;
+    joy = NULL;
 
-int score = 0;
-bool title_screen = true;
-bool high_scores_screen = false;
-int options_screen = -1;
-bool game_over = false;
-bool paused = false;
-bool quit = false;
+    score = 0;
+    title_screen = true;
+    high_scores_screen = false;
+    options_screen = -1;
+    game_over = false;
+    paused = false;
+    quit = false;
 
-int game_mode = GAME_MODE_DEFAULT;
+    game_mode = GAME_MODE_DEFAULT;
 
-int action_cooldown = 0;
-ActionMove action_move = ACTION_NONE;
-ActionMove action_last_move = ACTION_NONE;
-ActionMove action_switch = ACTION_NONE;
-bool action_bump = false;
-bool action_accept = false;
-bool action_pause = false;
-bool action_exit = false;
-bool action_click = false;
+    action_cooldown = 0;
+    action_move = ACTION_NONE;
+    action_last_move = ACTION_NONE;
+    action_switch = ACTION_NONE;
+    action_bump = false;
+    action_accept = false;
+    action_pause = false;
+    action_exit = false;
+    action_click = false;
 
-int option_joystick = -1;
-int option_sound = 8;
-int option_music = 8;
+    option_joystick = -1;
+    option_sound = 8;
+    option_music = 8;
 
 #ifdef __GCW0__
-int option_fullscreen = 1;
+    option_fullscreen = 1;
 #else
-int option_fullscreen = 0;
+    option_fullscreen = 0;
 #endif
 
-SDL_Keycode last_key = SDLK_UNKNOWN;
-int last_joy_button = -1;
+    last_key = SDLK_UNKNOWN;
+    last_joy_button = -1;
 
-int mouse_x = 0;
-int mouse_y = 0;
+    mouse_x = 0;
+    mouse_y = 0;
+}
 
 bool sysInit() {
     if(SDL_Init(SDL_INIT_EVERYTHING) == -1) return false;
     if(TTF_Init() == -1) return false;
     if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) == -1 ) return false;
-    
-    // SDL_WM_SetCaption("FreeBlocks v0.5",NULL);
+
+    sysInitVars();
 
     // set up the default controls
     option_key[KEY_SWITCH] = SDLK_LCTRL;
