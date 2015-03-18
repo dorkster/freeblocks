@@ -31,10 +31,10 @@ All other artwork is by me, Justin Jacobs, and is licensed under CC-BY-SA 3.0.
 
 ## Dependencies & Building
 
-* SDL
-* SDL_ttf
-* SDL_image
-* SDL_mixer
+* SDL2
+* SDL2_ttf
+* SDL2_image
+* SDL2_mixer
 
 To compile FreeBlocks, simply run `cmake . && make` in the base directory.
 
