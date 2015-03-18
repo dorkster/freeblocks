@@ -57,6 +57,8 @@ void sysInitVars() {
     surface_cursor_highlight = NULL;
     surface_bar = NULL;
     surface_bar_inactive = NULL;
+    surface_bar_left = NULL;
+    surface_bar_right = NULL;
     surface_background = NULL;
     surface_background_jewels = NULL;
     surface_title = NULL;
@@ -303,6 +305,8 @@ bool sysLoadFiles() {
     if (!sysLoadImage(&surface_cursor_highlight, "cursor_highlight.png")) return false;
     if (!sysLoadImage(&surface_bar, "bar.png")) return false;
     if (!sysLoadImage(&surface_bar_inactive, "bar_inactive.png")) return false;
+    if (!sysLoadImage(&surface_bar_left, "bar_left.png")) return false;
+    if (!sysLoadImage(&surface_bar_right, "bar_right.png")) return false;
     if (!sysLoadImage(&surface_background, "background.png")) return false;
     if (!sysLoadImage(&surface_background_jewels, "background_jewels.png")) return false;
     if (!sysLoadImage(&surface_title, "title.png")) return false;
@@ -338,6 +342,9 @@ void sysCleanup() {
     sysDestroyImage(&surface_cursor);
     sysDestroyImage(&surface_cursor_highlight);
     sysDestroyImage(&surface_bar);
+    sysDestroyImage(&surface_bar_inactive);
+    sysDestroyImage(&surface_bar_left);
+    sysDestroyImage(&surface_bar_right);
     sysDestroyImage(&surface_background);
     sysDestroyImage(&surface_background_jewels);
     sysDestroyImage(&surface_title);

@@ -55,7 +55,16 @@ void drawMenu(int offset) {
         dest.x = 0;
         dest.y = SCREEN_HEIGHT - ((menu_size-i) * surface_bar->h) - offset;
 
-        if (i == menu_option) sysRenderImage(surface_bar, NULL, &dest);
+        if (i == menu_option) {
+            sysRenderImage(surface_bar, NULL, &dest);
+            if (menuItemHasLeftButton(i)) {
+                sysRenderImage(surface_bar_left, NULL, &dest);
+            }
+            if (menuItemHasRightButton(i)) {
+                dest.x = SCREEN_WIDTH - surface_bar_right->w;
+                sysRenderImage(surface_bar_right, NULL, &dest);
+            }
+        }
         else sysRenderImage(surface_bar_inactive, NULL, &dest);
 
         if (menuItemIsEnabled(i))

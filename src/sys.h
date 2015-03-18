@@ -197,6 +197,8 @@ Image* surface_cursor;
 Image* surface_cursor_highlight;
 Image* surface_bar;
 Image* surface_bar_inactive;
+Image* surface_bar_left;
+Image* surface_bar_right;
 Image* surface_background;
 Image* surface_background_jewels;
 Image* surface_title;

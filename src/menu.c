@@ -38,13 +38,7 @@ void menuItemUpdate(int i) {
 
     if (val_max > 0) {
         Dork_StringAppend(&menu_items[i]->full_text, ": ");
-        if (menu_items[i]->val > menu_items[i]->val_min) {
-            Dork_StringAppend(&menu_items[i]->full_text, "< ");
-        }
         Dork_StringAppend(&menu_items[i]->full_text, menu_items[i]->options[val].data);
-        if (menu_items[i]->val < menu_items[i]->val_max) {
-            Dork_StringAppend(&menu_items[i]->full_text, " >");
-        }
     }
 }
 
@@ -129,6 +123,20 @@ void menuItemEnableAction(int i) {
         return;
 
     menu_items[i]->has_action = true;
+}
+
+bool menuItemHasLeftButton(int i) {
+    if (i < 0 || i >= menu_size)
+        return false;
+
+    return menu_items[i]->val > menu_items[i]->val_min;
+}
+
+bool menuItemHasRightButton(int i) {
+    if (i < 0 || i >= menu_size)
+        return false;
+
+    return menu_items[i]->val < menu_items[i]->val_max;
 }
 
 void menuInit() {
@@ -227,9 +235,9 @@ int menuLogic() {
                 if (mouse_y >= menu_pos && mouse_y < menu_pos + surface_bar->h) {
                     if (menu_option == i) {
                         if (menu_items[i]->val_max > 0) {
-                            if (mouse_x <= surface_bar->w/3)
+                            if (mouse_x <= surface_bar_left->w)
                                 click_decrease = true;
-                            else if (mouse_x > (surface_bar->w/3) * 2)
+                            else if (mouse_x > SCREEN_WIDTH - surface_bar_right->w)
                                 click_increase = true;
                             else
                                 click_accept = true;

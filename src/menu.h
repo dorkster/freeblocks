@@ -51,6 +51,8 @@ void menuItemSetOptionText(int i, int opt, const char* text);
 void menuItemSetEnabled(int i, bool enable);
 bool menuItemIsEnabled(int i);
 void menuItemEnableAction(int i);
+bool menuItemHasLeftButton(int i);
+bool menuItemHasRightButton(int i);
 
 void menuInit();
 void menuAdd(const char *item, unsigned int val_min, unsigned int val_max);
