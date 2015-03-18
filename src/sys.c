@@ -167,8 +167,7 @@ char* sysGetFilePath(Dork_String *dest, const char* path, bool is_gfx) {
     Dork_StringClear(dest);
 
 #ifdef __ANDROID__
-    Dork_StringAppend(dest, SDL_AndroidGetExternalStoragePath());
-    Dork_StringAppend(dest, "/res");
+    Dork_StringAppend(dest, "res");
 #else
     Dork_StringAppend(dest, "./res");
 #endif
@@ -179,10 +178,15 @@ char* sysGetFilePath(Dork_String *dest, const char* path, bool is_gfx) {
     }
     Dork_StringAppend(dest, path);
 
-    // logInfo("%s", Dork_StringGetData(dest));
+    logInfo("%s", Dork_StringGetData(dest));
 
+#ifdef __ANDROID__
+    // can't stat internal Android storage
+    return Dork_StringGetData(dest);
+#else
     if (stat(Dork_StringGetData(dest), &st) == 0)
         return Dork_StringGetData(dest);
+#endif
 
     // try install directory
     Dork_StringClear(dest);
