@@ -21,6 +21,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <stdarg.h>
 
 #include <SDL.h>
 #include <SDL_image.h>
@@ -114,17 +115,23 @@ bool sysInit() {
     option_key[KEY_SWITCH] = SDLK_LCTRL;
     option_key[KEY_BUMP] = SDLK_LALT;
     option_key[KEY_ACCEPT] = SDLK_RETURN;
+#ifdef __ANDROID__
+    option_key[KEY_EXIT] = SDLK_AC_BACK;
+#else
     option_key[KEY_EXIT] = SDLK_ESCAPE;
+#endif
 
     option_key[KEY_LEFT] = SDLK_LEFT;
     option_key[KEY_RIGHT] = SDLK_RIGHT;
     option_key[KEY_UP] = SDLK_UP;
     option_key[KEY_DOWN] = SDLK_DOWN;
 
+    option_key[KEY_PAUSE] = SDLK_ESCAPE;
 #ifdef __GCW0__
     option_key[KEY_PAUSE] = SDLK_RETURN;
-#else
-    option_key[KEY_PAUSE] = SDLK_ESCAPE;
+#endif
+#ifdef __ANDROID__
+    option_key[KEY_PAUSE] = SDLK_AC_BACK;
 #endif
 
     option_joy_button[KEY_SWITCH] = 0;
@@ -153,13 +160,22 @@ char* sysGetFilePath(Dork_String *dest, const char* path, bool is_gfx) {
 
     struct stat st;
 
-    // try current directory
     Dork_StringClear(dest);
+
+#ifdef __ANDROID__
+    Dork_StringAppend(dest, SDL_AndroidGetExternalStoragePath());
+    Dork_StringAppend(dest, "/res");
+#else
     Dork_StringAppend(dest, "./res");
+#endif
+
+    // try current directory
     if (is_gfx) {
         Dork_StringAppend(dest, GFX_PREFIX);
     }
     Dork_StringAppend(dest, path);
+
+    // logInfo("%s", Dork_StringGetData(dest));
 
     if (stat(Dork_StringGetData(dest), &st) == 0)
         return Dork_StringGetData(dest);
@@ -357,6 +373,10 @@ void sysInput() {
             if (event.button.button == SDL_BUTTON_LEFT)
                 action_click = false;
         }
+        else if (event.type == SDL_FINGERMOTION) {
+            mouse_x = (int)((event.tfinger.x + event.tfinger.dx) * SCREEN_WIDTH);
+            mouse_y = (int)((event.tfinger.y + event.tfinger.dy) * SCREEN_HEIGHT);
+        }
         else if (event.type == SDL_KEYDOWN) {
             last_key = event.key.keysym.sym;
 
@@ -468,7 +488,11 @@ void sysInputReset() {
 
 void sysConfigSetPaths() {
     Dork_StringInit(&path_dir_config);
+#ifdef __ANDROID__
+    Dork_StringAppend(&path_dir_config, SDL_AndroidGetInternalStoragePath());
+#else
     Dork_StringAppend(&path_dir_config, getenv(HOME_DIR_ENV));
+#endif
     Dork_StringAppend(&path_dir_config, "/.freeblocks");
 
     Dork_StringInit(&path_file_config);
@@ -513,6 +537,7 @@ void sysConfigLoad() {
             else if (strcmp(key,"music") == 0) option_music = atoi(strtok(NULL,"\n"));
             else if (strcmp(key,"fullscreen") == 0) option_fullscreen = atoi(strtok(NULL,"\n"));
 
+#ifndef __ANDROID__
             else if (strcmp(key,"key_switch") == 0) option_key[KEY_SWITCH] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
             else if (strcmp(key,"key_bump") == 0) option_key[KEY_BUMP] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
             else if (strcmp(key,"key_accept") == 0) option_key[KEY_ACCEPT] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
@@ -522,6 +547,7 @@ void sysConfigLoad() {
             else if (strcmp(key,"key_right") == 0) option_key[KEY_RIGHT] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
             else if (strcmp(key,"key_up") == 0) option_key[KEY_UP] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
             else if (strcmp(key,"key_down") == 0) option_key[KEY_DOWN] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
+#endif
 
             else if (strcmp(key,"joy_switch") == 0) option_joy_button[KEY_SWITCH] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
             else if (strcmp(key,"joy_bump") == 0) option_joy_button[KEY_BUMP] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
@@ -595,6 +621,10 @@ void sysConfigApply() {
     Mix_Volume(-1,option_sound*16);
     Mix_VolumeMusic(option_music*16);
 
+#ifdef __ANDROID__
+    option_fullscreen = 1;
+#endif
+
     if (option_fullscreen == 1) {
         if (!window)
             window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0, 0, SDL_WINDOW_FULLSCREEN_DESKTOP);
@@ -602,8 +632,9 @@ void sysConfigApply() {
             SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
     }
     else {
-        if (!window)
+        if (!window) {
             window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+        }
         else {
             SDL_SetWindowFullscreen(window, 0);
             SDL_SetWindowSize(window, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -677,5 +708,25 @@ void sysHighScoresClear() {
     for (int i=0; i<10; i++) {
         high_scores[i] = 0;
     }
+}
+
+void logInfo(const char* format, ...) {
+	va_list args;
+
+	va_start(args, format);
+
+	SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, format, args);
+
+	va_end(args);
+}
+
+void logError(const char* format, ...) {
+	va_list args;
+
+	va_start(args, format);
+
+	SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, format, args);
+
+	va_end(args);
 }
 

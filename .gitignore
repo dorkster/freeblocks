@@ -1,7 +1,6 @@
-freeblocks
-.depend
-build/
-freeblocks.opk
+/freeblocks
+/build/
+/freeblocks.opk
 gmon.out
 
 CMakeFiles/
@@ -25,4 +24,15 @@ freeblocks.build/
 *.xcodeproj
 
 # GCW-Zero
-pkg/gcw_build/
+/pkg/gcw_build/
+/pkg/freeblocks.opk
+
+# Android
+/pkg/android/bin/
+/pkg/android/jni/SDL2/
+/pkg/android/jni/SDL2_image/
+/pkg/android/jni/SDL2_mixer/
+/pkg/android/jni/SDL2_ttf/
+/pkg/android/libs/
+/pkg/android/obj/
+

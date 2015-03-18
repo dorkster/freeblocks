@@ -536,10 +536,12 @@ void gameBump() {
         action_bump = false;
     }
     else if (action_click) {
-        if (mouse_y > SCREEN_HEIGHT - surface_bar->h - bump_pixels) {
-            if (blockAddLayer())
-                score += POINTS_PER_BUMP;
-            action_click = false;
+        if (game_mode == GAME_MODE_DEFAULT) {
+            if (mouse_y > SCREEN_HEIGHT - surface_bar->h - bump_pixels) {
+                if (blockAddLayer())
+                    score += POINTS_PER_BUMP;
+                action_click = false;
+            }
         }
     }
 }

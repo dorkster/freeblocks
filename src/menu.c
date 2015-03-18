@@ -219,19 +219,24 @@ int menuLogic() {
 
         if (action_click) {
             int menu_top = SCREEN_HEIGHT - (menu_size * surface_bar->h);
-            if (paused)
+            if (paused || game_over)
                 menu_top -= surface_bar->h;
 
             for (int i=0; i<menu_size; i++) {
                 int menu_pos = menu_top + (i*surface_bar->h);
                 if (mouse_y >= menu_pos && mouse_y < menu_pos + surface_bar->h) {
                     if (menu_option == i) {
-                        if (mouse_x <= surface_bar->w/3)
-                            click_decrease = true;
-                        else if (mouse_x > (surface_bar->w/3) * 2)
-                            click_increase = true;
-                        else
+                        if (menu_items[i]->val_max > 0) {
+                            if (mouse_x <= surface_bar->w/3)
+                                click_decrease = true;
+                            else if (mouse_x > (surface_bar->w/3) * 2)
+                                click_increase = true;
+                            else
+                                click_accept = true;
+                        }
+                        else {
                             click_accept = true;
+                        }
                     }
                     menu_option = i;
                     break;

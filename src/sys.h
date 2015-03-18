@@ -186,6 +186,8 @@ void sysConfigApply();
 void sysHighScoresLoad();
 void sysHighScoresSave();
 void sysHighScoresClear();
+void logInfo(const char* format, ...);
+void logError(const char* format, ...);
 
 // Images
 Image* surface_blocks;
