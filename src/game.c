@@ -180,6 +180,10 @@ void gameInit() {
 void gameLogic() {
     int menu_choice;
 
+    if (title_screen || high_scores_screen || options_screen != -1 || rebind_index != -1 || game_over) {
+        force_pause = false;
+    }
+
     if (action_cooldown > 0) action_cooldown--;
 
     // handle the title screen menu
@@ -580,11 +584,12 @@ void gameOver() {
 }
 
 void gamePause() {
-    if (action_cooldown > 0) return;
+    if (action_cooldown > 0 && !force_pause) return;
 
-    if (action_pause) {
+    if (action_pause || force_pause) {
         menuClear();
-        Mix_PlayChannel(-1,sound_menu,0);
+        if (!force_pause)
+            Mix_PlayChannel(-1,sound_menu,0);
 
         if (!paused) {
             paused = true;
@@ -602,6 +607,7 @@ void gamePause() {
 
         action_accept = false;
         action_pause = false;
+        force_pause = false;
     }
 }
 

@@ -77,6 +77,7 @@ void sysInitVars() {
     options_screen = -1;
     game_over = false;
     paused = false;
+    force_pause = false;
     quit = false;
 
     game_mode = GAME_MODE_DEFAULT;
@@ -177,8 +178,6 @@ char* sysGetFilePath(Dork_String *dest, const char* path, bool is_gfx) {
         Dork_StringAppend(dest, GFX_PREFIX);
     }
     Dork_StringAppend(dest, path);
-
-    logInfo("%s", Dork_StringGetData(dest));
 
 #ifdef __ANDROID__
     // can't stat internal Android storage
@@ -365,6 +364,8 @@ void sysCleanup() {
     Mix_FreeChunk(sound_match);
     Mix_FreeChunk(sound_drop);
 
+    Mix_CloseAudio();
+
     SDL_Quit();
 }
 
@@ -459,6 +460,17 @@ void sysInput() {
                     action_pause = false;
                 if (event.jbutton.button == option_joy_button[KEY_EXIT])
                     action_exit = false;
+            }
+        }
+        else if (event.type == SDL_WINDOWEVENT) {
+            if (event.window.event == SDL_WINDOWEVENT_MINIMIZED) {
+                Mix_Pause(-1);
+                Mix_PauseMusic();
+                force_pause = true;
+            }
+            else if (event.window.event == SDL_WINDOWEVENT_RESTORED) {
+                Mix_Resume(-1);
+                Mix_ResumeMusic();
             }
         }
         else if (event.type == SDL_QUIT) {

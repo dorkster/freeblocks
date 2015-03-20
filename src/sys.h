@@ -116,6 +116,7 @@ bool high_scores_screen;
 int options_screen;
 bool game_over;
 bool paused;
+bool force_pause;
 bool quit;
 int game_mode;
 
