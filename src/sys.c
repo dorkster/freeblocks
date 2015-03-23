@@ -29,6 +29,7 @@
 #include <SDL_mixer.h>
 
 #include "sys.h"
+#include "game_mode.h"
 
 #define RENDERER_FLAGS (SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC)
 
@@ -79,8 +80,6 @@ void sysInitVars() {
     paused = false;
     force_pause = false;
     quit = false;
-
-    game_mode = GAME_MODE_DEFAULT;
 
     action_cooldown = 0;
     action_move = ACTION_NONE;
