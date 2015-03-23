@@ -38,13 +38,7 @@ void menuItemUpdate(int i) {
 
     if (val_max > 0) {
         Dork_StringAppend(&menu_items[i]->full_text, ": ");
-        if (menu_items[i]->val > menu_items[i]->val_min) {
-            Dork_StringAppend(&menu_items[i]->full_text, "< ");
-        }
         Dork_StringAppend(&menu_items[i]->full_text, menu_items[i]->options[val].data);
-        if (menu_items[i]->val < menu_items[i]->val_max) {
-            Dork_StringAppend(&menu_items[i]->full_text, " >");
-        }
     }
 }
 
@@ -131,6 +125,20 @@ void menuItemEnableAction(int i) {
     menu_items[i]->has_action = true;
 }
 
+bool menuItemHasLeftButton(int i) {
+    if (i < 0 || i >= menu_size)
+        return false;
+
+    return menu_items[i]->val > menu_items[i]->val_min;
+}
+
+bool menuItemHasRightButton(int i) {
+    if (i < 0 || i >= menu_size)
+        return false;
+
+    return menu_items[i]->val < menu_items[i]->val_max;
+}
+
 void menuInit() {
     menu_items = NULL;
     menu_size = 0;
@@ -213,7 +221,39 @@ void menuClear() {
 
 int menuLogic() {
     if (menu_size > 0) {
-        if ((action_switch || action_accept) && menu_items[menu_option]->enabled && menu_items[menu_option]->has_action) {
+        bool click_decrease = false;
+        bool click_increase = false;
+        bool click_accept = false;
+
+        if (action_click) {
+            int menu_top = SCREEN_HEIGHT - (menu_size * surface_bar->h);
+            if (paused || game_over)
+                menu_top -= surface_bar->h;
+
+            for (int i=0; i<menu_size; i++) {
+                int menu_pos = menu_top + (i*surface_bar->h);
+                if (mouse_y >= menu_pos && mouse_y < menu_pos + surface_bar->h) {
+                    if (menu_option == i) {
+                        if (menu_items[i]->val_max > 0) {
+                            if (mouse_x <= surface_bar_left->w)
+                                click_decrease = true;
+                            else if (mouse_x > SCREEN_WIDTH - surface_bar_right->w)
+                                click_increase = true;
+                            else
+                                click_accept = true;
+                        }
+                        else {
+                            click_accept = true;
+                        }
+                    }
+                    menu_option = i;
+                    break;
+                }
+            }
+            action_click = false;
+        }
+
+        if ((action_switch || action_accept || click_accept) && menu_items[menu_option]->enabled && menu_items[menu_option]->has_action) {
             action_switch = false;
             action_accept = false;
             Mix_PlayChannel(-1,sound_menu,0);
@@ -226,12 +266,12 @@ int menuLogic() {
             menu_option++;
             action_cooldown = ACTION_COOLDOWN;
             Mix_PlayChannel(-1,sound_switch,0);
-        } else if (action_move == ACTION_LEFT && action_cooldown == 0 && menu_items[menu_option]->enabled) {
+        } else if ((action_move == ACTION_LEFT || click_decrease) && action_cooldown == 0 && menu_items[menu_option]->enabled) {
             if (menuItemDecreaseVal(menu_option)) {
                 Mix_PlayChannel(-1,sound_switch,0);
             }
             action_cooldown = ACTION_COOLDOWN;
-        } else if (action_move == ACTION_RIGHT && action_cooldown == 0 && menu_items[menu_option]->enabled) {
+        } else if ((action_move == ACTION_RIGHT || click_increase) && action_cooldown == 0 && menu_items[menu_option]->enabled) {
             if (menuItemIncreaseVal(menu_option)) {
                 Mix_PlayChannel(-1,sound_switch,0);
             }

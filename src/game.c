@@ -60,6 +60,20 @@ void gameOptions() {
     high_scores_screen = false;
     options_screen = OPTIONS_MAIN;
 
+#ifdef __ANDROID__
+    // 0 sound level
+    menuAdd("Sound", 0, 8);
+    menuItemSetVal(0, option_sound);
+    menuItemSetOptionText(0, 0, "Off");
+    menuItemSetOptionText(0, 8, "Max");
+
+    // 1 music level
+    menuAdd("Music", 0, 8);
+    menuItemSetVal(1, option_music);
+    menuItemSetOptionText(1, 0, "Off");
+    menuItemSetOptionText(1, 8, "Max");
+
+#else
     // 0 joystick
     menuAdd("Controls", 0, SDL_NumJoysticks());
     menuItemEnableAction(0);
@@ -67,7 +81,7 @@ void gameOptions() {
     menuItemSetOptionText(0, 0, "(no joystick)");
     int i;
     for (i=0; i < SDL_NumJoysticks(); i++) {
-        menuItemSetOptionText(0, i+1, SDL_JoystickName(i));
+        menuItemSetOptionText(0, i+1, SDL_JoystickNameForIndex(i));
     }
 
     // 1 sound level
@@ -88,7 +102,9 @@ void gameOptions() {
     menuItemSetVal(3, option_fullscreen);
     menuItemSetOptionText(3, 0, "Off");
     menuItemSetOptionText(3, 1, "On");
-#endif
+#endif //__GCW0__
+
+#endif //__ANDROID__
 
     menuAdd("Cancel", 0, 0);
     menuAdd("Save settings", 0, 0);
@@ -164,6 +180,10 @@ void gameInit() {
 void gameLogic() {
     int menu_choice;
 
+    if (title_screen || high_scores_screen || options_screen != -1 || rebind_index != -1 || game_over) {
+        force_pause = false;
+    }
+
     if (action_cooldown > 0) action_cooldown--;
 
     // handle the title screen menu
@@ -232,19 +252,26 @@ void gameLogic() {
                 sysConfigLoad();
                 gameTitle();
             }
+#ifndef __ANDROID__
             else if (menu_choice == 0) {
                 // edit controls
                 option_joystick = (int)menuItemGetVal(0)-1;
                 menuClear();
                 gameOptionsControls();
             }
+#endif
             else if (menu_choice == menu_size-1) {
+#ifdef __ANDROID__
+                option_sound = menuItemGetVal(0);
+                option_music = menuItemGetVal(1);
+#else
                 option_joystick = (int)menuItemGetVal(0)-1;
                 option_sound = menuItemGetVal(1);
                 option_music = menuItemGetVal(2);
 #ifndef __GCW0__
                 option_fullscreen = menuItemGetVal(3);
-#endif
+#endif //__GCW0__
+#endif //__ANDROID__
 
                 menuClear();
                 sysConfigApply();
@@ -456,6 +483,72 @@ void gameSwitch() {
         blockSwitchCursor();
         action_switch = false;
     }
+    else if (action_click) {
+        // TODO some of this stuff should probably be in gameMove()
+        int bx, by;
+        blockGetAtMouse(&bx, &by);
+
+        if (bx != -1 && by != -1) {
+            if (game_mode == GAME_MODE_JEWELS && jewels_cursor_select) {
+                if (bx == cursor.x1 && by == cursor.y1-1) {
+                    cursor.x2 = cursor.x1;
+                    cursor.y2 = cursor.y1-1;
+                    blockSwitchCursor();
+                    Mix_PlayChannel(-1,sound_switch,0);
+                }
+                else if (bx == cursor.x1 && by == cursor.y1+1) {
+                    cursor.x2 = cursor.x1;
+                    cursor.y2 = cursor.y1+1;
+                    blockSwitchCursor();
+                    Mix_PlayChannel(-1,sound_switch,0);
+                }
+                else if (bx == cursor.x1-1 && by == cursor.y1) {
+                    cursor.x2 = cursor.x1-1;
+                    cursor.y2 = cursor.y1;
+                    blockSwitchCursor();
+                    Mix_PlayChannel(-1,sound_switch,0);
+                }
+                else if (bx == cursor.x1+1 && by == cursor.y1) {
+                    cursor.x2 = cursor.x1+1;
+                    cursor.y2 = cursor.y1;
+                    blockSwitchCursor();
+                    Mix_PlayChannel(-1,sound_switch,0);
+                }
+                else if (bx == cursor.x1 && by == cursor.y1) {
+                    jewels_cursor_select = !jewels_cursor_select;
+                    Mix_PlayChannel(-1,sound_switch,0);
+                }
+                else if (!(bx == cursor.x1 && by == cursor.y1)) {
+                    cursor.x1 = cursor.x2 = bx;
+                    cursor.y1 = cursor.y2 = by;
+                    jewels_cursor_select = true;
+                    Mix_PlayChannel(-1,sound_switch,0);
+                }
+            }
+            else {
+                if (!(bx == cursor.x1 && by == cursor.y1)) {
+                    cursor.x1 = bx;
+                    cursor.x2 = (game_mode == GAME_MODE_JEWELS) ? bx : bx+1;
+                    cursor.y1 = cursor.y2 = by;
+
+                    if (game_mode == GAME_MODE_JEWELS)
+                        jewels_cursor_select = true;
+
+                    Mix_PlayChannel(-1,sound_switch,0);
+                }
+                else {
+                    if (game_mode == GAME_MODE_JEWELS)
+                        jewels_cursor_select = !jewels_cursor_select;
+                    else
+                        blockSwitchCursor();
+
+                    Mix_PlayChannel(-1,sound_switch,0);
+                }
+            }
+            action_click = false;
+        }
+    }
+
 }
 
 void gameBump() {
@@ -468,6 +561,15 @@ void gameBump() {
                 score += POINTS_PER_BUMP;
         }
         action_bump = false;
+    }
+    else if (action_click) {
+        if (game_mode == GAME_MODE_DEFAULT) {
+            if (mouse_y > SCREEN_HEIGHT - surface_bar->h - bump_pixels) {
+                if (blockAddLayer())
+                    score += POINTS_PER_BUMP;
+                action_click = false;
+            }
+        }
     }
 }
 
@@ -482,11 +584,12 @@ void gameOver() {
 }
 
 void gamePause() {
-    if (action_cooldown > 0) return;
+    if (action_cooldown > 0 && !force_pause) return;
 
-    if (action_pause) {
+    if (action_pause || force_pause) {
         menuClear();
-        Mix_PlayChannel(-1,sound_menu,0);
+        if (!force_pause)
+            Mix_PlayChannel(-1,sound_menu,0);
 
         if (!paused) {
             paused = true;
@@ -504,6 +607,7 @@ void gamePause() {
 
         action_accept = false;
         action_pause = false;
+        force_pause = false;
     }
 }
 

@@ -99,7 +99,14 @@ enum KEYBINDS {
 
 extern const char* const key_desc[];
 
-SDL_Surface* screen;
+typedef struct Image {
+    SDL_Texture* texture;
+    int w;
+    int h;
+}Image;
+
+SDL_Window* window;
+SDL_Renderer* renderer;
 TTF_Font* font;
 
 int score;
@@ -109,6 +116,7 @@ bool high_scores_screen;
 int options_screen;
 bool game_over;
 bool paused;
+bool force_pause;
 bool quit;
 int game_mode;
 
@@ -130,6 +138,7 @@ bool action_bump;
 bool action_accept;
 bool action_pause;
 bool action_exit;
+bool action_click;
 
 Dork_String path_dir_config;
 Dork_String path_file_config;
@@ -141,15 +150,17 @@ int option_sound;
 int option_music;
 int option_fullscreen;
 
-SDLKey option_key[9];
+SDL_Keycode option_key[9];
 int option_joy_button[5];
 int option_joy_axis_x;
 int option_joy_axis_y;
 
-SDLKey last_key;
+SDL_Keycode last_key;
 int last_joy_button;
 
 SDL_Event event;
+int mouse_x;
+int mouse_y;
 
 // Timers
 unsigned int startTimer;
@@ -157,9 +168,12 @@ unsigned int endTimer;
 unsigned int deltaTimer;
 
 // Functions
+void sysInitVars();
 bool sysInit();
 char* sysGetFilePath(Dork_String *dest, const char* path, bool is_gfx);
-bool sysLoadImage(SDL_Surface** dest, const char* path);
+bool sysLoadImage(Image** dest, const char* path);
+void sysDestroyImage(Image** dest);
+void sysRenderImage(Image* img, SDL_Rect* src, SDL_Rect* dest);
 bool sysLoadFont(TTF_Font** dest, const char* path, int font_size);
 bool sysLoadMusic(Mix_Music** dest, const char* path);
 bool sysLoadSound(Mix_Chunk** dest, const char* path);
@@ -174,18 +188,22 @@ void sysConfigApply();
 void sysHighScoresLoad();
 void sysHighScoresSave();
 void sysHighScoresClear();
+void logInfo(const char* format, ...);
+void logError(const char* format, ...);
 
 // Images
-SDL_Surface* surface_blocks;
-SDL_Surface* surface_clear;
-SDL_Surface* surface_cursor;
-SDL_Surface* surface_cursor_highlight;
-SDL_Surface* surface_bar;
-SDL_Surface* surface_bar_inactive;
-SDL_Surface* surface_background;
-SDL_Surface* surface_background_jewels;
-SDL_Surface* surface_title;
-SDL_Surface* surface_highscores;
+Image* surface_blocks;
+Image* surface_clear;
+Image* surface_cursor;
+Image* surface_cursor_highlight;
+Image* surface_bar;
+Image* surface_bar_inactive;
+Image* surface_bar_left;
+Image* surface_bar_right;
+Image* surface_background;
+Image* surface_background_jewels;
+Image* surface_title;
+Image* surface_highscores;
 
 // Music and Sounds
 Mix_Music* music;

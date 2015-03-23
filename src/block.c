@@ -513,3 +513,31 @@ void blockSwitchCursor() {
         }
     }
 }
+
+void blockGetAtMouse(int* block_x, int* block_y) {
+    if (!block_x || !block_y) return;
+
+    *block_x = -1;
+    *block_y = -1;
+
+    int mx = mouse_x;
+    int my = mouse_y;
+
+    if (game_mode == GAME_MODE_DEFAULT)
+        mx -= (BLOCK_SIZE/2);
+
+    if (mx < DRAW_OFFSET_X)
+        return;
+
+    if (my < DRAW_OFFSET_Y)
+        return;
+
+    int x = (mx - DRAW_OFFSET_X) / BLOCK_SIZE;
+    int y = (my - DRAW_OFFSET_Y + bump_pixels) / BLOCK_SIZE;
+
+    if (x >= 0 && x <= CURSOR_MAX_X)
+        *block_x = x;
+
+    if (y >= CURSOR_MIN_Y && y <= CURSOR_MAX_Y)
+        *block_y = y;
+}

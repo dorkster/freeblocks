@@ -27,5 +27,6 @@ void drawInfo();
 void drawTitle();
 void drawHighScores();
 void drawOptions();
+Image* createText(const char* text, const SDL_Color* color);
 
 #endif

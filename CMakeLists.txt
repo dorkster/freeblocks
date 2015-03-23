@@ -60,34 +60,35 @@ If(NOT IS_ABSOLUTE "${APPDIR}")
 EndIf(NOT IS_ABSOLUTE "${APPDIR}")
 
 
-# Check for SDL
-Find_Package (SDL REQUIRED)
-If (NOT SDL_FOUND)
-  Message (FATAL_ERROR "Couldn't find SDL development files. On Debian-based systems (such as Ubuntu) you should install the 'libsdl1.2-dev' package.")
-Else (NOT SDL_FOUND)
-  Include_Directories (${SDL_INCLUDE_DIR})
-EndIf (NOT SDL_FOUND)
+# Check for SDL2
+Find_Package(SDL2)
+If (NOT SDL2_FOUND)
+	Message (FATAL_ERROR "Couldn't find SDL2 development files. On Debian-based systems (such as Ubuntu) you should install the 'libsdl2-dev' package.")
+Else (NOT SDL2_FOUND)
+	INCLUDE_DIRECTORIES(${SDL2_INCLUDE_DIR})
+EndIf (NOT SDL2_FOUND)
 
-Find_Package (SDL_mixer REQUIRED)
-If (NOT SDLMIXER_FOUND)
-  Message (FATAL_ERROR "Couldn't find SDL-mixer development files. On Debian-based systems (such as Ubuntu) you should install the 'libsdl-mixer1.2-dev' package.")
-Else (NOT SDLMIXER_FOUND)
-  Include_Directories (${SDLMIXER_INCLUDE_DIR})
-EndIf (NOT SDLMIXER_FOUND)
+Find_Package(SDL2_image)
+If (NOT SDL2IMAGE_FOUND)
+	Message (FATAL_ERROR "Couldn't find SDL2-image development files. On Debian-based systems (such as Ubuntu) you should install the 'libsdl2-image-dev' package.")
+Else (NOT SDL2IMAGE_FOUND)
+	INCLUDE_DIRECTORIES(${SDL2IMAGE_INCLUDE_DIR})
+EndIf (NOT SDL2IMAGE_FOUND)
 
-Find_Package (SDL_image REQUIRED)
-If (NOT SDLIMAGE_FOUND)
-  Message (FATAL_ERROR "Couldn't find SDL-image development files. On Debian-based systems (such as Ubuntu) you should install the 'libsdl-image1.2-dev' package.")
-Else (NOT SDLIMAGE_FOUND)
-  Include_Directories (${SDLIMAGE_INCLUDE_DIR})
-EndIf (NOT SDLIMAGE_FOUND)
+Find_Package(SDL2_mixer)
+If (NOT SDL2MIXER_FOUND)
+	Message (FATAL_ERROR "Couldn't find SDL2-mixer development files. On Debian-based systems (such as Ubuntu) you should install the 'libsdl2-mixer-dev' package.")
+Else (NOT SDL2MIXER_FOUND)
+	INCLUDE_DIRECTORIES(${SDL2MIXER_INCLUDE_DIR})
+EndIf (NOT SDL2MIXER_FOUND)
 
-Find_Package (SDL_ttf REQUIRED)
-If (NOT SDLTTF_FOUND)
-  Message (FATAL_ERROR "Couldn't find SDL-ttf development files. On Debian-based systems (such as Ubuntu) you should install the 'libsdl-ttf2.0-dev' package.")
-Else (NOT SDLTTF_FOUND)
-  Include_Directories (${SDLTTF_INCLUDE_DIR})
-EndIf (NOT SDLTTF_FOUND)
+Find_Package(SDL2_ttf)
+If (NOT SDL2TTF_FOUND)
+	Message (FATAL_ERROR "Couldn't find SDL2-ttf development files. On Debian-based systems (such as Ubuntu) you should install the 'libsdl2-ttf-dev' package.")
+Else (NOT SDL2TTF_FOUND)
+	INCLUDE_DIRECTORIES(${SDL2TTF_INCLUDE_DIR})
+EndIf (NOT SDL2TTF_FOUND)
+
 
 # Sources
 
@@ -121,15 +122,15 @@ endif()
 Add_Executable (freeblocks ${FREEBLOCKS_SOURCES} ${FREEBLOCKS_HEADERS} ${FREEBLOCKS_EXTRA})
 
 # libSDLMain comes with libSDL if needed on certain platforms
-If (NOT SDLMAIN_LIBRARY)
-  Set (SDLMAIN_LIBRARY "")
-EndIf (NOT SDLMAIN_LIBRARY)
+If (NOT SDL2MAIN_LIBRARY)
+  Set (SDL2MAIN_LIBRARY "")
+EndIf (NOT SDL2MAIN_LIBRARY)
 
 If (UNIX)
     set(CMAKE_LD_FLAGS ${CMAKE_LD_FLAGS} m)
 EndIf()
 
-Target_Link_Libraries (freeblocks ${CMAKE_LD_FLAGS} ${SDL_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLTTF_LIBRARY} ${SDLMAIN_LIBRARY} ${EXTRA_LIBRARIES})
+Target_Link_Libraries (freeblocks ${CMAKE_LD_FLAGS} ${SDL2_LIBRARY} ${SDL2IMAGE_LIBRARY} ${SDL2MIXER_LIBRARY} ${SDL2TTF_LIBRARY} ${SDL2MAIN_LIBRARY} ${EXTRA_LIBRARIES})
 
 # installing to the proper places
 install(TARGETS freeblocks DESTINATION ${BINDIR})
