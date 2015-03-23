@@ -28,7 +28,7 @@ void drawEverything() {
     // Fill the screen with black
     SDL_RenderClear(renderer);
 
-    SDL_BlitSurface(game_mode->background, NULL, screen, NULL);
+    sysRenderImage(game_mode->background, NULL, NULL);
 
     if (title_screen) {
         drawTitle();
