@@ -392,7 +392,6 @@ void gameMove() {
                 cursor.x2 = cursor.x1 - 1;
                 cursor.y2 = cursor.y1;
                 cursor_moving = true;
-                blockSwitchCursor();
             }
             break;
         case ACTION_RIGHT:
@@ -400,7 +399,6 @@ void gameMove() {
                 cursor.x2 = cursor.x1 + 1;
                 cursor.y2 = cursor.y1;
                 cursor_moving = true;
-                blockSwitchCursor();
             }
             break;
         case ACTION_UP:
@@ -408,7 +406,6 @@ void gameMove() {
                 cursor.y2 = cursor.y1 - 1;
                 cursor.x2 = cursor.x1;
                 cursor_moving = true;
-                blockSwitchCursor();
             }
             break;
         case ACTION_DOWN:
@@ -416,11 +413,13 @@ void gameMove() {
                 cursor.y2 = cursor.y1 + 1;
                 cursor.x2 = cursor.x1;
                 cursor_moving = true;
-                blockSwitchCursor();
             }
             break;
         case ACTION_NONE:
             break;
+        }
+        if (cursor_moving) {
+            game_mode->doSwitch(&cursor);
         }
     }
     else {
@@ -479,7 +478,7 @@ void gameMove() {
 
 void gameSwitch() {
     if (action_switch) {
-        blockSwitchCursor();
+        game_mode->doSwitch(&cursor);
         action_switch = false;
     }
     else if (action_click) {
@@ -492,25 +491,25 @@ void gameSwitch() {
                 if (bx == cursor.x1 && by == cursor.y1-1) {
                     cursor.x2 = cursor.x1;
                     cursor.y2 = cursor.y1-1;
-                    blockSwitchCursor();
+                    game_mode->doSwitch(&cursor);
                     Mix_PlayChannel(-1,sound_switch,0);
                 }
                 else if (bx == cursor.x1 && by == cursor.y1+1) {
                     cursor.x2 = cursor.x1;
                     cursor.y2 = cursor.y1+1;
-                    blockSwitchCursor();
+                    game_mode->doSwitch(&cursor);
                     Mix_PlayChannel(-1,sound_switch,0);
                 }
                 else if (bx == cursor.x1-1 && by == cursor.y1) {
                     cursor.x2 = cursor.x1-1;
                     cursor.y2 = cursor.y1;
-                    blockSwitchCursor();
+                    game_mode->doSwitch(&cursor);
                     Mix_PlayChannel(-1,sound_switch,0);
                 }
                 else if (bx == cursor.x1+1 && by == cursor.y1) {
                     cursor.x2 = cursor.x1+1;
                     cursor.y2 = cursor.y1;
-                    blockSwitchCursor();
+                    game_mode->doSwitch(&cursor);
                     Mix_PlayChannel(-1,sound_switch,0);
                 }
                 else if (bx == cursor.x1 && by == cursor.y1) {
@@ -539,7 +538,7 @@ void gameSwitch() {
                     if (game_mode == GAME_MODE_JEWELS)
                         jewels_cursor_select = !jewels_cursor_select;
                     else
-                        blockSwitchCursor();
+                        game_mode->doSwitch(&cursor);
 
                     Mix_PlayChannel(-1,sound_switch,0);
                 }
@@ -552,7 +551,7 @@ void gameSwitch() {
 
 void gameBump() {
     if (action_bump) {
-        game_mode->bump();
+        game_mode->bump(&cursor);
         action_bump = false;
     }
     else if (action_click) {

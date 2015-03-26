@@ -100,11 +100,15 @@ void blockSwitch(int i, int j, int k, int l, bool animate, bool sound_after_move
     }
 }
 
+static bool blockCanMatch(int i, int j) {
+    return blocks[i][j].color != -1 && blocks[i][j].alive &&
+        blocks[i][j].clear_timer == 0 && blocks[i][j].frame <= 0;
+}
+
 bool blockCompare(int i, int j, int k, int l) {
+    if (!blockCanMatch(i, j) || !blockCanMatch(k, l)) return false;
     if (blocks[i][j].color != blocks[k][l].color) return false;
     if (blocks[i][j].alive != blocks[k][l].alive) return false;
-    if (blocks[i][j].clear_timer > 0 || blocks[i][j].frame > 0) return false;
-    if (blocks[k][l].clear_timer > 0 || blocks[k][l].frame > 0) return false;
     return true;
 }
 
@@ -128,6 +132,22 @@ int blockMatchVertical(int i, int j) {
             break;
     }
     return match_count;
+}
+
+static void blockMatchAdjacentImpl(int i, int j, int k, int l) {
+    if (k < 0 || k >= ROWS - DISABLED_ROWS || l < 0 || l >= COLS) return;
+    if (!blockCanMatch(k, l)) return;
+    if (blocks[i][j].color != blocks[k][l].color) return;
+    // Already matched
+    if (blocks[k][l].matched) return;
+    blocks[k][l].matched = true;
+    blockMatchAdjacentImpl(i, j, k - 1, l);
+    blockMatchAdjacentImpl(i, j, k + 1, l);
+    blockMatchAdjacentImpl(i, j, k, l - 1);
+    blockMatchAdjacentImpl(i, j, k, l + 1);
+}
+void blockMatchAdjacent(int i, int j) {
+    blockMatchAdjacentImpl(i, j, i, j);
 }
 
 int interpolateBlock(int start, int end, int counter, int counter_max, AHEasingFunction ease_func) {
@@ -218,7 +238,7 @@ bool blockHasMatches() {
             }
         }
     }
-	return false;
+    return false;
 }
 
 void blockSetDefaults() {
@@ -332,37 +352,36 @@ void blockGravity() {
     }
 }
 
-void blockMatch() {
-    int i,j,k;
-    int match_count;
-    int blocks_cleared = 0;
-    bool new_match = false;
+void blockClearMatches() {
+    if (animating) return;
 
-    if (!animating) {
-        // now, clear all the matches
-        for (i=0;i<ROWS-DISABLED_ROWS;i++) {
-            for(j=0;j<COLS;j++) {
-                if (blocks[i][j].matched) {
-                    blockClear(i,j);
-                    blocks_cleared++;
-                }
+    // now, clear all the matches
+    int blocks_cleared = 0;
+    for (int i=0;i<ROWS-DISABLED_ROWS;i++) {
+        for(int j=0;j<COLS;j++) {
+            if (blocks[i][j].matched) {
+                blockClear(i,j);
+                blocks_cleared++;
             }
         }
-        if (blocks_cleared > 2) {
-            score += blocks_cleared * POINTS_PER_BLOCK;
-            if (blocks_cleared-3 > 0) score += (blocks_cleared-3) * POINTS_PER_COMBO_BLOCK;
-        }
     }
+    if (blocks_cleared > 2) {
+        score += blocks_cleared * POINTS_PER_BLOCK;
+        if (blocks_cleared-3 > 0) score += (blocks_cleared-3) * POINTS_PER_COMBO_BLOCK;
+    }
+}
 
+void blockFindMatch3() {
+    bool new_match = false;
     // next, mark all the blocks that will be cleared
     // skip the bottom rows because blocks there aren't fully "in" the block field
-    for (i=0;i<ROWS-DISABLED_ROWS;i++) {
-        for(j=0;j<COLS;j++) {
+    for (int i=0;i<ROWS-DISABLED_ROWS;i++) {
+        for(int j=0;j<COLS;j++) {
             if (blocks[i][j].alive) {
                 // horizontal matches
-                match_count = blockMatchHorizontal(i,j);
+                int match_count = blockMatchHorizontal(i,j);
                 if (match_count > 1) {
-                    for(k=j;k<j+match_count+1;k++) {
+                    for(int k=j;k<j+match_count+1;k++) {
                         blocks[i][k].matched = true;
                         new_match = true;
                     }
@@ -370,7 +389,7 @@ void blockMatch() {
                 // vertical matches
                 match_count = blockMatchVertical(i,j);
                 if (match_count > 1) {
-                    for(k=i;k<i+match_count+1;k++) {
+                    for(int k=i;k<i+match_count+1;k++) {
                         blocks[k][j].matched = true;
                         new_match = true;
                     }
@@ -443,29 +462,13 @@ bool blockHasGaps() {
     return false;
 }
 
-void blockSwitchCursor() {
-    if (game_mode == &game_mode_jewels) {
-        if (!jewels_cursor_select) {
-            jewels_cursor_select = true;
-            cursor.x2 = cursor.x1;
-            cursor.y2 = cursor.y1;
-            return;
-        }
-        else {
-            jewels_cursor_select = false;
-        }
-    }
-
+bool blockSwitchCursor() {
     // don't allow switching blocks that are already moving
     if (blocks[cursor.y1][cursor.x1].moving == false && blocks[cursor.y2][cursor.x2].moving == false) {
         blockSwitch(cursor.y1, cursor.x1, cursor.y2, cursor.x2, true, false, SineEaseOut);
-        if (game_mode == &game_mode_jewels) {
-            blocks[cursor.y1][cursor.x1].return_row = cursor.y2;
-            blocks[cursor.y1][cursor.x1].return_col = cursor.x2;
-            cursor.x2 = cursor.x1;
-            cursor.y2 = cursor.y1;
-        }
+        return true;
     }
+    return false;
 }
 
 void blockGetAtMouse(int* block_x, int* block_y) {

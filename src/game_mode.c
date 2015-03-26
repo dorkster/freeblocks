@@ -33,9 +33,15 @@ static void jewelsStatusText(char *buf, int score, int speed);
 static void defaultSetCursor(struct Cursor *cursor);
 static void jewelsSetCursor(struct Cursor *cursor);
 static void dropSetCursor(struct Cursor *cursor);
-static void defaultBump(void);
-static void jewelsBump(void);
-static void dropBump(void);
+static void defaultSwitch(struct Cursor *cursor);
+static void jewelsSwitch(struct Cursor *cursor);
+static void dropSwitch(struct Cursor *cursor);
+static void defaultBump(struct Cursor *cursor);
+static void jewelsBump(struct Cursor *cursor);
+static void dropBump(struct Cursor *cursor);
+
+static int dropColor = -1;
+static int dropAmount = 0;
 
 void gameModeInit() {
     game_mode_default.setDefaults = defaultSetDefaults;
@@ -47,6 +53,7 @@ void gameModeInit() {
     game_mode_default.music = music;
     game_mode_default.speed = true;
     game_mode_default.setCursor = defaultSetCursor;
+    game_mode_default.doSwitch = defaultSwitch;
     game_mode_default.bump = defaultBump;
     game_mode_default.highscores = &path_file_highscores;
 
@@ -60,6 +67,7 @@ void gameModeInit() {
     game_mode_jewels.music = music_jewels;
     game_mode_jewels.speed = false;
     game_mode_jewels.setCursor = jewelsSetCursor;
+    game_mode_jewels.doSwitch = jewelsSwitch;
     game_mode_jewels.bump = jewelsBump;
     game_mode_jewels.highscores = &path_file_highscores_jewels;
 
@@ -69,6 +77,7 @@ void gameModeInit() {
     game_mode_drop.initAll = dropInitAll;
     game_mode_drop.blockLogic = dropBlockLogic;
     game_mode_drop.setCursor = dropSetCursor;
+    game_mode_drop.doSwitch = dropSwitch;
     game_mode_drop.bump = dropBump;
     game_mode_drop.highscores = &path_file_highscores_drop;
 }
@@ -127,12 +136,14 @@ static void dropInitAll(void) {
 }
 
 static void defaultBlockLogic(void) {
-    blockMatch();
+    blockClearMatches();
+    blockFindMatch3();
     blockRise();
     blockGravity();
 }
 static void jewelsBlockLogic(void) {
-    blockMatch();
+    blockClearMatches();
+    blockFindMatch3();
     blockReturn();
     blockAddFromTop();
     blockGravity();
@@ -140,6 +151,7 @@ static void jewelsBlockLogic(void) {
         game_over_timer = FPS * 2;
 }
 static void dropBlockLogic(void) {
+    blockClearMatches();
     blockRise();
     blockGravity();
 }
@@ -171,12 +183,76 @@ static void dropSetCursor(struct Cursor *cursor) {
     cursor->y2 = cursor->y1;
 }
 
-static void defaultBump(void) {
+static void defaultBump(struct Cursor *cursor) {
     if (blockAddLayer())
         score += POINTS_PER_BUMP;
 }
-static void jewelsBump(void) {
+static void jewelsBump(struct Cursor *cursor) {
     jewels_cursor_select = false;
 }
-static void dropBump(void) {
+static void dropBump(struct Cursor *cursor) {
+    // don't grab if no blocks in column
+    if (cursor->y1 == ROWS - 1 || !blocks[cursor->y1][cursor->x1].alive) {
+        return;
+    }
+    int color = blocks[cursor->y1][cursor->x1].color;
+    // if currently no blocks grabbed, grab any color
+    if (dropColor == -1) {
+        dropColor = color;
+    }
+    // only grab blocks of the same color
+    if (color != dropColor) {
+        return;
+    }
+    // Grab the blocks TODO: animate
+    for (int i = cursor->y1; i < ROWS-DISABLED_ROWS; i++) {
+        if (blocks[i][cursor->x1].color != color) {
+            break;
+        }
+        blocks[i][cursor->x1].alive = false;
+        dropAmount++;
+    }
+    Mix_PlayChannel(-1,sound_switch,0);
+}
+
+static void defaultSwitch(struct Cursor *cursor) {
+    blockSwitchCursor();
+}
+static void jewelsSwitch(struct Cursor *cursor) {
+    if (!jewels_cursor_select) {
+        jewels_cursor_select = true;
+        cursor->x2 = cursor->x1;
+        cursor->y2 = cursor->y1;
+        return;
+    }
+    else {
+        jewels_cursor_select = false;
+    }
+
+    if (blockSwitchCursor()) {
+        blocks[cursor->y1][cursor->x1].return_row = cursor->y2;
+        blocks[cursor->y1][cursor->x1].return_col = cursor->x2;
+        cursor->x2 = cursor->x1;
+        cursor->y2 = cursor->y1;
+    }
+}
+static void dropSwitch(struct Cursor *cursor) {
+    if (dropAmount == 0) {
+        return;
+    }
+    // Eject all the blocks held TODO: animate
+    int i;
+    for (i = cursor->y1 - 1; i >= 0 && dropAmount > 0; i--, dropAmount--) {
+        blocks[i][cursor->x1].color = dropColor;
+        blocks[i][cursor->x1].alive = true;
+    }
+    // Check if there is a match in the current column
+    if (blockMatchVertical(i + 1, cursor->x1) > 1) {
+        // Perform a flooding match from the dropped blocks
+        blockMatchAdjacent(i + 1, cursor->x1);
+        Mix_PlayChannel(-1,sound_match,0);
+    }
+    if (dropAmount == 0) {
+        dropColor = -1;
+    }
 }
