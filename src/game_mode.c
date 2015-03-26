@@ -82,6 +82,17 @@ void gameModeInit() {
     game_mode_drop.highscores = &path_file_highscores_drop;
 }
 
+int gameModeGetIndex() {
+    if (game_mode == &game_mode_default)
+        return GAME_MODE_DEFAULT;
+    else if (game_mode == &game_mode_jewels)
+        return GAME_MODE_JEWELS;
+    else if (game_mode == &game_mode_drop)
+        return GAME_MODE_DROP;
+    else
+        return GAME_MODE_DEFAULT;
+}
+
 static void defaultSetDefaults(void) {
     ROWS = 10;
     COLS = 13;

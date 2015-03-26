@@ -52,5 +52,6 @@ GameMode game_mode_jewels;
 GameMode game_mode_drop;
 
 void gameModeInit();
+int gameModeGetIndex();
 
 #endif

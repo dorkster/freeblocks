@@ -44,7 +44,7 @@ void gameTitle() {
     menuItemSetOptionText(1, GAME_MODE_DEFAULT, "Normal");
     menuItemSetOptionText(1, GAME_MODE_JEWELS, "Jewels");
     menuItemSetOptionText(1, GAME_MODE_DROP, "Drop");
-    menuItemSetVal(1, GAME_MODE_DEFAULT);
+    menuItemSetVal(1, gameModeGetIndex());
 }
 
 void gameHighScores() {
