@@ -73,7 +73,7 @@ void gameModeInit() {
 
     game_mode_drop = game_mode_default;
     game_mode_drop.setDefaults = dropSetDefaults;
-    game_mode_drop.drawOffsetExtraY = 0;
+    game_mode_drop.drawOffsetExtraY = BLOCK_SIZE-(surface_bar->h);
     game_mode_drop.initAll = dropInitAll;
     game_mode_drop.blockLogic = dropBlockLogic;
     game_mode_drop.setCursor = dropSetCursor;
