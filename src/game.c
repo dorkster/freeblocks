@@ -20,6 +20,7 @@
 
 #include "block.h"
 #include "game.h"
+#include "game_mode.h"
 #include "menu.h"
 #include "sys.h"
 
@@ -34,7 +35,7 @@ void gameTitle() {
     Mix_FadeOutMusic(2000);
 
     menuAdd("Play Game", 0, 0);
-    menuAdd("Game Type", GAME_MODE_DEFAULT, GAME_MODE_JEWELS);
+    menuAdd("Game Type", GAME_MODE_DEFAULT, GAME_MODE_DROP);
     menuAdd("Speed Level", 1, MAX_SPEED);
     menuAdd("High Scores", 0, 0);
     menuAdd("Options", 0, 0);
@@ -42,7 +43,8 @@ void gameTitle() {
 
     menuItemSetOptionText(1, GAME_MODE_DEFAULT, "Normal");
     menuItemSetOptionText(1, GAME_MODE_JEWELS, "Jewels");
-    menuItemSetVal(1, game_mode);
+    menuItemSetOptionText(1, GAME_MODE_DROP, "Drop");
+    menuItemSetVal(1, gameModeGetIndex());
 }
 
 void gameHighScores() {
@@ -168,10 +170,7 @@ void gameInit() {
 
     Mix_VolumeMusic(option_music*16);
     if (!game_over) {
-        if (game_mode == GAME_MODE_JEWELS)
-            Mix_PlayMusic(music_jewels,-1);
-        else
-            Mix_PlayMusic(music,-1);
+        Mix_PlayMusic(game_mode->music,-1);
     }
 
     game_over = false;
@@ -197,12 +196,13 @@ void gameLogic() {
         }
 
         // get the "Game Type" value
-        game_mode = menuItemGetVal(1);
+        switch (menuItemGetVal(1)) {
+        case GAME_MODE_DEFAULT: game_mode = &game_mode_default; break;
+        case GAME_MODE_JEWELS: game_mode = &game_mode_jewels; break;
+        case GAME_MODE_DROP: game_mode = &game_mode_drop; break;
+        }
 
-        if (game_mode == GAME_MODE_JEWELS)
-            menuItemSetEnabled(2, false);
-        else
-            menuItemSetEnabled(2, true);
+        menuItemSetEnabled(2, game_mode->speed);
 
         if (menu_choice > -1) {
             // get the "Speed Level" value
@@ -385,14 +385,13 @@ void gameMove() {
     if (action_move != action_last_move) cursor_timer = -1;
     if (action_move == action_last_move && action_cooldown > 0) return;
 
-    if (game_mode == GAME_MODE_JEWELS && jewels_cursor_select) {
+    if (game_mode == &game_mode_jewels && jewels_cursor_select) {
         switch (action_move) {
         case ACTION_LEFT:
             if (cursor.x1 > 0) {
                 cursor.x2 = cursor.x1 - 1;
                 cursor.y2 = cursor.y1;
                 cursor_moving = true;
-                blockSwitchCursor();
             }
             break;
         case ACTION_RIGHT:
@@ -400,7 +399,6 @@ void gameMove() {
                 cursor.x2 = cursor.x1 + 1;
                 cursor.y2 = cursor.y1;
                 cursor_moving = true;
-                blockSwitchCursor();
             }
             break;
         case ACTION_UP:
@@ -408,7 +406,6 @@ void gameMove() {
                 cursor.y2 = cursor.y1 - 1;
                 cursor.x2 = cursor.x1;
                 cursor_moving = true;
-                blockSwitchCursor();
             }
             break;
         case ACTION_DOWN:
@@ -416,11 +413,13 @@ void gameMove() {
                 cursor.y2 = cursor.y1 + 1;
                 cursor.x2 = cursor.x1;
                 cursor_moving = true;
-                blockSwitchCursor();
             }
             break;
         case ACTION_NONE:
             break;
+        }
+        if (cursor_moving) {
+            game_mode->doSwitch(&cursor);
         }
     }
     else {
@@ -453,8 +452,7 @@ void gameMove() {
             break;
         }
 
-        cursor.x2 = (game_mode == GAME_MODE_JEWELS) ? cursor.x1 : cursor.x1+1;
-        cursor.y2 = cursor.y1;
+        game_mode->setCursor(&cursor);
     }
 
     if (cursor_moving) {
@@ -480,7 +478,7 @@ void gameMove() {
 
 void gameSwitch() {
     if (action_switch) {
-        blockSwitchCursor();
+        game_mode->doSwitch(&cursor);
         action_switch = false;
     }
     else if (action_click) {
@@ -489,29 +487,29 @@ void gameSwitch() {
         blockGetAtMouse(&bx, &by);
 
         if (bx != -1 && by != -1) {
-            if (game_mode == GAME_MODE_JEWELS && jewels_cursor_select) {
+            if (game_mode == &game_mode_jewels && jewels_cursor_select) {
                 if (bx == cursor.x1 && by == cursor.y1-1) {
                     cursor.x2 = cursor.x1;
                     cursor.y2 = cursor.y1-1;
-                    blockSwitchCursor();
+                    game_mode->doSwitch(&cursor);
                     Mix_PlayChannel(-1,sound_switch,0);
                 }
                 else if (bx == cursor.x1 && by == cursor.y1+1) {
                     cursor.x2 = cursor.x1;
                     cursor.y2 = cursor.y1+1;
-                    blockSwitchCursor();
+                    game_mode->doSwitch(&cursor);
                     Mix_PlayChannel(-1,sound_switch,0);
                 }
                 else if (bx == cursor.x1-1 && by == cursor.y1) {
                     cursor.x2 = cursor.x1-1;
                     cursor.y2 = cursor.y1;
-                    blockSwitchCursor();
+                    game_mode->doSwitch(&cursor);
                     Mix_PlayChannel(-1,sound_switch,0);
                 }
                 else if (bx == cursor.x1+1 && by == cursor.y1) {
                     cursor.x2 = cursor.x1+1;
                     cursor.y2 = cursor.y1;
-                    blockSwitchCursor();
+                    game_mode->doSwitch(&cursor);
                     Mix_PlayChannel(-1,sound_switch,0);
                 }
                 else if (bx == cursor.x1 && by == cursor.y1) {
@@ -525,22 +523,22 @@ void gameSwitch() {
                     Mix_PlayChannel(-1,sound_switch,0);
                 }
             }
-            else {
+            else if (game_mode == &game_mode_default || (game_mode == &game_mode_jewels && !jewels_cursor_select)) {
                 if (!(bx == cursor.x1 && by == cursor.y1)) {
                     cursor.x1 = bx;
-                    cursor.x2 = (game_mode == GAME_MODE_JEWELS) ? bx : bx+1;
+                    cursor.x2 = (game_mode == &game_mode_jewels) ? bx : bx+1;
                     cursor.y1 = cursor.y2 = by;
 
-                    if (game_mode == GAME_MODE_JEWELS)
+                    if (game_mode == &game_mode_jewels)
                         jewels_cursor_select = true;
 
                     Mix_PlayChannel(-1,sound_switch,0);
                 }
                 else {
-                    if (game_mode == GAME_MODE_JEWELS)
+                    if (game_mode == &game_mode_jewels)
                         jewels_cursor_select = !jewels_cursor_select;
                     else
-                        blockSwitchCursor();
+                        game_mode->doSwitch(&cursor);
 
                     Mix_PlayChannel(-1,sound_switch,0);
                 }
@@ -553,17 +551,11 @@ void gameSwitch() {
 
 void gameBump() {
     if (action_bump) {
-        if (game_mode == GAME_MODE_JEWELS) {
-            jewels_cursor_select = false;
-        }
-        else {
-            if (blockAddLayer())
-                score += POINTS_PER_BUMP;
-        }
+        game_mode->bump(&cursor);
         action_bump = false;
     }
     else if (action_click) {
-        if (game_mode == GAME_MODE_DEFAULT) {
+        if (game_mode == &game_mode_default) {
             if (mouse_y > SCREEN_HEIGHT - surface_bar->h - bump_pixels) {
                 if (blockAddLayer())
                     score += POINTS_PER_BUMP;

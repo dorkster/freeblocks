@@ -23,6 +23,7 @@
 #include "block.h"
 #include "draw.h"
 #include "game.h"
+#include "game_mode.h"
 #include "menu.h"
 #include "sys.h"
 
@@ -37,6 +38,7 @@ int main(int argc, char *argv[]) {
     if(!sysInit()) return 1;
     if(!sysLoadFiles()) return 1;
 
+    gameModeInit();
     menuInit();
     gameTitle();
 
