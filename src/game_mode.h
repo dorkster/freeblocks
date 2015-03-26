@@ -42,7 +42,8 @@ typedef struct GameMode{
     Mix_Music *music;
     bool speed;
     void (*setCursor)(struct Cursor *cursor);
-    void (*bump)(void);
+    void (*doSwitch)(struct Cursor *cursor);
+    void (*bump)(struct Cursor *cursor);
     Dork_String *highscores;
 }GameMode;
 

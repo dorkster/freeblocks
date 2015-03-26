@@ -89,12 +89,15 @@ void blockLogic();
 void blockRise();
 void blockAddFromTop();
 void blockGravity();
-void blockMatch();
+void blockClearMatches();
+void blockFindMatch3();
+int blockMatchVertical(int i, int j);
+void blockMatchAdjacent(int i, int j);
 bool blockAddLayer();
 void blockAddLayerRandom(int i);
 bool blockHasSwitchMatch();
 bool blockHasGaps();
-void blockSwitchCursor();
+bool blockSwitchCursor();
 void blockGetAtMouse(int* block_x, int* block_y);
 
 #endif
