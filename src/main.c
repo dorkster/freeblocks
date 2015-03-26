@@ -23,6 +23,7 @@
 #include "block.h"
 #include "draw.h"
 #include "game.h"
+#include "game_mode.h"
 #include "menu.h"
 #include "sys.h"
 

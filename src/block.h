@@ -77,6 +77,7 @@ int speed_timer;
 int game_over_timer;
 bool jewels_cursor_select;
 
+int blockRand();
 void blockSet(int i, int j, bool alive, int color);
 void blockClear(int i, int j);
 void blockSwitch(int i, int j, int k, int l, bool animate, bool sound_after_move, AHEasingFunction ease_func);
@@ -94,7 +95,9 @@ void blockFindMatch3();
 int blockMatchVertical(int i, int j);
 void blockMatchAdjacent(int i, int j);
 bool blockAddLayer();
+void blockReturn();
 void blockAddLayerRandom(int i);
+bool blockHasMatches();
 bool blockHasSwitchMatch();
 bool blockHasGaps();
 bool blockSwitchCursor();

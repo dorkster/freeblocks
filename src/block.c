@@ -28,7 +28,7 @@ const int POINTS_PER_COMBO_BLOCK = 15;
 int speed_init = 1;
 Block **blocks = NULL;
 
-int blockRand(void) {
+int blockRand() {
     return rand() % NUM_BLOCKS;
 }
 
@@ -480,7 +480,7 @@ void blockGetAtMouse(int* block_x, int* block_y) {
     int mx = mouse_x;
     int my = mouse_y;
 
-    if (game_mode == GAME_MODE_DEFAULT)
+    if (game_mode == &game_mode_default)
         mx -= (BLOCK_SIZE/2);
 
     if (mx < DRAW_OFFSET_X)

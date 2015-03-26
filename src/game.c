@@ -487,7 +487,7 @@ void gameSwitch() {
         blockGetAtMouse(&bx, &by);
 
         if (bx != -1 && by != -1) {
-            if (game_mode == GAME_MODE_JEWELS && jewels_cursor_select) {
+            if (game_mode == &game_mode_jewels && jewels_cursor_select) {
                 if (bx == cursor.x1 && by == cursor.y1-1) {
                     cursor.x2 = cursor.x1;
                     cursor.y2 = cursor.y1-1;
@@ -523,19 +523,19 @@ void gameSwitch() {
                     Mix_PlayChannel(-1,sound_switch,0);
                 }
             }
-            else {
+            else if (game_mode == &game_mode_default || (game_mode == &game_mode_jewels && !jewels_cursor_select)) {
                 if (!(bx == cursor.x1 && by == cursor.y1)) {
                     cursor.x1 = bx;
-                    cursor.x2 = (game_mode == GAME_MODE_JEWELS) ? bx : bx+1;
+                    cursor.x2 = (game_mode == &game_mode_jewels) ? bx : bx+1;
                     cursor.y1 = cursor.y2 = by;
 
-                    if (game_mode == GAME_MODE_JEWELS)
+                    if (game_mode == &game_mode_jewels)
                         jewels_cursor_select = true;
 
                     Mix_PlayChannel(-1,sound_switch,0);
                 }
                 else {
-                    if (game_mode == GAME_MODE_JEWELS)
+                    if (game_mode == &game_mode_jewels)
                         jewels_cursor_select = !jewels_cursor_select;
                     else
                         game_mode->doSwitch(&cursor);
@@ -555,7 +555,7 @@ void gameBump() {
         action_bump = false;
     }
     else if (action_click) {
-        if (game_mode == GAME_MODE_DEFAULT) {
+        if (game_mode == &game_mode_default) {
             if (mouse_y > SCREEN_HEIGHT - surface_bar->h - bump_pixels) {
                 if (blockAddLayer())
                     score += POINTS_PER_BUMP;

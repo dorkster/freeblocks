@@ -19,12 +19,11 @@
 #ifndef GAME_MODE_H
 #define GAME_MODE_H
 
-#include <stdbool.h>
-
 #include <SDL.h>
 #include <SDL_mixer.h>
 
 #include "dork/dork_string.h"
+#include "sys.h"
 
 enum {
     GAME_MODE_DEFAULT,
@@ -37,13 +36,13 @@ typedef struct GameMode{
     int drawOffsetExtraY;
     void (*initAll)(void);
     void (*blockLogic)(void);
-    SDL_Surface *background;
-    void (*statusText)(char *buf, int score, int speed);
+    Image *background;
+    void (*statusText)(char *buf, int _score, int _speed);
     Mix_Music *music;
     bool speed;
-    void (*setCursor)(struct Cursor *cursor);
-    void (*doSwitch)(struct Cursor *cursor);
-    void (*bump)(struct Cursor *cursor);
+    void (*setCursor)(struct Cursor *_cursor);
+    void (*doSwitch)(struct Cursor *_cursor);
+    void (*bump)(struct Cursor *_cursor);
     Dork_String *highscores;
 }GameMode;
 
