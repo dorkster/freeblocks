@@ -29,6 +29,7 @@
 #include <SDL_mixer.h>
 
 #include "sys.h"
+#include "game_mode.h"
 
 #define RENDERER_FLAGS (SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC)
 
@@ -79,8 +80,6 @@ void sysInitVars() {
     paused = false;
     force_pause = false;
     quit = false;
-
-    game_mode = GAME_MODE_DEFAULT;
 
     action_cooldown = 0;
     action_move = ACTION_NONE;
@@ -152,10 +151,6 @@ bool sysInit() {
     sysConfigSetPaths();
     sysConfigLoad();
     sysConfigApply();
-
-    //load high scores
-    sysHighScoresClear();
-    sysHighScoresLoad();
 
     return true;
 }
@@ -531,6 +526,10 @@ void sysConfigSetPaths() {
     Dork_StringInit(&path_file_highscores_jewels);
     Dork_StringAppend(&path_file_highscores_jewels, Dork_StringGetData(&path_dir_config));
     Dork_StringAppend(&path_file_highscores_jewels, "/highscores_jewels");
+
+    Dork_StringInit(&path_file_highscores_drop);
+    Dork_StringAppend(&path_file_highscores_drop, Dork_StringGetData(&path_dir_config));
+    Dork_StringAppend(&path_file_highscores_drop, "/highscores_drop");
 }
 
 void sysConfigLoad() {
@@ -688,10 +687,7 @@ void sysHighScoresLoad() {
 
     mkdir(Dork_StringGetData(&path_dir_config), MKDIR_MODE);
 
-    if (game_mode == GAME_MODE_JEWELS)
-        file = fopen(Dork_StringGetData(&path_file_highscores_jewels),"r+");
-    else
-        file = fopen(Dork_StringGetData(&path_file_highscores),"r+");
+    file = fopen(Dork_StringGetData(game_mode->highscores),"r+");
 
     if (file) {
         while (fgets(buffer,BUFSIZ,file)) {
@@ -716,10 +712,7 @@ void sysHighScoresSave() {
 
     mkdir(Dork_StringGetData(&path_dir_config), MKDIR_MODE);
 
-    if (game_mode == GAME_MODE_JEWELS)
-        file = fopen(Dork_StringGetData(&path_file_highscores_jewels),"w+");
-    else
-        file = fopen(Dork_StringGetData(&path_file_highscores),"w+");
+    file = fopen(Dork_StringGetData(game_mode->highscores),"w+");
 
     if (file) {
         for (i=0;i<10;i++) {

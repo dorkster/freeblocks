@@ -19,16 +19,13 @@
 #ifndef SYS_H
 #define SYS_H
 
+#include <stdbool.h>
+
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
 
 #include "dork/dork_string.h"
-
-typedef enum { false = 0, true = 1 } bool;
-
-#define GAME_MODE_DEFAULT 0
-#define GAME_MODE_JEWELS 1
 
 #ifdef __GCW0__
 #define HALF_GFX
@@ -85,6 +82,13 @@ typedef enum { false = 0, true = 1 } bool;
 #define stat _stat
 #endif
 
+#ifndef min
+#define min(a, b) (((a)<(b))?(a):(b))
+#endif
+#ifndef max
+#define max(a,b) (((a)>(b))?(a):(b))
+#endif
+
 enum KEYBINDS {
     KEY_SWITCH = 0,
     KEY_BUMP = 1,
@@ -118,7 +122,6 @@ bool game_over;
 bool paused;
 bool force_pause;
 bool quit;
-int game_mode;
 
 struct Cursor {
     int x1;
@@ -144,6 +147,7 @@ Dork_String path_dir_config;
 Dork_String path_file_config;
 Dork_String path_file_highscores;
 Dork_String path_file_highscores_jewels;
+Dork_String path_file_highscores_drop;
 
 int option_joystick;
 int option_sound;
