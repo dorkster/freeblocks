@@ -447,7 +447,7 @@ void gameMove() {
     }
 
     int bx = -1, by = -1;
-    if (mouse_moving) {
+    if (mouse_moving && !(game_mode == &game_mode_jewels && jewels_cursor_select)) {
         blockGetAtMouse(&bx, &by);
         if (bx != -1 && by != -1) {
             cursor.x1 = bx;
