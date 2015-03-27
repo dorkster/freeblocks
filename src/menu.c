@@ -240,7 +240,10 @@ int menuLogic() {
         bool click_increase = false;
         bool click_accept = false;
 
-        int mouse_menu = menuOptionMouse();
+        int mouse_menu = -1;
+        if (mouse_moving || action_click) {
+            mouse_menu = menuOptionMouse();
+        }
         if (action_click) {
             if (mouse_menu >= 0) {
                 if (menu_items[mouse_menu]->val_max > 0) {

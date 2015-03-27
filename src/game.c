@@ -385,34 +385,31 @@ void gameMove() {
     if (action_move != action_last_move) cursor_timer = -1;
     if (action_move == action_last_move && action_cooldown > 0) return;
 
+    struct Cursor cursor_prev = cursor;
     if (game_mode == &game_mode_jewels && jewels_cursor_select) {
         switch (action_move) {
         case ACTION_LEFT:
             if (cursor.x1 > 0) {
                 cursor.x2 = cursor.x1 - 1;
                 cursor.y2 = cursor.y1;
-                cursor_moving = true;
             }
             break;
         case ACTION_RIGHT:
             if (cursor.x1 < CURSOR_MAX_X) {
                 cursor.x2 = cursor.x1 + 1;
                 cursor.y2 = cursor.y1;
-                cursor_moving = true;
             }
             break;
         case ACTION_UP:
             if (cursor.y1 > CURSOR_MIN_Y) {
                 cursor.y2 = cursor.y1 - 1;
                 cursor.x2 = cursor.x1;
-                cursor_moving = true;
             }
             break;
         case ACTION_DOWN:
             if (cursor.y1 < CURSOR_MAX_Y) {
                 cursor.y2 = cursor.y1 + 1;
                 cursor.x2 = cursor.x1;
-                cursor_moving = true;
             }
             break;
         case ACTION_NONE:
@@ -427,33 +424,40 @@ void gameMove() {
         case ACTION_LEFT:
             if (cursor.x1 > 0) {
                 cursor.x1--;
-                cursor_moving = true;
             }
             break;
         case ACTION_RIGHT:
             if (cursor.x1 < CURSOR_MAX_X) {
                 cursor.x1++;
-                cursor_moving = true;
             }
             break;
         case ACTION_UP:
             if (cursor.y1 > CURSOR_MIN_Y) {
                 cursor.y1--;
-                cursor_moving = true;
             }
             break;
         case ACTION_DOWN:
             if (cursor.y1 < CURSOR_MAX_Y) {
                 cursor.y1++;
-                cursor_moving = true;
             }
             break;
         case ACTION_NONE:
             break;
         }
-
-        game_mode->setCursor(&cursor);
     }
+
+    int bx = -1, by = -1;
+    if (mouse_moving) {
+        blockGetAtMouse(&bx, &by);
+        if (bx != -1 && by != -1) {
+            cursor.x1 = bx;
+            cursor.y1 = by;
+        }
+    }
+
+    game_mode->setCursor(&cursor);
+
+    cursor_moving = cursor_prev.x1 != cursor.x1 || cursor_prev.y1 != cursor.y1;
 
     if (cursor_moving) {
         Mix_PlayChannel(-1,sound_switch,0);
@@ -473,6 +477,11 @@ void gameMove() {
     }
     else {
         cursor_timer = -1;
+    }
+
+    if (bx != -1 && by != -1) {
+        // No cooldown for the mouse
+        action_cooldown = 0;
     }
 }
 

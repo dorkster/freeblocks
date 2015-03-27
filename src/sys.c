@@ -106,6 +106,7 @@ void sysInitVars() {
 
     mouse_x = 0;
     mouse_y = 0;
+    mouse_moving = false;
 }
 
 bool sysInit() {
@@ -365,10 +366,12 @@ void sysCleanup() {
 }
 
 void sysInput() {
+    mouse_moving = false;
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_MOUSEMOTION) {
             mouse_x = event.motion.x;
             mouse_y = event.motion.y;
+            mouse_moving = true;
         }
         else if (event.type == SDL_MOUSEBUTTONDOWN) {
             mouse_x = event.motion.x;

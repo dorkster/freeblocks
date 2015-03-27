@@ -165,6 +165,7 @@ int last_joy_button;
 SDL_Event event;
 int mouse_x;
 int mouse_y;
+bool mouse_moving;
 
 // Timers
 unsigned int startTimer;
