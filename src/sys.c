@@ -90,6 +90,7 @@ void sysInitVars() {
     action_pause = false;
     action_exit = false;
     action_click = false;
+    action_right_click = false;
 
     option_joystick = -1;
     option_sound = 8;
@@ -378,12 +379,16 @@ void sysInput() {
             mouse_y = event.motion.y;
             if (event.button.button == SDL_BUTTON_LEFT)
                 action_click = true;
+            else if (event.button.button == SDL_BUTTON_RIGHT)
+                action_right_click = true;
         }
         else if (event.type == SDL_MOUSEBUTTONUP) {
             mouse_x = event.motion.x;
             mouse_y = event.motion.y;
             if (event.button.button == SDL_BUTTON_LEFT)
                 action_click = false;
+            else if (event.button.button == SDL_BUTTON_RIGHT)
+                action_right_click = false;
         }
         else if (event.type == SDL_FINGERMOTION) {
             mouse_x = (int)((event.tfinger.x + event.tfinger.dx) * SCREEN_WIDTH);

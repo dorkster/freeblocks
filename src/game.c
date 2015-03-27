@@ -559,9 +559,10 @@ void gameSwitch() {
 }
 
 void gameBump() {
-    if (action_bump) {
+    if (action_bump || action_right_click) {
         game_mode->bump(&cursor);
         action_bump = false;
+        action_right_click = false;
     }
     else if (action_click) {
         if (game_mode == &game_mode_default) {

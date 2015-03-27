@@ -241,7 +241,7 @@ int menuLogic() {
         bool click_accept = false;
 
         int mouse_menu = -1;
-        if (mouse_moving || action_click) {
+        if (mouse_moving || action_click || action_right_click) {
             mouse_menu = menuOptionMouse();
         }
         if (action_click) {
