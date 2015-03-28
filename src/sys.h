@@ -142,6 +142,7 @@ bool action_accept;
 bool action_pause;
 bool action_exit;
 bool action_click;
+bool action_right_click;
 
 Dork_String path_dir_config;
 Dork_String path_file_config;
@@ -165,6 +166,7 @@ int last_joy_button;
 SDL_Event event;
 int mouse_x;
 int mouse_y;
+bool mouse_moving;
 
 // Timers
 unsigned int startTimer;
