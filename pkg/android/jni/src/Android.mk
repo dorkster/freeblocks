@@ -20,6 +20,7 @@ LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.c \
 	../../../../src/draw.c \
 	../../../../src/easing.c \
 	../../../../src/game.c \
+	../../../../src/game_mode.c \
 	../../../../src/menu.c \
 	../../../../src/sys.c \
 	../../../../src/main.c
