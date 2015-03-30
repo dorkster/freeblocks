@@ -240,6 +240,13 @@ int menuLogic() {
         bool click_increase = false;
         bool click_accept = false;
 
+        bool use_two_clicks = false;
+        int last_menu = menu_option;
+
+#ifdef __ANDROID__
+        use_two_clicks = true;
+#endif
+
         int mouse_menu = -1;
         if (mouse_moving || action_click || action_right_click) {
             mouse_menu = menuOptionMouse();
@@ -251,11 +258,18 @@ int menuLogic() {
                         click_decrease = true;
                     else if (mouse_x > SCREEN_WIDTH - surface_bar_right->w)
                         click_increase = true;
-                    else
-                        click_accept = true;
+                    else {
+                        if (use_two_clicks && last_menu == mouse_menu)
+                            click_accept = true;
+                        else if (!use_two_clicks)
+                            click_accept = true;
+                    }
                 }
                 else {
-                    click_accept = true;
+                    if (use_two_clicks && last_menu == mouse_menu)
+                        click_accept = true;
+                    else if (!use_two_clicks)
+                        click_accept = true;
                 }
             }
             action_click = false;
