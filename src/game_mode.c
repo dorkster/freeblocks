@@ -39,6 +39,9 @@ static void dropSwitch(struct Cursor *_cursor);
 static void defaultBump(struct Cursor *_cursor);
 static void jewelsBump(struct Cursor *_cursor);
 static void dropBump(struct Cursor *_cursor);
+static void defaultGetHeld(int *color, int *amount);
+static void jewelsGetHeld(int *color, int *amount);
+static void dropGetHeld(int *color, int *amount);
 
 static int dropColor = -1;
 static int dropAmount = 0;
@@ -55,6 +58,7 @@ void gameModeInit() {
     game_mode_default.setCursor = defaultSetCursor;
     game_mode_default.doSwitch = defaultSwitch;
     game_mode_default.bump = defaultBump;
+    game_mode_default.getHeld= defaultGetHeld;
     game_mode_default.highscores = &path_file_highscores;
 
     game_mode_jewels = game_mode_default;
@@ -69,16 +73,18 @@ void gameModeInit() {
     game_mode_jewels.setCursor = jewelsSetCursor;
     game_mode_jewels.doSwitch = jewelsSwitch;
     game_mode_jewels.bump = jewelsBump;
+    game_mode_jewels.getHeld= jewelsGetHeld;
     game_mode_jewels.highscores = &path_file_highscores_jewels;
 
     game_mode_drop = game_mode_default;
     game_mode_drop.setDefaults = dropSetDefaults;
-    game_mode_drop.drawOffsetExtraY = BLOCK_SIZE-(surface_bar->h);
+    game_mode_drop.drawOffsetExtraY = BLOCK_SIZE-(surface_bar->h)+(BLOCK_SIZE/2);
     game_mode_drop.initAll = dropInitAll;
     game_mode_drop.blockLogic = dropBlockLogic;
     game_mode_drop.setCursor = dropSetCursor;
     game_mode_drop.doSwitch = dropSwitch;
     game_mode_drop.bump = dropBump;
+    game_mode_drop.getHeld= dropGetHeld;
     game_mode_drop.highscores = &path_file_highscores_drop;
 }
 
@@ -114,7 +120,7 @@ static void jewelsSetDefaults(void) {
     BLOCK_MOVE_FRAMES = 8;
 }
 static void dropSetDefaults(void) {
-    ROWS = 10;
+    ROWS = 9;
     COLS = 13;
     NUM_BLOCKS = 4;
     START_ROWS = 4;
@@ -144,6 +150,9 @@ static void dropInitAll(void) {
             blockSet(i,j,true,blockRand());
         }
     }
+
+    dropColor = -1;
+    dropAmount = 0;
 }
 
 static void defaultBlockLogic(void) {
@@ -185,9 +194,9 @@ static void jewelsSetCursor(struct Cursor *_cursor) {
 }
 static void dropSetCursor(struct Cursor *_cursor) {
     // always set cursor to top block in column
-    for (int i=ROWS-1;i>=0;i--) {
+    for (int i=CURSOR_MAX_Y;i>=0;i--) {
         if (!blocks[i][_cursor->x1].alive) {
-            _cursor->y1 = min(max(i + 1, 0), ROWS - 1);
+            _cursor->y1 = min(max(i + 1, 0), CURSOR_MAX_Y);
             break;
         }
     }
@@ -257,7 +266,11 @@ static void dropSwitch(struct Cursor *_cursor) {
     }
     // Eject all the blocks held TODO: animate
     int i;
-    for (i = _cursor->y1 - 1; i >= 0 && dropAmount > 0; i--, dropAmount--) {
+    for (i = _cursor->y1; i >= 0 && dropAmount > 0; i--, dropAmount--) {
+        if (blocks[i][_cursor->x1].alive) {
+            dropAmount++;
+            continue;
+        }
         blocks[i][_cursor->x1].color = dropColor;
         blocks[i][_cursor->x1].alive = true;
     }
@@ -270,4 +283,24 @@ static void dropSwitch(struct Cursor *_cursor) {
     if (dropAmount == 0) {
         dropColor = -1;
     }
+}
+
+static void defaultGetHeld(int *color, int *amount) {
+    // unused
+    if (color || amount) {}
+    return;
+}
+
+static void jewelsGetHeld(int *color, int *amount) {
+    // unused
+    if (color || amount) {}
+    return;
+}
+
+static void dropGetHeld(int *color, int *amount) {
+    if (color)
+        *color = dropColor;
+
+    if (amount)
+        *amount = dropAmount;
 }

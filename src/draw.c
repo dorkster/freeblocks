@@ -117,6 +117,40 @@ void drawCursor() {
         dest.y = (cursor.y2*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
         sysRenderImage(surface_cursor, NULL, &dest);
     }
+
+    if (game_mode == &game_mode_drop) {
+        int drop_color, drop_amount;
+        game_mode->getHeld(&drop_color, &drop_amount);
+
+        if (drop_color != -1) {
+            SDL_Rect src;
+
+            dest.x = cursor.x1 * BLOCK_SIZE + DRAW_OFFSET_X;
+            dest.y = DRAW_OFFSET_Y - BLOCK_SIZE;
+
+            src.x = drop_color * BLOCK_SIZE;
+            src.y = 0;
+            src.w = src.h = BLOCK_SIZE;
+
+            sysRenderImage(surface_blocks, &src, &dest);
+
+            if (drop_amount > 1) {
+                Image *text;
+                SDL_Color color = {63,63,63,255};
+                char amount_str[3];
+                sprintf(amount_str, "%d", drop_amount);
+
+                text = createText(amount_str, &color);
+                if(text) {
+                    dest.x = (cursor.x1*BLOCK_SIZE) + DRAW_OFFSET_X + (BLOCK_SIZE/2) - (text->w/2) ;
+                    dest.y = DRAW_OFFSET_Y - BLOCK_SIZE + (BLOCK_SIZE/2) - (text->h/2);
+                    sysRenderImage(text, NULL, &dest);
+                    sysDestroyImage(&text);
+                    text = NULL;
+                }
+            }
+        }
+    }
 }
 
 void drawBlocks() {
