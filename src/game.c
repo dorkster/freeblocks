@@ -553,12 +553,13 @@ void gameSwitch() {
                 }
             }
             else if (game_mode == &game_mode_drop) {
-                if (bx == cursor.x1 && by >= cursor.y1) {
+                int drop_amount;
+                game_mode->getHeld(NULL, &drop_amount);
+
+                if (drop_amount == 0 || (bx == cursor.x1 && by == cursor.y1 && blocks[by][bx].alive))
                     game_mode->bump(&cursor);
-                }
-                else if (bx == cursor.x1 && by < cursor.y1) {
+                else
                     game_mode->doSwitch(&cursor);
-                }
             }
         }
         else {
