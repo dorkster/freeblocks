@@ -81,6 +81,7 @@ void gameModeInit() {
     game_mode_drop.drawOffsetExtraY = BLOCK_SIZE-(surface_bar->h)+(BLOCK_SIZE/2);
     game_mode_drop.initAll = dropInitAll;
     game_mode_drop.blockLogic = dropBlockLogic;
+    game_mode_drop.background = surface_background_drop;
     game_mode_drop.setCursor = dropSetCursor;
     game_mode_drop.doSwitch = dropSwitch;
     game_mode_drop.bump = dropBump;
@@ -121,7 +122,7 @@ static void jewelsSetDefaults(void) {
 }
 static void dropSetDefaults(void) {
     ROWS = 9;
-    COLS = 13;
+    COLS = 8;
     NUM_BLOCKS = 4;
     START_ROWS = 4;
     DISABLED_ROWS = 1;

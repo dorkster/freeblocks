@@ -208,6 +208,7 @@ Image* surface_bar_left;
 Image* surface_bar_right;
 Image* surface_background;
 Image* surface_background_jewels;
+Image* surface_background_drop;
 Image* surface_title;
 Image* surface_highscores;
 

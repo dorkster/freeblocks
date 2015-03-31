@@ -62,6 +62,7 @@ void sysInitVars() {
     surface_bar_right = NULL;
     surface_background = NULL;
     surface_background_jewels = NULL;
+    surface_background_drop = NULL;
     surface_title = NULL;
     surface_highscores = NULL;
     music = NULL;
@@ -309,6 +310,7 @@ bool sysLoadFiles() {
     if (!sysLoadImage(&surface_bar_right, "bar_right.png")) return false;
     if (!sysLoadImage(&surface_background, "background.png")) return false;
     if (!sysLoadImage(&surface_background_jewels, "background_jewels.png")) return false;
+    if (!sysLoadImage(&surface_background_drop, "background_drop.png")) return false;
     if (!sysLoadImage(&surface_title, "title.png")) return false;
     if (!sysLoadImage(&surface_highscores, "highscores.png")) return false;
 
@@ -347,6 +349,7 @@ void sysCleanup() {
     sysDestroyImage(&surface_bar_right);
     sysDestroyImage(&surface_background);
     sysDestroyImage(&surface_background_jewels);
+    sysDestroyImage(&surface_background_drop);
     sysDestroyImage(&surface_title);
     sysDestroyImage(&surface_highscores);
 
