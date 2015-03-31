@@ -29,8 +29,8 @@
 #endif
 
 #define CLEAR_TIME 4 / (60/FPS)
-#define SPEED_FACTOR 32 / BLOCK_SIZE
-#define BUMP_TIME (60 / (60/FPS)) * SPEED_FACTOR
+#define SPEED_FACTOR 48 / BLOCK_SIZE
+#define BUMP_TIME ((60 / (60/FPS)) * SPEED_FACTOR) / 2
 #define SPEED_TIME 1800 / (60/FPS)
 #define MAX_SPEED 25
 
