@@ -552,10 +552,42 @@ void gameSwitch() {
                     Mix_PlayChannel(-1,sound_switch,0);
                 }
             }
-            action_click = false;
+            else if (game_mode == &game_mode_drop) {
+                if (bx == cursor.x1 && by >= cursor.y1) {
+                    game_mode->bump(&cursor);
+                }
+                else if (bx == cursor.x1 && by < cursor.y1) {
+                    game_mode->doSwitch(&cursor);
+                }
+            }
         }
-    }
+        else {
+            if (game_mode == &game_mode_drop) {
+                SDL_Rect r;
+                r.x = DRAW_OFFSET_X;
+                r.y = DRAW_OFFSET_Y - BLOCK_SIZE;
+                r.w = BLOCK_SIZE*COLS;
+                r.h = BLOCK_SIZE;
 
+                if (mouse_x >= r.x && mouse_x < r.x+r.w && mouse_y >= r.y && mouse_y < r.y+r.h) {
+                    SDL_Rect r2;
+                    r2.x = cursor.x1 * BLOCK_SIZE + DRAW_OFFSET_X;
+                    r2.y = r.y;
+                    r2.w = r2.h = r.h;
+
+                    if (mouse_x >= r2.x && mouse_x < r2.x+r2.w && mouse_y >= r2.y && mouse_y < r2.y+r2.h) {
+                        game_mode->doSwitch(&cursor);
+                    }
+                    else {
+                        cursor.x1 = (mouse_x  - DRAW_OFFSET_X) / BLOCK_SIZE;
+                        game_mode->setCursor(&cursor);
+                    }
+                }
+            }
+        }
+
+        action_click = false;
+    }
 }
 
 void gameBump() {

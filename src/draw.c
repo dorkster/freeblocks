@@ -142,7 +142,7 @@ void drawCursor() {
 
                 text = createText(amount_str, &color);
                 if(text) {
-                    dest.x = (cursor.x1*BLOCK_SIZE) + DRAW_OFFSET_X + (BLOCK_SIZE/2) - (text->w/2) ;
+                    dest.x = (cursor.x1*BLOCK_SIZE) + DRAW_OFFSET_X + (BLOCK_SIZE/2) - (text->w/2);
                     dest.y = DRAW_OFFSET_Y - BLOCK_SIZE + (BLOCK_SIZE/2) - (text->h/2);
                     sysRenderImage(text, NULL, &dest);
                     sysDestroyImage(&text);
