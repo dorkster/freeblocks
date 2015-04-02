@@ -216,7 +216,7 @@ static void jewelsBump(struct Cursor *_cursor) {
 }
 static void dropBump(struct Cursor *_cursor) {
     // don't grab if no blocks in column
-    if (_cursor->y1 == ROWS - 1 || !blocks[_cursor->y1][_cursor->x1].alive) {
+    if (_cursor->y1 == ROWS - 1 || !blocks[_cursor->y1][_cursor->x1].alive || blocks[_cursor->y1][_cursor->x1].matched) {
         return;
     }
     int color = blocks[_cursor->y1][_cursor->x1].color;
@@ -230,7 +230,7 @@ static void dropBump(struct Cursor *_cursor) {
     }
     // Grab the blocks TODO: animate
     for (int i = _cursor->y1; i < ROWS-DISABLED_ROWS; i++) {
-        if (blocks[i][_cursor->x1].color != color) {
+        if (blocks[i][_cursor->x1].color != color || blocks[i][_cursor->x1].matched) {
             break;
         }
         blocks[i][_cursor->x1].alive = false;
