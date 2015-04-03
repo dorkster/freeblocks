@@ -43,6 +43,7 @@ typedef struct GameMode{
     void (*setCursor)(struct Cursor *_cursor);
     void (*doSwitch)(struct Cursor *_cursor);
     void (*bump)(struct Cursor *_cursor);
+    void (*pickUp)(struct Cursor *_cursor);
     void (*getHeld)(int *color, int *amount);
     Dork_String *highscores;
 }GameMode;

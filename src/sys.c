@@ -39,6 +39,7 @@
 const char* const key_desc[] = {
     "Switch blocks",
     "Raise blocks",
+    "Pick up blocks",
     "Accept",
     "Pause",
     "Exit",
@@ -85,8 +86,9 @@ void sysInitVars() {
     action_cooldown = 0;
     action_move = ACTION_NONE;
     action_last_move = ACTION_NONE;
-    action_switch = ACTION_NONE;
+    action_switch = false;
     action_bump = false;
+    action_pickup = false;
     action_accept = false;
     action_pause = false;
     action_exit = false;
@@ -121,6 +123,7 @@ bool sysInit() {
     // set up the default controls
     option_key[KEY_SWITCH] = SDLK_LCTRL;
     option_key[KEY_BUMP] = SDLK_LALT;
+    option_key[KEY_PICKUP] = SDLK_LSHIFT;
     option_key[KEY_ACCEPT] = SDLK_RETURN;
 #ifdef __ANDROID__
     option_key[KEY_EXIT] = SDLK_AC_BACK;
@@ -143,6 +146,7 @@ bool sysInit() {
 
     option_joy_button[KEY_SWITCH] = 0;
     option_joy_button[KEY_BUMP] = 1;
+    option_joy_button[KEY_PICKUP] = 2;
     option_joy_button[KEY_ACCEPT] = 9;
     option_joy_button[KEY_PAUSE] = 9;
     option_joy_button[KEY_EXIT] = 8;
@@ -412,6 +416,8 @@ void sysInput() {
                 action_switch = true;
             if (event.key.keysym.sym == option_key[KEY_BUMP])
                 action_bump = true;
+            if (event.key.keysym.sym == option_key[KEY_PICKUP])
+                action_pickup = true;
             if (event.key.keysym.sym == option_key[KEY_ACCEPT])
                 action_accept = true;
             if (event.key.keysym.sym == option_key[KEY_PAUSE])
@@ -431,6 +437,8 @@ void sysInput() {
                 action_switch = false;
             if (event.key.keysym.sym == option_key[KEY_BUMP])
                 action_bump = false;
+            if (event.key.keysym.sym == option_key[KEY_PICKUP])
+                action_pickup = false;
             if (event.key.keysym.sym == option_key[KEY_ACCEPT])
                 action_accept = false;
             if (event.key.keysym.sym == option_key[KEY_PAUSE])
@@ -446,6 +454,8 @@ void sysInput() {
                     action_switch = true;
                 if (event.jbutton.button == option_joy_button[KEY_BUMP])
                     action_bump = true;
+                if (event.jbutton.button == option_joy_button[KEY_PICKUP])
+                    action_pickup = true;
                 if (event.jbutton.button == option_joy_button[KEY_ACCEPT])
                     action_accept = true;
                 if (event.jbutton.button == option_joy_button[KEY_PAUSE])
@@ -460,12 +470,36 @@ void sysInput() {
                     action_switch = false;
                 if (event.jbutton.button == option_joy_button[KEY_BUMP])
                     action_bump = false;
+                if (event.jbutton.button == option_joy_button[KEY_PICKUP])
+                    action_pickup = false;
                 if (event.jbutton.button == option_joy_button[KEY_ACCEPT])
                     action_accept = false;
                 if (event.jbutton.button == option_joy_button[KEY_PAUSE])
                     action_pause = false;
                 if (event.jbutton.button == option_joy_button[KEY_EXIT])
                     action_exit = false;
+            }
+        }
+        else if (joy && event.type == SDL_JOYAXISMOTION) {
+            int joy_x = SDL_JoystickGetAxis(joy, 0);
+            int joy_y = SDL_JoystickGetAxis(joy, 1);
+
+            // x axis
+            if (joy_x < -JOY_DEADZONE) {
+                action_move = ACTION_LEFT;
+            } else if (joy_x > JOY_DEADZONE) {
+                action_move = ACTION_RIGHT;
+            }
+
+            // y axis
+            if (joy_y < -JOY_DEADZONE) {
+                action_move = ACTION_UP;
+            } else if (joy_y > JOY_DEADZONE) {
+                action_move = ACTION_DOWN;
+            }
+
+            if (joy_x >= -JOY_DEADZONE && joy_x <= JOY_DEADZONE && joy_y >= -JOY_DEADZONE && joy_y <= JOY_DEADZONE) {
+                action_move = ACTION_NONE;
             }
         }
         else if (event.type == SDL_WINDOWEVENT) {
@@ -483,35 +517,13 @@ void sysInput() {
             quit = true;
         }
     }
-
-    if (joy && event.type == SDL_JOYAXISMOTION) {
-        int joy_x = SDL_JoystickGetAxis(joy, 0);
-        int joy_y = SDL_JoystickGetAxis(joy, 1);
-
-        // x axis
-        if (joy_x < -JOY_DEADZONE) {
-            action_move = ACTION_LEFT;
-        } else if (joy_x > JOY_DEADZONE) {
-            action_move = ACTION_RIGHT;
-        }
-
-        // y axis
-        if (joy_y < -JOY_DEADZONE) {
-            action_move = ACTION_UP;
-        } else if (joy_y > JOY_DEADZONE) {
-            action_move = ACTION_DOWN;
-        }
-
-        if (joy_x >= -JOY_DEADZONE && joy_x <= JOY_DEADZONE && joy_y >= -JOY_DEADZONE && joy_y <= JOY_DEADZONE) {
-            action_move = ACTION_NONE;
-        }
-    }
 }
 
 void sysInputReset() {
     action_move = ACTION_NONE;
     action_switch = false;
     action_bump = false;
+    action_pickup = false;
     action_accept = false;
     action_pause = false;
     action_exit = false;
@@ -575,6 +587,7 @@ void sysConfigLoad() {
 #ifndef __ANDROID__
             else if (strcmp(key,"key_switch") == 0) option_key[KEY_SWITCH] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
             else if (strcmp(key,"key_bump") == 0) option_key[KEY_BUMP] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
+            else if (strcmp(key,"key_pickup") == 0) option_key[KEY_PICKUP] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
             else if (strcmp(key,"key_accept") == 0) option_key[KEY_ACCEPT] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
             else if (strcmp(key,"key_pause") == 0) option_key[KEY_PAUSE] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
             else if (strcmp(key,"key_exit") == 0) option_key[KEY_EXIT] = (SDL_Keycode)atoi(strtok(NULL,"\n"));
@@ -622,6 +635,7 @@ void sysConfigSave() {
         fprintf(config_file,"\n# keyboard/GCW-Zero bindings\n");
         fprintf(config_file,"key_switch=%d\n",(int)option_key[KEY_SWITCH]);
         fprintf(config_file,"key_bump=%d\n",(int)option_key[KEY_BUMP]);
+        fprintf(config_file,"key_pickup=%d\n",(int)option_key[KEY_PICKUP]);
         fprintf(config_file,"key_accept=%d\n",(int)option_key[KEY_ACCEPT]);
         fprintf(config_file,"key_pause=%d\n",(int)option_key[KEY_PAUSE]);
         fprintf(config_file,"key_exit=%d\n",(int)option_key[KEY_EXIT]);

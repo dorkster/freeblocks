@@ -39,6 +39,9 @@ static void dropSwitch(struct Cursor *_cursor);
 static void defaultBump(struct Cursor *_cursor);
 static void jewelsBump(struct Cursor *_cursor);
 static void dropBump(struct Cursor *_cursor);
+static void defaultPickUp(struct Cursor *_cursor);
+static void jewelsPickUp(struct Cursor *_cursor);
+static void dropPickUp(struct Cursor *_cursor);
 static void defaultGetHeld(int *color, int *amount);
 static void jewelsGetHeld(int *color, int *amount);
 static void dropGetHeld(int *color, int *amount);
@@ -58,6 +61,7 @@ void gameModeInit() {
     game_mode_default.setCursor = defaultSetCursor;
     game_mode_default.doSwitch = defaultSwitch;
     game_mode_default.bump = defaultBump;
+    game_mode_default.pickUp = defaultPickUp;
     game_mode_default.getHeld= defaultGetHeld;
     game_mode_default.highscores = &path_file_highscores;
 
@@ -73,7 +77,8 @@ void gameModeInit() {
     game_mode_jewels.setCursor = jewelsSetCursor;
     game_mode_jewels.doSwitch = jewelsSwitch;
     game_mode_jewels.bump = jewelsBump;
-    game_mode_jewels.getHeld= jewelsGetHeld;
+    game_mode_jewels.pickUp = jewelsPickUp;
+    game_mode_jewels.getHeld = jewelsGetHeld;
     game_mode_jewels.highscores = &path_file_highscores_jewels;
 
     game_mode_drop = game_mode_default;
@@ -85,6 +90,7 @@ void gameModeInit() {
     game_mode_drop.setCursor = dropSetCursor;
     game_mode_drop.doSwitch = dropSwitch;
     game_mode_drop.bump = dropBump;
+    game_mode_drop.pickUp = dropPickUp;
     game_mode_drop.getHeld= dropGetHeld;
     game_mode_drop.highscores = &path_file_highscores_drop;
 }
@@ -215,28 +221,9 @@ static void jewelsBump(struct Cursor *_cursor) {
     jewels_cursor_select = false;
 }
 static void dropBump(struct Cursor *_cursor) {
-    // don't grab if no blocks in column
-    if (_cursor->y1 == ROWS - 1 || !blocks[_cursor->y1][_cursor->x1].alive || blocks[_cursor->y1][_cursor->x1].matched) {
-        return;
-    }
-    int color = blocks[_cursor->y1][_cursor->x1].color;
-    // if currently no blocks grabbed, grab any color
-    if (dropColor == -1) {
-        dropColor = color;
-    }
-    // only grab blocks of the same color
-    if (color != dropColor) {
-        return;
-    }
-    // Grab the blocks TODO: animate
-    for (int i = _cursor->y1; i < ROWS-DISABLED_ROWS; i++) {
-        if (blocks[i][_cursor->x1].color != color || blocks[i][_cursor->x1].matched) {
-            break;
-        }
-        blocks[i][_cursor->x1].alive = false;
-        dropAmount++;
-    }
-    Mix_PlayChannel(-1,sound_switch,0);
+    if (_cursor) {} // unused
+    if (blockAddLayer())
+        score += POINTS_PER_BUMP;
 }
 
 static void defaultSwitch(struct Cursor *_cursor) {
@@ -284,6 +271,43 @@ static void dropSwitch(struct Cursor *_cursor) {
     if (dropAmount == 0) {
         dropColor = -1;
     }
+}
+
+static void defaultPickUp(struct Cursor *_cursor) {
+    // unused
+    if (_cursor) {}
+    return;
+}
+
+static void jewelsPickUp(struct Cursor *_cursor) {
+    // unused
+    if (_cursor) {}
+    return;
+}
+
+static void dropPickUp(struct Cursor *_cursor) {
+    // don't grab if no blocks in column
+    if (_cursor->y1 == ROWS - 1 || !blocks[_cursor->y1][_cursor->x1].alive || blocks[_cursor->y1][_cursor->x1].matched) {
+        return;
+    }
+    int color = blocks[_cursor->y1][_cursor->x1].color;
+    // if currently no blocks grabbed, grab any color
+    if (dropColor == -1) {
+        dropColor = color;
+    }
+    // only grab blocks of the same color
+    if (color != dropColor) {
+        return;
+    }
+    // Grab the blocks TODO: animate
+    for (int i = _cursor->y1; i < ROWS-DISABLED_ROWS; i++) {
+        if (blocks[i][_cursor->x1].color != color || blocks[i][_cursor->x1].matched) {
+            break;
+        }
+        blocks[i][_cursor->x1].alive = false;
+        dropAmount++;
+    }
+    Mix_PlayChannel(-1,sound_switch,0);
 }
 
 static void defaultGetHeld(int *color, int *amount) {

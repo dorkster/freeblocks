@@ -374,6 +374,7 @@ void gameLogic() {
             blockLogic();
             gameMove();
             gameSwitch();
+            gamePickUp();
             gameBump();
         }
     }
@@ -392,31 +393,34 @@ void gameMove() {
             if (cursor.x1 > 0) {
                 cursor.x2 = cursor.x1 - 1;
                 cursor.y2 = cursor.y1;
+                game_mode->doSwitch(&cursor);
             }
             break;
         case ACTION_RIGHT:
             if (cursor.x1 < CURSOR_MAX_X) {
                 cursor.x2 = cursor.x1 + 1;
                 cursor.y2 = cursor.y1;
+                game_mode->doSwitch(&cursor);
             }
             break;
         case ACTION_UP:
             if (cursor.y1 > CURSOR_MIN_Y) {
                 cursor.y2 = cursor.y1 - 1;
                 cursor.x2 = cursor.x1;
+                game_mode->doSwitch(&cursor);
             }
             break;
         case ACTION_DOWN:
             if (cursor.y1 < CURSOR_MAX_Y) {
                 cursor.y2 = cursor.y1 + 1;
                 cursor.x2 = cursor.x1;
+                game_mode->doSwitch(&cursor);
             }
             break;
         case ACTION_NONE:
             break;
         }
         if (cursor_moving) {
-            game_mode->doSwitch(&cursor);
         }
     }
     else {
@@ -557,10 +561,12 @@ void gameSwitch() {
                 game_mode->getHeld(NULL, &drop_amount);
 
                 if (drop_amount == 0 || (bx == cursor.x1 && by == cursor.y1 && blocks[by][bx].alive))
-                    game_mode->bump(&cursor);
+                    game_mode->pickUp(&cursor);
                 else
                     game_mode->doSwitch(&cursor);
             }
+
+            action_click = false;
         }
         else {
             if (game_mode == &game_mode_drop) {
@@ -583,11 +589,11 @@ void gameSwitch() {
                         cursor.x1 = (mouse_x  - DRAW_OFFSET_X) / BLOCK_SIZE;
                         game_mode->setCursor(&cursor);
                     }
+
+                    action_click = false;
                 }
             }
         }
-
-        action_click = false;
     }
 }
 
@@ -598,13 +604,20 @@ void gameBump() {
         action_right_click = false;
     }
     else if (action_click) {
-        if (game_mode == &game_mode_default) {
+        if (game_mode == &game_mode_default || game_mode == &game_mode_drop) {
             if (mouse_y > SCREEN_HEIGHT - img_bar->h - bump_pixels) {
                 if (blockAddLayer())
                     score += POINTS_PER_BUMP;
                 action_click = false;
             }
         }
+    }
+}
+
+void gamePickUp() {
+    if (action_pickup) {
+        game_mode->pickUp(&cursor);
+        action_pickup = false;
     }
 }
 

@@ -35,6 +35,7 @@ void gameLogic();
 void gameMove();
 void gameSwitch();
 void gameBump();
+void gamePickUp();
 void gameOver();
 void gamePause();
 void gameAddHighScore(int _score);

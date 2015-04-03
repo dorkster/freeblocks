@@ -47,7 +47,7 @@
 #endif
 
 #define FPS 60
-#define JOY_DEADZONE 100
+#define JOY_DEADZONE 8192
 #define ACTION_COOLDOWN 10 / (60/FPS)
 
 #define OPTIONS_MAIN 0
@@ -89,16 +89,19 @@
 #define max(a,b) (((a)>(b))?(a):(b))
 #endif
 
+#define KEY_COUNT 10
+
 enum KEYBINDS {
     KEY_SWITCH = 0,
     KEY_BUMP = 1,
-    KEY_ACCEPT = 2,
-    KEY_PAUSE = 3,
-    KEY_EXIT = 4,
-    KEY_LEFT = 5,
-    KEY_RIGHT = 6,
-    KEY_UP = 7,
-    KEY_DOWN = 8
+    KEY_PICKUP = 2,
+    KEY_ACCEPT = 3,
+    KEY_PAUSE = 4,
+    KEY_EXIT = 5,
+    KEY_LEFT = 6,
+    KEY_RIGHT = 7,
+    KEY_UP = 8,
+    KEY_DOWN = 9
 };
 
 extern const char* const key_desc[];
@@ -136,8 +139,9 @@ typedef enum {
 }ActionMove;
 ActionMove action_move;
 ActionMove action_last_move;
-ActionMove action_switch;
+bool action_switch;
 bool action_bump;
+bool action_pickup;
 bool action_accept;
 bool action_pause;
 bool action_exit;
@@ -155,8 +159,8 @@ int option_sound;
 int option_music;
 int option_fullscreen;
 
-SDL_Keycode option_key[9];
-int option_joy_button[5];
+SDL_Keycode option_key[KEY_COUNT];
+int option_joy_button[KEY_COUNT-4]; // joysticks can't remap directions
 int option_joy_axis_x;
 int option_joy_axis_y;
 
