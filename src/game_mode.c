@@ -249,7 +249,7 @@ static void dropSwitch() {
     }
     // Eject all the blocks held TODO: animate
     int i;
-    for (i = cursor.y1; i >= 0 && dropAmount > 0; i--, dropAmount--) {
+    for (i = cursor.y1; i > 0 && dropAmount > 0; i--, dropAmount--) {
         if (blocks[i][cursor.x1].alive) {
             dropAmount++;
             continue;
