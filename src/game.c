@@ -393,28 +393,28 @@ void gameMove() {
             if (cursor.x1 > 0) {
                 cursor.x2 = cursor.x1 - 1;
                 cursor.y2 = cursor.y1;
-                game_mode->doSwitch(&cursor);
+                game_mode->doSwitch();
             }
             break;
         case ACTION_RIGHT:
             if (cursor.x1 < CURSOR_MAX_X) {
                 cursor.x2 = cursor.x1 + 1;
                 cursor.y2 = cursor.y1;
-                game_mode->doSwitch(&cursor);
+                game_mode->doSwitch();
             }
             break;
         case ACTION_UP:
             if (cursor.y1 > CURSOR_MIN_Y) {
                 cursor.y2 = cursor.y1 - 1;
                 cursor.x2 = cursor.x1;
-                game_mode->doSwitch(&cursor);
+                game_mode->doSwitch();
             }
             break;
         case ACTION_DOWN:
             if (cursor.y1 < CURSOR_MAX_Y) {
                 cursor.y2 = cursor.y1 + 1;
                 cursor.x2 = cursor.x1;
-                game_mode->doSwitch(&cursor);
+                game_mode->doSwitch();
             }
             break;
         case ACTION_NONE:
@@ -459,7 +459,7 @@ void gameMove() {
         }
     }
 
-    game_mode->setCursor(&cursor);
+    game_mode->setCursor();
 
     cursor_moving = cursor_prev.x1 != cursor.x1 || cursor_prev.y1 != cursor.y1;
 
@@ -491,7 +491,7 @@ void gameMove() {
 
 void gameSwitch() {
     if (action_switch) {
-        game_mode->doSwitch(&cursor);
+        game_mode->doSwitch();
         action_switch = false;
     }
     else if (action_click) {
@@ -504,25 +504,25 @@ void gameSwitch() {
                 if (bx == cursor.x1 && by == cursor.y1-1) {
                     cursor.x2 = cursor.x1;
                     cursor.y2 = cursor.y1-1;
-                    game_mode->doSwitch(&cursor);
+                    game_mode->doSwitch();
                     Mix_PlayChannel(-1,sound_switch,0);
                 }
                 else if (bx == cursor.x1 && by == cursor.y1+1) {
                     cursor.x2 = cursor.x1;
                     cursor.y2 = cursor.y1+1;
-                    game_mode->doSwitch(&cursor);
+                    game_mode->doSwitch();
                     Mix_PlayChannel(-1,sound_switch,0);
                 }
                 else if (bx == cursor.x1-1 && by == cursor.y1) {
                     cursor.x2 = cursor.x1-1;
                     cursor.y2 = cursor.y1;
-                    game_mode->doSwitch(&cursor);
+                    game_mode->doSwitch();
                     Mix_PlayChannel(-1,sound_switch,0);
                 }
                 else if (bx == cursor.x1+1 && by == cursor.y1) {
                     cursor.x2 = cursor.x1+1;
                     cursor.y2 = cursor.y1;
-                    game_mode->doSwitch(&cursor);
+                    game_mode->doSwitch();
                     Mix_PlayChannel(-1,sound_switch,0);
                 }
                 else if (bx == cursor.x1 && by == cursor.y1) {
@@ -551,7 +551,7 @@ void gameSwitch() {
                     if (game_mode == &game_mode_jewels)
                         jewels_cursor_select = !jewels_cursor_select;
                     else
-                        game_mode->doSwitch(&cursor);
+                        game_mode->doSwitch();
 
                     Mix_PlayChannel(-1,sound_switch,0);
                 }
@@ -561,9 +561,9 @@ void gameSwitch() {
                 game_mode->getHeld(NULL, &drop_amount);
 
                 if (drop_amount == 0 || (bx == cursor.x1 && by == cursor.y1 && blocks[by][bx].alive))
-                    game_mode->pickUp(&cursor);
+                    game_mode->pickUp();
                 else
-                    game_mode->doSwitch(&cursor);
+                    game_mode->doSwitch();
             }
 
             action_click = false;
@@ -583,11 +583,11 @@ void gameSwitch() {
                     r2.w = r2.h = r.h;
 
                     if (mouse_x >= r2.x && mouse_x < r2.x+r2.w && mouse_y >= r2.y && mouse_y < r2.y+r2.h) {
-                        game_mode->doSwitch(&cursor);
+                        game_mode->doSwitch();
                     }
                     else {
                         cursor.x1 = (mouse_x  - DRAW_OFFSET_X) / BLOCK_SIZE;
-                        game_mode->setCursor(&cursor);
+                        game_mode->setCursor();
                     }
 
                     action_click = false;
@@ -599,7 +599,7 @@ void gameSwitch() {
 
 void gameBump() {
     if (action_bump || action_right_click) {
-        game_mode->bump(&cursor);
+        game_mode->bump();
         action_bump = false;
         action_right_click = false;
     }
@@ -616,7 +616,7 @@ void gameBump() {
 
 void gamePickUp() {
     if (action_pickup) {
-        game_mode->pickUp(&cursor);
+        game_mode->pickUp();
         action_pickup = false;
     }
 }
