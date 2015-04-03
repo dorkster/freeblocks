@@ -51,19 +51,19 @@ void drawMenu(int offset) {
 
     for (int i=0;i<menu_size;i++) {
         dest.x = 0;
-        dest.y = SCREEN_HEIGHT - ((menu_size-i) * surface_bar->h) - offset;
+        dest.y = SCREEN_HEIGHT - ((menu_size-i) * img_bar->h) - offset;
 
         if (i == menu_option) {
-            sysRenderImage(surface_bar, NULL, &dest);
+            sysRenderImage(img_bar, NULL, &dest);
             if (menuItemHasLeftButton(i)) {
-                sysRenderImage(surface_bar_left, NULL, &dest);
+                sysRenderImage(img_bar_left, NULL, &dest);
             }
             if (menuItemHasRightButton(i)) {
-                dest.x = SCREEN_WIDTH - surface_bar_right->w;
-                sysRenderImage(surface_bar_right, NULL, &dest);
+                dest.x = SCREEN_WIDTH - img_bar_right->w;
+                sysRenderImage(img_bar_right, NULL, &dest);
             }
         }
-        else sysRenderImage(surface_bar_inactive, NULL, &dest);
+        else sysRenderImage(img_bar_inactive, NULL, &dest);
 
         if (menuItemIsEnabled(i))
             text = createText(menuItemGetText(i), &color);
@@ -72,7 +72,7 @@ void drawMenu(int offset) {
 
         if (text) {
             dest.x = SCREEN_WIDTH/2 - text->w/2;
-            dest.y = SCREEN_HEIGHT - ((menu_size-i-1) * surface_bar->h) - surface_bar->h - offset;
+            dest.y = SCREEN_HEIGHT - ((menu_size-i-1) * img_bar->h) - img_bar->h - offset;
             sysRenderImage(text, NULL, &dest);
             sysDestroyImage(&text);
         }
@@ -87,35 +87,35 @@ void drawCursor() {
     dest.x = cursor.x1*BLOCK_SIZE + DRAW_OFFSET_X;
     dest.y = (cursor.y1*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
 
-    sysRenderImage(surface_cursor, NULL, &dest);
+    sysRenderImage(img_cursor, NULL, &dest);
 
     if (game_mode == &game_mode_jewels && jewels_cursor_select) {
         if (cursor.x1 > 0) {
             dest.x = (cursor.x1-1)*BLOCK_SIZE + DRAW_OFFSET_X;
             dest.y = (cursor.y1*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
-            sysRenderImage(surface_cursor_highlight, NULL, &dest);
+            sysRenderImage(img_cursor_highlight, NULL, &dest);
         }
         if (cursor.x1 < CURSOR_MAX_X) {
             dest.x = (cursor.x1+1)*BLOCK_SIZE + DRAW_OFFSET_X;
             dest.y = (cursor.y1*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
-            sysRenderImage(surface_cursor_highlight, NULL, &dest);
+            sysRenderImage(img_cursor_highlight, NULL, &dest);
         }
         if (cursor.y1 > CURSOR_MIN_Y) {
             dest.x = cursor.x1*BLOCK_SIZE + DRAW_OFFSET_X;
             dest.y = ((cursor.y1-1)*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
-            sysRenderImage(surface_cursor_highlight, NULL, &dest);
+            sysRenderImage(img_cursor_highlight, NULL, &dest);
         }
         if (cursor.y1 < CURSOR_MAX_Y) {
             dest.x = cursor.x1*BLOCK_SIZE + DRAW_OFFSET_X;
             dest.y = ((cursor.y1+1)*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
-            sysRenderImage(surface_cursor_highlight, NULL, &dest);
+            sysRenderImage(img_cursor_highlight, NULL, &dest);
         }
     }
 
     if (!(cursor.x1 == cursor.x2 && cursor.y1 == cursor.y2)) {
         dest.x = cursor.x2*BLOCK_SIZE + DRAW_OFFSET_X;
         dest.y = (cursor.y2*BLOCK_SIZE) - bump_pixels + DRAW_OFFSET_Y;
-        sysRenderImage(surface_cursor, NULL, &dest);
+        sysRenderImage(img_cursor, NULL, &dest);
     }
 
     if (game_mode == &game_mode_drop) {
@@ -132,7 +132,7 @@ void drawCursor() {
             src.y = 0;
             src.w = src.h = BLOCK_SIZE;
 
-            sysRenderImage(surface_blocks, &src, &dest);
+            sysRenderImage(img_blocks, &src, &dest);
 
             if (drop_amount > 1) {
                 Image *text;
@@ -173,7 +173,7 @@ void drawBlocks() {
 
                     src.w = src.h = BLOCK_SIZE;
 
-                    sysRenderImage(surface_clear, &src, &dest);
+                    sysRenderImage(img_clear, &src, &dest);
                 } else {
                     src.x = blocks[i][j].color * BLOCK_SIZE;
 
@@ -182,7 +182,7 @@ void drawBlocks() {
 
                     src.w = src.h = BLOCK_SIZE;
 
-                    sysRenderImage(surface_blocks, &src, &dest);
+                    sysRenderImage(img_blocks, &src, &dest);
                 }
             }
         }
@@ -197,9 +197,9 @@ void drawInfo() {
 
     // statusbar background
     dest.x = 0;
-    dest.y = SCREEN_HEIGHT - surface_bar->h;
-    if (paused || game_over || game_over_timer > 0) sysRenderImage(surface_bar_inactive, NULL, &dest);
-    else sysRenderImage(surface_bar, NULL, &dest);
+    dest.y = SCREEN_HEIGHT - img_bar->h;
+    if (paused || game_over || game_over_timer > 0) sysRenderImage(img_bar_inactive, NULL, &dest);
+    else sysRenderImage(img_bar, NULL, &dest);
 
     // statusbar text
     if (game_over || game_over_timer > 0) sprintf(text,"Score: %-10d  Game Over!",score);
@@ -212,8 +212,8 @@ void drawInfo() {
 
     text_info = createText(text, &color);
     if(text_info) {
-        dest.x = surface_bar->h / 4;
-        dest.y = SCREEN_HEIGHT-surface_bar->h;
+        dest.x = img_bar->h / 4;
+        dest.y = SCREEN_HEIGHT-img_bar->h;
 
         sysRenderImage(text_info, NULL, &dest);
         sysDestroyImage(&text_info);
@@ -221,7 +221,7 @@ void drawInfo() {
     }
 
     // menu
-    if (paused || game_over) drawMenu(surface_bar->h);
+    if (paused || game_over) drawMenu(img_bar->h);
 }
 
 void drawTitle() {
@@ -230,7 +230,7 @@ void drawTitle() {
     // title logo
     dest.x = 0;
     dest.y = 0;
-    sysRenderImage(surface_title, NULL, &dest);
+    sysRenderImage(img_title, NULL, &dest);
 
     // menu
     drawMenu(0);
@@ -244,16 +244,16 @@ void drawHighScores() {
     SDL_Rect dest;
 
     // list background
-    dest.x = SCREEN_WIDTH/2 - surface_highscores->w/2;
+    dest.x = SCREEN_WIDTH/2 - img_highscores->w/2;
     dest.y = 0;
-    sysRenderImage(surface_highscores, NULL, &dest);
+    sysRenderImage(img_highscores, NULL, &dest);
 
     // "High Scores" text
     sprintf(text,"High Scores");
     text_header = createText(text, &color);
     if (text_header) {
         dest.x = SCREEN_WIDTH/2 - text_header->w/2;
-        dest.y = surface_bar->h/4;
+        dest.y = img_bar->h/4;
 
         sysRenderImage(text_header, NULL, &dest);
         sysDestroyImage(&text_header);
@@ -266,8 +266,8 @@ void drawHighScores() {
         else sprintf(text,"%d.",i+1);
         text_score[i] = createText(text, &color);
         if (text_score[i]) {
-            dest.x = surface_highscores->w;
-            dest.y = (surface_bar->h*i) + surface_bar->h*2;
+            dest.x = img_highscores->w;
+            dest.y = (img_bar->h*i) + img_bar->h*2;
 
             sysRenderImage(text_score[i], NULL, &dest);
             sysDestroyImage(&text_score[i]);

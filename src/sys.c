@@ -52,19 +52,19 @@ void sysInitVars() {
     window = NULL;
     renderer = NULL;
     font = NULL;
-    surface_blocks = NULL;
-    surface_clear = NULL;
-    surface_cursor = NULL;
-    surface_cursor_highlight = NULL;
-    surface_bar = NULL;
-    surface_bar_inactive = NULL;
-    surface_bar_left = NULL;
-    surface_bar_right = NULL;
-    surface_background = NULL;
-    surface_background_jewels = NULL;
-    surface_background_drop = NULL;
-    surface_title = NULL;
-    surface_highscores = NULL;
+    img_blocks = NULL;
+    img_clear = NULL;
+    img_cursor = NULL;
+    img_cursor_highlight = NULL;
+    img_bar = NULL;
+    img_bar_inactive = NULL;
+    img_bar_left = NULL;
+    img_bar_right = NULL;
+    img_background = NULL;
+    img_background_jewels = NULL;
+    img_background_drop = NULL;
+    img_title = NULL;
+    img_highscores = NULL;
     music = NULL;
     music_jewels = NULL;
     sound_menu = NULL;
@@ -300,19 +300,19 @@ bool sysLoadFiles() {
     if (!sysLoadFont(&font, "/fonts/Alegreya-Regular.ttf", FONT_SIZE)) return false;
 
     // graphics
-    if (!sysLoadImage(&surface_blocks, "blocks.png")) return false;
-    if (!sysLoadImage(&surface_clear, "clear.png")) return false;
-    if (!sysLoadImage(&surface_cursor, "cursor.png")) return false;
-    if (!sysLoadImage(&surface_cursor_highlight, "cursor_highlight.png")) return false;
-    if (!sysLoadImage(&surface_bar, "bar.png")) return false;
-    if (!sysLoadImage(&surface_bar_inactive, "bar_inactive.png")) return false;
-    if (!sysLoadImage(&surface_bar_left, "bar_left.png")) return false;
-    if (!sysLoadImage(&surface_bar_right, "bar_right.png")) return false;
-    if (!sysLoadImage(&surface_background, "background.png")) return false;
-    if (!sysLoadImage(&surface_background_jewels, "background_jewels.png")) return false;
-    if (!sysLoadImage(&surface_background_drop, "background_drop.png")) return false;
-    if (!sysLoadImage(&surface_title, "title.png")) return false;
-    if (!sysLoadImage(&surface_highscores, "highscores.png")) return false;
+    if (!sysLoadImage(&img_blocks, "blocks.png")) return false;
+    if (!sysLoadImage(&img_clear, "clear.png")) return false;
+    if (!sysLoadImage(&img_cursor, "cursor.png")) return false;
+    if (!sysLoadImage(&img_cursor_highlight, "cursor_highlight.png")) return false;
+    if (!sysLoadImage(&img_bar, "bar.png")) return false;
+    if (!sysLoadImage(&img_bar_inactive, "bar_inactive.png")) return false;
+    if (!sysLoadImage(&img_bar_left, "bar_left.png")) return false;
+    if (!sysLoadImage(&img_bar_right, "bar_right.png")) return false;
+    if (!sysLoadImage(&img_background, "background.png")) return false;
+    if (!sysLoadImage(&img_background_jewels, "background_jewels.png")) return false;
+    if (!sysLoadImage(&img_background_drop, "background_drop.png")) return false;
+    if (!sysLoadImage(&img_title, "title.png")) return false;
+    if (!sysLoadImage(&img_highscores, "highscores.png")) return false;
 
     // background music
     if (!sysLoadMusic(&music, "/sounds/music.ogg")) return false;
@@ -339,19 +339,19 @@ void sysCleanup() {
 
     TTF_CloseFont(font);
 
-    sysDestroyImage(&surface_blocks);
-    sysDestroyImage(&surface_clear);
-    sysDestroyImage(&surface_cursor);
-    sysDestroyImage(&surface_cursor_highlight);
-    sysDestroyImage(&surface_bar);
-    sysDestroyImage(&surface_bar_inactive);
-    sysDestroyImage(&surface_bar_left);
-    sysDestroyImage(&surface_bar_right);
-    sysDestroyImage(&surface_background);
-    sysDestroyImage(&surface_background_jewels);
-    sysDestroyImage(&surface_background_drop);
-    sysDestroyImage(&surface_title);
-    sysDestroyImage(&surface_highscores);
+    sysDestroyImage(&img_blocks);
+    sysDestroyImage(&img_clear);
+    sysDestroyImage(&img_cursor);
+    sysDestroyImage(&img_cursor_highlight);
+    sysDestroyImage(&img_bar);
+    sysDestroyImage(&img_bar_inactive);
+    sysDestroyImage(&img_bar_left);
+    sysDestroyImage(&img_bar_right);
+    sysDestroyImage(&img_background);
+    sysDestroyImage(&img_background_jewels);
+    sysDestroyImage(&img_background_drop);
+    sysDestroyImage(&img_title);
+    sysDestroyImage(&img_highscores);
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

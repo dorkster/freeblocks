@@ -599,7 +599,7 @@ void gameBump() {
     }
     else if (action_click) {
         if (game_mode == &game_mode_default) {
-            if (mouse_y > SCREEN_HEIGHT - surface_bar->h - bump_pixels) {
+            if (mouse_y > SCREEN_HEIGHT - img_bar->h - bump_pixels) {
                 if (blockAddLayer())
                     score += POINTS_PER_BUMP;
                 action_click = false;

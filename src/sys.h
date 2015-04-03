@@ -198,19 +198,19 @@ void logInfo(const char* format, ...);
 void logError(const char* format, ...);
 
 // Images
-Image* surface_blocks;
-Image* surface_clear;
-Image* surface_cursor;
-Image* surface_cursor_highlight;
-Image* surface_bar;
-Image* surface_bar_inactive;
-Image* surface_bar_left;
-Image* surface_bar_right;
-Image* surface_background;
-Image* surface_background_jewels;
-Image* surface_background_drop;
-Image* surface_title;
-Image* surface_highscores;
+Image* img_blocks;
+Image* img_clear;
+Image* img_cursor;
+Image* img_cursor_highlight;
+Image* img_bar;
+Image* img_bar_inactive;
+Image* img_bar_left;
+Image* img_bar_right;
+Image* img_background;
+Image* img_background_jewels;
+Image* img_background_drop;
+Image* img_title;
+Image* img_highscores;
 
 // Music and Sounds
 Mix_Music* music;

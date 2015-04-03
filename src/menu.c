@@ -220,13 +220,13 @@ void menuClear() {
 }
 
 static int menuOptionMouse() {
-    int menu_top = SCREEN_HEIGHT - (menu_size * surface_bar->h);
+    int menu_top = SCREEN_HEIGHT - (menu_size * img_bar->h);
     if (paused || game_over)
-        menu_top -= surface_bar->h;
+        menu_top -= img_bar->h;
 
     for (int i=0; i<menu_size; i++) {
-        int menu_pos = menu_top + (i*surface_bar->h);
-        if (mouse_y >= menu_pos && mouse_y < menu_pos + surface_bar->h) {
+        int menu_pos = menu_top + (i*img_bar->h);
+        if (mouse_y >= menu_pos && mouse_y < menu_pos + img_bar->h) {
             menu_option = i;
             return i;
         }
@@ -254,9 +254,9 @@ int menuLogic() {
         if (action_click) {
             if (mouse_menu >= 0) {
                 if (menu_items[mouse_menu]->val_max > 0) {
-                    if (mouse_x <= surface_bar_left->w)
+                    if (mouse_x <= img_bar_left->w)
                         click_decrease = true;
-                    else if (mouse_x > SCREEN_WIDTH - surface_bar_right->w)
+                    else if (mouse_x > SCREEN_WIDTH - img_bar_right->w)
                         click_increase = true;
                     else {
                         if (use_two_clicks && last_menu == mouse_menu)

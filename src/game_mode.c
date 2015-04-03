@@ -48,10 +48,10 @@ static int dropAmount = 0;
 
 void gameModeInit() {
     game_mode_default.setDefaults = defaultSetDefaults;
-    game_mode_default.drawOffsetExtraY = BLOCK_SIZE-(surface_bar->h);
+    game_mode_default.drawOffsetExtraY = BLOCK_SIZE-(img_bar->h);
     game_mode_default.initAll = defaultInitAll;
     game_mode_default.blockLogic = defaultBlockLogic;
-    game_mode_default.background = surface_background;
+    game_mode_default.background = img_background;
     game_mode_default.statusText = defaultStatusText;
     game_mode_default.music = music;
     game_mode_default.speed = true;
@@ -66,7 +66,7 @@ void gameModeInit() {
     game_mode_jewels.drawOffsetExtraY = 0;
     game_mode_jewels.initAll = jewelsInitAll;
     game_mode_jewels.blockLogic = jewelsBlockLogic;
-    game_mode_jewels.background = surface_background_jewels;
+    game_mode_jewels.background = img_background_jewels;
     game_mode_jewels.statusText = jewelsStatusText;
     game_mode_jewels.music = music_jewels;
     game_mode_jewels.speed = false;
@@ -78,10 +78,10 @@ void gameModeInit() {
 
     game_mode_drop = game_mode_default;
     game_mode_drop.setDefaults = dropSetDefaults;
-    game_mode_drop.drawOffsetExtraY = BLOCK_SIZE-(surface_bar->h)+(BLOCK_SIZE/2);
+    game_mode_drop.drawOffsetExtraY = BLOCK_SIZE-(img_bar->h)+(BLOCK_SIZE/2);
     game_mode_drop.initAll = dropInitAll;
     game_mode_drop.blockLogic = dropBlockLogic;
-    game_mode_drop.background = surface_background_drop;
+    game_mode_drop.background = img_background_drop;
     game_mode_drop.setCursor = dropSetCursor;
     game_mode_drop.doSwitch = dropSwitch;
     game_mode_drop.bump = dropBump;
