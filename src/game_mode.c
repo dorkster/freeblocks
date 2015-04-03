@@ -187,7 +187,6 @@ static void defaultStatusText(char *buf, int _score, int _speed) {
     sprintf(buf, "Score: %-10d  Speed: %d", _score, _speed);
 }
 static void jewelsStatusText(char *buf, int _score, int _speed) {
-    if (_speed) {} // unused
     sprintf(buf, "Score: %-10d", _score);
 }
 
@@ -304,14 +303,10 @@ static void dropPickUp() {
 
 static void defaultGetHeld(int *color, int *amount) {
     // unused
-    if (color || amount) {}
-    return;
 }
 
 static void jewelsGetHeld(int *color, int *amount) {
     // unused
-    if (color || amount) {}
-    return;
 }
 
 static void dropGetHeld(int *color, int *amount) {

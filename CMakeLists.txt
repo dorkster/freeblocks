@@ -24,6 +24,7 @@ if(MSVC)
 else()
     add_definitions(-Wall -Wextra -Wunused -Wshadow -Wunreachable-code -std=c99)
     add_definitions(-fno-math-errno -fno-exceptions)
+    add_definitions(-Wno-unused-parameter)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
