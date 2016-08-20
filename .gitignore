@@ -28,11 +28,17 @@ freeblocks.build/
 /pkg/freeblocks.opk
 
 # Android
-/pkg/android/bin/
-/pkg/android/jni/SDL2/
-/pkg/android/jni/SDL2_image/
-/pkg/android/jni/SDL2_mixer/
-/pkg/android/jni/SDL2_ttf/
-/pkg/android/libs/
-/pkg/android/obj/
+/pkg/freeblocks-android/.gradle
+/pkg/freeblocks-android/.idea
+/pkg/freeblocks-android/build
+/pkg/freeblocks-android/app/build
+/pkg/freeblocks-android/app/app.iml
+/pkg/freeblocks-android/local.properties
+/pkg/freeblocks-android/app/src/main/libs
+/pkg/freeblocks-android/app/src/main/obj
+/pkg/freeblocks-android/app/src/main/jni/SDL2
+/pkg/freeblocks-android/app/src/main/jni/SDL2_image
+/pkg/freeblocks-android/app/src/main/jni/SDL2_mixer
+/pkg/freeblocks-android/app/src/main/jni/SDL2_ttf
+
 
