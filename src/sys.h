@@ -1,6 +1,6 @@
 /*
     FreeBlocks -  A simple puzzle game, similar to Tetris Attack
-    Copyright (C) 2012 Justin Jacobs
+    Copyright (C) 2012-2017 Justin Jacobs
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
 
-#include "dork/dork_string.h"
+#include "string.h"
 
 #ifdef __GCW0__
 #define HALF_GFX
@@ -56,12 +56,6 @@
 
 #ifndef PKGDATADIR
 #define PKGDATADIR "./res"
-#endif
-
-#ifdef _MSC_VER
-#define HOME_DIR_ENV "AppData"
-#else
-#define HOME_DIR_ENV "HOME"
 #endif
 
 #ifdef _MSC_VER
@@ -148,11 +142,11 @@ bool action_exit;
 bool action_click;
 bool action_right_click;
 
-Dork_String path_dir_config;
-Dork_String path_file_config;
-Dork_String path_file_highscores;
-Dork_String path_file_highscores_jewels;
-Dork_String path_file_highscores_drop;
+String path_dir_config;
+String path_file_config;
+String path_file_highscores;
+String path_file_highscores_jewels;
+String path_file_highscores_drop;
 
 int option_joystick;
 int option_sound;
@@ -180,7 +174,7 @@ unsigned int deltaTimer;
 // Functions
 void sysInitVars();
 bool sysInit();
-char* sysGetFilePath(Dork_String *dest, const char* path, bool is_gfx);
+char* sysGetFilePath(String *dest, const char* path, bool is_gfx);
 bool sysLoadImage(Image** dest, const char* path);
 void sysDestroyImage(Image** dest);
 void sysRenderImage(Image* img, SDL_Rect* src, SDL_Rect* dest);

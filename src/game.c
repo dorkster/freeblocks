@@ -1,6 +1,6 @@
 /*
     FreeBlocks -  A simple puzzle game, similar to Tetris Attack
-    Copyright (C) 2012 Justin Jacobs
+    Copyright (C) 2012-2017 Justin Jacobs
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -117,24 +117,19 @@ void gameOptionsControls() {
 
     if (option_joystick == -1) {
         for (int i=0; i<9; i++) {
-            Dork_String label;
-            Dork_StringInit(&label);
-            Dork_StringAppend(&label, key_desc[i]);
-            Dork_StringAppend(&label, ": ");
-            Dork_StringAppend(&label, SDL_GetKeyName(option_key[i]));
-            menuAdd(Dork_StringGetData(&label), 0, 0);
-            Dork_StringClear(&label);
+            String label;
+            String_Init(&label, key_desc[i], ": ", SDL_GetKeyName(option_key[i]), 0);
+            menuAdd(label.buf, 0, 0);
+            String_Clear(&label);
         }
     }
     else if (option_joystick > -1) {
         for (int i=0; i<5; i++) {
-            Dork_String label;
-            Dork_StringInit(&label);
-            Dork_StringAppend(&label, key_desc[i]);
-            Dork_StringAppend(&label, ": Button ");
-            Dork_StringAppendNumber(&label, option_joy_button[i]);
-            menuAdd(Dork_StringGetData(&label), 0, 0);
-            Dork_StringClear(&label);
+            String label;
+            String_Init(&label, key_desc[i], ": Button ", 0);
+            String_AppendL(&label, option_joy_button[i]);
+            menuAdd(label.buf, 0, 0);
+            String_Clear(&label);
         }
     }
 
@@ -147,12 +142,10 @@ void gameOptionsRebind() {
     last_key = SDLK_UNKNOWN;
     last_joy_button = -1;
 
-    Dork_String label;
-    Dork_StringInit(&label);
-    Dork_StringAppend(&label, "Press a key to use for: ");
-    Dork_StringAppend(&label, key_desc[rebind_index]);
-    menuAdd(Dork_StringGetData(&label), 0, 0);
-    Dork_StringClear(&label);
+    String label;
+    String_Init(&label, "Press a key to use for: ", key_desc[rebind_index], 0);
+    menuAdd(label.buf, 0, 0);
+    String_Clear(&label);
 }
 
 void gameInit() {

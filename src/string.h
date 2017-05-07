@@ -1,6 +1,6 @@
 /*
-    Dork_String - A basic text string API
-    Copyright (C) 2015 Justin Jacobs
+    FreeBlocks -  A simple puzzle game, similar to Tetris Attack
+    Copyright (C) 2012-2017 Justin Jacobs
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,18 +16,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DORK_STRING
-#define DORK_STRING
+#ifndef STRING_H
+#define STRING_H
 
-typedef struct {
-    unsigned int length;
-    char* data;
-}Dork_String;
+typedef struct String {
+    size_t len;
+    char *buf;
+}String;
 
-void Dork_StringInit(Dork_String *dest);
-void Dork_StringAppend(Dork_String* dest, const char* src);
-void Dork_StringAppendNumber(Dork_String* dest, long src);
-void Dork_StringClear(Dork_String* dest);
-char* Dork_StringGetData(const Dork_String* dest);
+void String_Init(String *str, ...);
+void String_InitL(String *str, long value);
+void String_Clear(String *str);
+void String_Append(String *str, ...);
+void String_AppendL(String *str, long value);
 
 #endif

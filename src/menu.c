@@ -1,6 +1,6 @@
 /*
     FreeBlocks -  A simple puzzle game, similar to Tetris Attack
-    Copyright (C) 2012 Justin Jacobs
+    Copyright (C) 2012-2017 Justin Jacobs
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,12 +33,11 @@ void menuItemUpdate(int i) {
     unsigned int val = menu_items[i]->val - menu_items[i]->val_min;
     unsigned int val_max = menu_items[i]->val_max - menu_items[i]->val_min;
 
-    Dork_StringClear(&menu_items[i]->full_text);
-    Dork_StringAppend(&menu_items[i]->full_text, menu_items[i]->prefix.data);
+    String_Clear(&menu_items[i]->full_text);
+    String_Init(&menu_items[i]->full_text, menu_items[i]->prefix.buf, 0);
 
     if (val_max > 0) {
-        Dork_StringAppend(&menu_items[i]->full_text, ": ");
-        Dork_StringAppend(&menu_items[i]->full_text, menu_items[i]->options[val].data);
+        String_Append(&menu_items[i]->full_text, ": ", menu_items[i]->options[val].buf, 0);
     }
 }
 
@@ -46,7 +45,7 @@ char* menuItemGetText(int i) {
     if (i < 0 || i >= menu_size)
         return NULL;
 
-    return Dork_StringGetData(&menu_items[i]->full_text);
+    return menu_items[i]->full_text.buf;
 }
 
 bool menuItemIncreaseVal(int i) {
@@ -97,8 +96,7 @@ void menuItemSetOptionText(int i, int opt, const char* text) {
     if (i < 0 || i >= menu_size || (unsigned)opt > (menu_items[i]->val_max - menu_items[i]->val_min))
         return;
 
-    Dork_StringClear(&menu_items[i]->options[opt]);
-    Dork_StringAppend(&menu_items[i]->options[opt], text);
+    String_Init(&menu_items[i]->options[opt], text, 0);
 
     if ((unsigned)opt == menu_items[i]->val - menu_items[i]->val_min)
         menuItemUpdate(i);
@@ -151,15 +149,14 @@ void menuAdd(const char *item, unsigned int val_min, unsigned int val_max) {
 
     menu_items = realloc(menu_items, sizeof(MenuItem*)*(menu_size+1));
     if (menu_items != NULL) {
-        menu_items[menu_size] = NULL;
         menu_items[menu_size] = malloc(sizeof(MenuItem));
     }
     else
         return;
 
-    Dork_StringInit(&menu_items[menu_size]->prefix);
+    String_Init(&menu_items[menu_size]->prefix, item, 0);
     menu_items[menu_size]->options = NULL;
-    Dork_StringInit(&menu_items[menu_size]->full_text);
+    String_Init(&menu_items[menu_size]->full_text, "", 0);
 
     menu_items[menu_size]->val = 0;
     menu_items[menu_size]->val_min = 0;
@@ -173,16 +170,13 @@ void menuAdd(const char *item, unsigned int val_min, unsigned int val_max) {
     menu_items[menu_size]->val = menu_items[menu_size]->val_min = val_min;
     menu_items[menu_size]->val_max = val_max;
 
-    Dork_StringAppend(&menu_items[menu_size]->prefix, item);
-
     // create default options if this is a "spinner" menu item
     if (val_max > 0) {
         menu_items[menu_size]->has_action = false;
-        menu_items[menu_size]->options = malloc(sizeof(Dork_String)*(val_max+1));
+        menu_items[menu_size]->options = malloc(sizeof(String)*(val_max+1));
         unsigned int i;
         for (i=val_min; i<=val_max; i++) {
-            Dork_StringInit(&menu_items[menu_size]->options[i-val_min]);
-            Dork_StringAppendNumber(&menu_items[menu_size]->options[i-val_min], i);
+            String_InitL(&menu_items[menu_size]->options[i-val_min], i);
         }
     }
 
@@ -198,13 +192,13 @@ void menuClear() {
         if (menu_items[i] == NULL)
             continue;
 
-        Dork_StringClear(&menu_items[i]->prefix);
-        Dork_StringClear(&menu_items[i]->full_text);
+        String_Clear(&menu_items[i]->prefix);
+        String_Clear(&menu_items[i]->full_text);
 
         if (menu_items[i]->options != NULL) {
             unsigned int j;
             for (j=0; j<=menu_items[i]->val_max-menu_items[i]->val_min; j++) {
-                Dork_StringClear(&menu_items[i]->options[j]);
+                String_Clear(&menu_items[i]->options[j]);
             }
             free(menu_items[i]->options);
         }

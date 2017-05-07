@@ -1,6 +1,6 @@
 /*
     FreeBlocks -  A simple puzzle game, similar to Tetris Attack
-    Copyright (C) 2012 Justin Jacobs
+    Copyright (C) 2012-2017 Justin Jacobs
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,14 +20,14 @@
 #define MENU_H
 
 #include "sys.h"
-#include "dork/dork_string.h"
+#include "string.h"
 
 #define MAX_MENU_ITEMS 15
 
 typedef struct {
-    Dork_String prefix;
-    Dork_String* options;
-    Dork_String full_text;
+    String prefix;
+    String* options;
+    String full_text;
 
     unsigned int val;
     unsigned int val_min;

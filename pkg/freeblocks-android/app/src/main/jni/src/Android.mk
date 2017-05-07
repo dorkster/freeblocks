@@ -15,7 +15,6 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDL_PATH)/include \
 
 # Add your application source files here...
 LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.c \
-	../../../../../../../src/dork/dork_string.c \
 	../../../../../../../src/block.c \
 	../../../../../../../src/draw.c \
 	../../../../../../../src/easing.c \
@@ -23,6 +22,7 @@ LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.c \
 	../../../../../../../src/game_mode.c \
 	../../../../../../../src/menu.c \
 	../../../../../../../src/sys.c \
+	../../../../../../../src/string.c \
 	../../../../../../../src/main.c
 
 LOCAL_SHARED_LIBRARIES := SDL2 SDL2_image SDL2_mixer SDL2_ttf

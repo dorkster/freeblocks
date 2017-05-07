@@ -1,6 +1,6 @@
 /*
     FreeBlocks -  A simple puzzle game, similar to Tetris Attack
-    Copyright (C) 2012 Justin Jacobs
+    Copyright (C) 2012-2017 Justin Jacobs
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -162,54 +162,50 @@ bool sysInit() {
     return true;
 }
 
-char* sysGetFilePath(Dork_String *dest, const char* path, bool is_gfx) {
-    if (dest == NULL) return NULL;
+char* sysGetFilePath(String *full_path, const char* path, bool is_gfx) {
+    if (full_path == NULL) return NULL;
 
     struct stat st;
 
-    Dork_StringClear(dest);
-
 #ifdef __ANDROID__
-    Dork_StringAppend(dest, "res");
+    String_Init(full_path, "res", 0);
 #else
-    Dork_StringAppend(dest, "./res");
+    String_Init(full_path, "./res", 0);
 #endif
 
     // try current directory
     if (is_gfx) {
-        Dork_StringAppend(dest, GFX_PREFIX);
+        String_Append(full_path, GFX_PREFIX, 0);
     }
-    Dork_StringAppend(dest, path);
+    String_Append(full_path, path, 0);
 
 #ifdef __ANDROID__
     // can't stat internal Android storage
-    return Dork_StringGetData(dest);
+    return full_path->buf;
 #else
-    if (stat(Dork_StringGetData(dest), &st) == 0)
-        return Dork_StringGetData(dest);
+    if (stat(full_path->buf, &st) == 0)
+        return full_path->buf;
 #endif
 
     // try install directory
-    Dork_StringClear(dest);
-    Dork_StringAppend(dest, PKGDATADIR);
+    String_Clear(full_path);
+    String_Init(full_path, PKGDATADIR, 0);
     if (is_gfx) {
-        Dork_StringAppend(dest, GFX_PREFIX);
+        String_Append(full_path, GFX_PREFIX, 0);
     }
-    Dork_StringAppend(dest, path);
+    String_Append(full_path, path, 0);
 
-    if (stat(Dork_StringGetData(dest), &st) == 0)
-        return Dork_StringGetData(dest);
+    if (stat(full_path->buf, &st) == 0)
+        return full_path->buf;
 
     // failure, just return NULL
     return NULL;
 }
 
 bool sysLoadImage(Image** dest, const char* path) {
-    Dork_String temp;
-    Dork_StringInit(&temp);
-
+    String temp;
     SDL_Surface* surface = IMG_Load(sysGetFilePath(&temp, path, true));
-    Dork_StringClear(&temp);
+    String_Clear(&temp);
 
     if (surface == NULL) {
         return false;
@@ -257,45 +253,39 @@ void sysRenderImage(Image* img, SDL_Rect* src, SDL_Rect* dest) {
 }
 
 bool sysLoadFont(TTF_Font** dest, const char* path, int font_size) {
-    Dork_String temp;
-    Dork_StringInit(&temp);
-
+    String temp;
     *dest = TTF_OpenFont(sysGetFilePath(&temp, path, false), font_size);
-    if(*dest == NULL) {
-        Dork_StringClear(&temp);
-        return false;
-    }
-    else TTF_SetFontHinting(*dest, TTF_HINTING_LIGHT);
+    String_Clear(&temp);
 
-    Dork_StringClear(&temp);
+    if(*dest == NULL)
+        return false;
+    else
+        TTF_SetFontHinting(*dest, TTF_HINTING_LIGHT);
+
     return true;
 }
 
 bool sysLoadMusic(Mix_Music** dest, const char* path) {
-    Dork_String temp;
-    Dork_StringInit(&temp);
-
+    String temp;
     *dest = Mix_LoadMUS(sysGetFilePath(&temp, path, false));
+    String_Clear(&temp);
+
     if (*dest == NULL) {
-        Dork_StringClear(&temp);
         return false;
     }
 
-    Dork_StringClear(&temp);
     return true;
 }
 
 bool sysLoadSound(Mix_Chunk** dest, const char* path) {
-    Dork_String temp;
-    Dork_StringInit(&temp);
-
+    String temp;
     *dest = Mix_LoadWAV(sysGetFilePath(&temp, path, false));
+    String_Clear(&temp);
+
     if (*dest == NULL) {
-        Dork_StringClear(&temp);
         return false;
     }
 
-    Dork_StringClear(&temp);
     return true;
 }
 
@@ -334,10 +324,10 @@ bool sysLoadFiles() {
 void sysCleanup() {
     sysConfigSave();
 
-    Dork_StringClear(&path_dir_config);
-    Dork_StringClear(&path_file_config);
-    Dork_StringClear(&path_file_highscores);
-    Dork_StringClear(&path_file_highscores_jewels);
+    String_Clear(&path_dir_config);
+    String_Clear(&path_file_config);
+    String_Clear(&path_file_highscores);
+    String_Clear(&path_file_highscores_jewels);
 
     Mix_HaltMusic();
 
@@ -530,29 +520,23 @@ void sysInputReset() {
 }
 
 void sysConfigSetPaths() {
-    Dork_StringInit(&path_dir_config);
 #ifdef __ANDROID__
-    Dork_StringAppend(&path_dir_config, SDL_AndroidGetInternalStoragePath());
+    String_Init(&path_dir_config, SDL_AndroidGetInternalStoragePath(), 0);
 #else
-    Dork_StringAppend(&path_dir_config, getenv(HOME_DIR_ENV));
+#ifdef _MSC_VER
+    String_Init(&path_dir_config, getenv("AppData"), "/freeblocks", 0);
+#else
+    if (getenv("XDG_CONFIG_HOME"))
+        String_Init(&path_dir_config, getenv("XDG_CONFIG_HOME"), "/freeblocks", 0);
+    else
+        String_Init(&path_dir_config, getenv("HOME"), "/.config/freeblocks", 0);
 #endif
-    Dork_StringAppend(&path_dir_config, "/.freeblocks");
+#endif
 
-    Dork_StringInit(&path_file_config);
-    Dork_StringAppend(&path_file_config, Dork_StringGetData(&path_dir_config));
-    Dork_StringAppend(&path_file_config, "/config");
-
-    Dork_StringInit(&path_file_highscores);
-    Dork_StringAppend(&path_file_highscores, Dork_StringGetData(&path_dir_config));
-    Dork_StringAppend(&path_file_highscores, "/highscores");
-
-    Dork_StringInit(&path_file_highscores_jewels);
-    Dork_StringAppend(&path_file_highscores_jewels, Dork_StringGetData(&path_dir_config));
-    Dork_StringAppend(&path_file_highscores_jewels, "/highscores_jewels");
-
-    Dork_StringInit(&path_file_highscores_drop);
-    Dork_StringAppend(&path_file_highscores_drop, Dork_StringGetData(&path_dir_config));
-    Dork_StringAppend(&path_file_highscores_drop, "/highscores_drop");
+    String_Init(&path_file_config, path_dir_config.buf, "/config", 0);
+    String_Init(&path_file_highscores, path_dir_config.buf, "/highscores", 0);
+    String_Init(&path_file_highscores_jewels, path_dir_config.buf, "/highscores_jewels", 0);
+    String_Init(&path_file_highscores_drop, path_dir_config.buf, "/highscores_drop", 0);
 }
 
 void sysConfigLoad() {
@@ -561,9 +545,9 @@ void sysConfigLoad() {
     char *temp = NULL;
     bool version_match = false;
 
-    mkdir(Dork_StringGetData(&path_dir_config), MKDIR_MODE);
+    mkdir(path_dir_config.buf, MKDIR_MODE);
 
-    FILE *config_file = fopen(Dork_StringGetData(&path_file_config),"r+");
+    FILE *config_file = fopen(path_file_config.buf,"r+");
     if (config_file) {
         while (fgets(buffer,BUFSIZ,config_file)) {
             temp = buffer;
@@ -621,9 +605,9 @@ void sysConfigLoad() {
 }
 
 void sysConfigSave() {
-    mkdir(Dork_StringGetData(&path_dir_config), MKDIR_MODE);
+    mkdir(path_dir_config.buf, MKDIR_MODE);
 
-    FILE *config_file = fopen(Dork_StringGetData(&path_file_config),"w+");
+    FILE *config_file = fopen(path_file_config.buf,"w+");
     if (config_file) {
         fprintf(config_file,"version=%s\n", VERSION);
 
@@ -710,9 +694,9 @@ void sysHighScoresLoad() {
     char *temp;
     int i = 0;
 
-    mkdir(Dork_StringGetData(&path_dir_config), MKDIR_MODE);
+    mkdir(path_dir_config.buf, MKDIR_MODE);
 
-    file = fopen(Dork_StringGetData(game_mode->highscores),"r+");
+    file = fopen(game_mode->highscores->buf,"r+");
 
     if (file) {
         while (fgets(buffer,BUFSIZ,file)) {
@@ -735,9 +719,9 @@ void sysHighScoresSave() {
     FILE *file = NULL;
     int i = 0;
 
-    mkdir(Dork_StringGetData(&path_dir_config), MKDIR_MODE);
+    mkdir(path_dir_config.buf, MKDIR_MODE);
 
-    file = fopen(Dork_StringGetData(game_mode->highscores),"w+");
+    file = fopen(game_mode->highscores->buf,"w+");
 
     if (file) {
         for (i=0;i<10;i++) {

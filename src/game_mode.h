@@ -22,7 +22,7 @@
 #include <SDL.h>
 #include <SDL_mixer.h>
 
-#include "dork/dork_string.h"
+#include "string.h"
 #include "sys.h"
 
 enum {
@@ -45,7 +45,7 @@ typedef struct GameMode{
     void (*bump)(void);
     void (*pickUp)(void);
     void (*getHeld)(int *color, int *amount);
-    Dork_String *highscores;
+    String *highscores;
 }GameMode;
 
 GameMode *game_mode;
