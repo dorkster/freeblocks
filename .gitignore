@@ -41,4 +41,10 @@ freeblocks.build/
 /pkg/freeblocks-android/app/src/main/jni/SDL2_mixer
 /pkg/freeblocks-android/app/src/main/jni/SDL2_ttf
 
+# Emscripten
+game_html.zip
+index.data
+index.html
+index.html.mem
+index.js
 

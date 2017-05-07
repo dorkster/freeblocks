@@ -20,7 +20,7 @@
 #define GAME_MODE_H
 
 #include <SDL.h>
-#include <SDL_mixer.h>
+#include <SDL/SDL_mixer.h>
 
 #include "string.h"
 #include "sys.h"

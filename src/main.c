@@ -27,6 +27,19 @@
 #include "menu.h"
 #include "sys.h"
 
+#ifdef __EMSCRIPTEN__
+#include "emscripten.h"
+#endif
+
+#ifdef __EMSCRIPTEN__
+static void emscriptenMainLoop() {
+    sysInput();
+    gameLogic();
+    drawEverything();
+    SDL_RenderPresent(renderer);
+}
+#endif
+
 int main(int argc, char *argv[]) {
     srand(time(0));
 
@@ -36,6 +49,10 @@ int main(int argc, char *argv[]) {
     gameModeInit();
     menuInit();
     gameTitle();
+
+#ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop(emscriptenMainLoop, 60, 1);
+#endif
 
     while(!quit) {
         startTimer = SDL_GetTicks();

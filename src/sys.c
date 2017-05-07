@@ -26,7 +26,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
-#include <SDL_mixer.h>
+#include <SDL/SDL_mixer.h>
 
 #include "sys.h"
 #include "game_mode.h"
@@ -114,9 +114,18 @@ void sysInitVars() {
 }
 
 bool sysInit() {
-    if(SDL_Init(SDL_INIT_EVERYTHING) == -1) return false;
-    if(TTF_Init() == -1) return false;
-    if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) == -1 ) return false;
+    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) == -1) {
+        logError("SDL_Init failied");
+        return false;
+    }
+    if(TTF_Init() == -1) {
+        logError("TTF_Init failed");
+        return false;
+    }
+    if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) == -1 ) {
+        logError("Mix_OpenAudio failied");
+        return false;
+    }
 
     sysInitVars();
 
@@ -742,7 +751,11 @@ void logInfo(const char* format, ...) {
 
 	va_start(args, format);
 
+#ifndef __EMSCRIPTEN__
 	SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, format, args);
+#else
+    vprintf(format, args);
+#endif
 
 	va_end(args);
 }
@@ -752,7 +765,11 @@ void logError(const char* format, ...) {
 
 	va_start(args, format);
 
+#ifndef __EMSCRIPTEN__
 	SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, format, args);
+#else
+    vprintf(format, args);
+#endif
 
 	va_end(args);
 }

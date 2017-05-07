@@ -39,7 +39,9 @@ void gameTitle() {
     menuAdd("Speed Level", 1, MAX_SPEED);
     menuAdd("High Scores", 0, 0);
     menuAdd("Options", 0, 0);
+#ifndef __EMSCRIPTEN__
     menuAdd("Quit", 0, 0);
+#endif
 
     menuItemSetOptionText(1, GAME_MODE_DEFAULT, "Normal");
     menuItemSetOptionText(1, GAME_MODE_JEWELS, "Jewels");
@@ -99,11 +101,13 @@ void gameOptions() {
     menuItemSetOptionText(2, 8, "Max");
 
 #ifndef __GCW0__
+#ifndef __EMSCRIPTEN__
     // 3 fullscreen toggle
     menuAdd("Fullscreen", 0, 1);
     menuItemSetVal(3, option_fullscreen);
     menuItemSetOptionText(3, 0, "Off");
     menuItemSetOptionText(3, 1, "On");
+#endif // __EMSCRIPTEN__
 #endif //__GCW0__
 
 #endif //__ANDROID__
@@ -262,7 +266,9 @@ void gameLogic() {
                 option_sound = menuItemGetVal(1);
                 option_music = menuItemGetVal(2);
 #ifndef __GCW0__
+#ifndef __EMSCRIPTEN__
                 option_fullscreen = menuItemGetVal(3);
+#endif // __EMSCRIPTEN__
 #endif //__GCW0__
 #endif //__ANDROID__
 
