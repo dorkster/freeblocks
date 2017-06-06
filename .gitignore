@@ -16,6 +16,7 @@ install_manifest.txt
 *.sln
 freeblocks.dir/
 Win32/
+.vs/
 
 # OSX
 CMakeScripts/
