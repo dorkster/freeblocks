@@ -48,6 +48,7 @@ index.data
 index.html
 index.html.mem
 index.js
+emscripten_output/
 
 # Others
 freeblocks_itch.tar.gz
