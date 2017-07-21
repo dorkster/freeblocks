@@ -33,6 +33,9 @@
 
 #ifdef __EMSCRIPTEN__
 static void emscriptenMainLoop() {
+    if (!emscriptenPersistData())
+        return;
+
     sysInput();
     gameLogic();
     drawEverything();

@@ -26,6 +26,8 @@
 
 #ifdef __EMSCRIPTEN__
 #include <SDL/SDL_mixer.h>
+bool emscripten_can_write;
+bool emscriptenPersistData();
 #else
 #include <SDL_mixer.h>
 #endif

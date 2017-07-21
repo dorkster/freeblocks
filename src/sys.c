@@ -30,6 +30,83 @@
 #include "sys.h"
 #include "game_mode.h"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+bool emscripten_fs_ready = false;
+
+void emscriptenFSInit() {
+    EM_ASM(
+        FS.mkdir('/persistent_data');
+        FS.mount(IDBFS,{},'/persistent_data');
+
+        Module.print("start file sync..");
+        Module.syncdone = 0;
+
+        FS.syncfs(true, function(err) {
+                       assert(!err);
+                       Module.print("end file sync..");
+                       Module.syncdone = 1;
+        });
+    );
+}
+
+void emscriptenLoadConfigs() {
+    sysConfigLoad();
+
+    GameMode *game_mode_current = game_mode;
+
+    game_mode = &game_mode_default;
+    sysHighScoresLoad();
+    game_mode = &game_mode_jewels;
+    sysHighScoresLoad();
+    game_mode = &game_mode_drop;
+    sysHighScoresLoad();
+
+    game_mode = game_mode_current;
+}
+
+bool emscriptenPersistData() {
+    if (emscripten_fs_ready)
+        return true;
+
+    if(emscripten_run_script_int("Module.syncdone") == 1) {
+        FILE *config_file = fopen(path_file_config.buf,"r+");
+        if (config_file == NULL) {
+            //persist Emscripten current data to Indexed Db
+            EM_ASM(
+                Module.print("Start File sync..");
+                Module.syncdone = 0;
+                FS.syncfs(false, function(err) {
+                    assert(!err);
+                    Module.print("End File sync..");
+                    Module.syncdone = 1;
+                });
+            );
+            emscriptenLoadConfigs();
+            return false;
+        }
+        else {
+            fclose(config_file);
+            emscripten_fs_ready = true;
+            emscriptenLoadConfigs();
+            return true;
+        }
+    }
+    return false;
+}
+
+void emscriptenWriteFile(char* filename) {
+    printf("Wrote to file: %s\n", filename);
+
+    EM_ASM(
+        //persist changes
+        FS.syncfs(false,function (err) {
+                          assert(!err);
+        });
+    );
+}
+#endif
+
 #define RENDERER_FLAGS (SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC)
 
 #define VERSION "0.5"
@@ -164,7 +241,15 @@ bool sysInit() {
 
     // load config
     sysConfigSetPaths();
+
+#ifdef __EMSCRIPTEN__
+    // set up persistent storage for Emscripten
+    // Emscripten can't load until the FS is synced
+    emscriptenFSInit();
+#else 
     sysConfigLoad();
+#endif
+
     sysConfigApply();
 
     return true;
@@ -530,15 +615,15 @@ void sysInputReset() {
 void sysConfigSetPaths() {
 #ifdef __ANDROID__
     String_Init(&path_dir_config, SDL_AndroidGetInternalStoragePath(), 0);
-#else
-#ifdef _MSC_VER
+#elif _MSC_VER
     String_Init(&path_dir_config, getenv("AppData"), "/freeblocks", 0);
+#elif __EMSCRIPTEN__
+    String_Init(&path_dir_config, "/persistent_data", 0);
 #else
     if (getenv("XDG_CONFIG_HOME"))
         String_Init(&path_dir_config, getenv("XDG_CONFIG_HOME"), "/freeblocks", 0);
     else
         String_Init(&path_dir_config, getenv("HOME"), "/.config/freeblocks", 0);
-#endif
 #endif
 
     String_Init(&path_file_config, path_dir_config.buf, "/config", 0);
@@ -646,6 +731,9 @@ void sysConfigSave() {
         fprintf(config_file,"joy_axis_y=%d\n",option_joy_axis_y);
 
         fclose(config_file);
+#ifdef __EMSCRIPTEN__
+        emscriptenWriteFile(path_file_config.buf);
+#endif
     } else printf("Error: Couldn't write to config file.\n");
 
     sysConfigApply();
@@ -736,6 +824,10 @@ void sysHighScoresSave() {
             fprintf(file,"%d\n",high_scores[i]);
         }
         fclose(file);
+
+#ifdef __EMSCRIPTEN__
+        emscriptenWriteFile(game_mode->highscores->buf);
+#endif
     } else printf("Error: Couldn't save high scores.\n");
 }
 
