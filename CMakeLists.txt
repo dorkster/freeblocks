@@ -1,5 +1,5 @@
+cmake_minimum_required (VERSION 3.10)
 Project (freeblocks)
-cmake_minimum_required (VERSION 2.6)
 
 Set (PACKAGE "FREEBLOCKS")
 Set (VERSION "0.5")
@@ -25,6 +25,7 @@ else()
     add_definitions(-Wall -Wextra -Wunused -Wshadow -Wunreachable-code -std=c99)
     add_definitions(-fno-math-errno -fno-exceptions)
     add_definitions(-Wno-unused-parameter)
+    add_definitions(-fcommon)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
