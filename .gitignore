@@ -52,3 +52,6 @@ emscripten_output/
 
 # Others
 freeblocks_itch.tar.gz
+
+# RadDBG
+*.rdi
